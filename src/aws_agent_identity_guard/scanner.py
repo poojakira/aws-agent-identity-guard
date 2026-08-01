@@ -80,37 +80,82 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
         condition = statement.get("Condition", {})
 
         if "NotAction" in statement or "NotResource" in statement:
-            findings.append(Finding(
-                "AIG001", "high",
-                "Agent policy uses NotAction or NotResource, which is difficult to reason about for autonomous workloads.",
-                "Replace negative policy matching with explicit allow lists for each tool action and resource.", index))
+            findings.append(
+                Finding(
+                    "AIG001",
+                    "high",
+                    "Agent policy uses NotAction or NotResource, which is difficult to reason about for autonomous workloads.",
+                    "Replace negative policy matching with explicit allow lists for each tool action and resource.",
+                    index,
+                )
+            )
 
         if any(a == "*" or a.endswith(":*") for a in actions):
-            findings.append(Finding(
-                "AIG002", "critical", "Agent policy grants wildcard service or account actions.",
-                "Scope actions to the exact services and APIs the agent tool is allowed to call.", index))
+            findings.append(
+                Finding(
+                    "AIG002",
+                    "critical",
+                    "Agent policy grants wildcard service or account actions.",
+                    "Scope actions to the exact services and APIs the agent tool is allowed to call.",
+                    index,
+                )
+            )
 
         if any(r == "*" for r in resources):
-            findings.append(Finding(
-                "AIG003", "high", "Agent policy grants access to all resources.",
-                "Bind permissions to specific ARNs and add tenant/session conditions where possible.", index))
+            findings.append(
+                Finding(
+                    "AIG003",
+                    "high",
+                    "Agent policy grants access to all resources.",
+                    "Bind permissions to specific ARNs and add tenant/session conditions where possible.",
+                    index,
+                )
+            )
 
-        if any(_matches_any(a, {"iam:PassRole"}) for a in actions) and "iam:PassedToService" not in str(condition):
-            findings.append(Finding(
-                "AIG004", "critical", "iam:PassRole is allowed without an iam:PassedToService condition.",
-                "Constrain PassRole to the one AWS service that runs the agent or tool workload.", index))
+        if any(
+            _matches_any(a, {"iam:PassRole"}) for a in actions
+        ) and "iam:PassedToService" not in str(condition):
+            findings.append(
+                Finding(
+                    "AIG004",
+                    "critical",
+                    "iam:PassRole is allowed without an iam:PassedToService condition.",
+                    "Constrain PassRole to the one AWS service that runs the agent or tool workload.",
+                    index,
+                )
+            )
 
         for action in actions:
             if _matches_any(action, PRIVILEGE_ACTIONS):
-                findings.append(Finding(
-                    "AIG005", "critical", f"Agent policy includes privilege-management action {action}.",
-                    "Separate agent runtime roles from IAM administration and role-broker permissions.", index))
+                findings.append(
+                    Finding(
+                        "AIG005",
+                        "critical",
+                        f"Agent policy includes privilege-management action {action}.",
+                        "Separate agent runtime roles from IAM administration and role-broker permissions.",
+                        index,
+                    )
+                )
             if _matches_any(action, TOOL_EXECUTION_PATTERNS) and any(r == "*" for r in resources):
-                findings.append(Finding(
-                    "AIG006", "high", f"Tool execution action {action} is not resource-scoped.",
-                    "Restrict tool execution to approved Lambda, SSM, Step Functions, ECS, or Bedrock resources.", index))
-            if _matches_any(action, SENSITIVE_DATA_PATTERNS) and "aws:PrincipalTag" not in str(condition):
-                findings.append(Finding(
-                    "AIG007", "medium", f"Sensitive-data action {action} has no visible principal/session tag condition.",
-                    "Use principal tags, session tags, or resource tags to bind data access to agent owner and tenant context.", index))
+                findings.append(
+                    Finding(
+                        "AIG006",
+                        "high",
+                        f"Tool execution action {action} is not resource-scoped.",
+                        "Restrict tool execution to approved Lambda, SSM, Step Functions, ECS, or Bedrock resources.",
+                        index,
+                    )
+                )
+            if _matches_any(action, SENSITIVE_DATA_PATTERNS) and "aws:PrincipalTag" not in str(
+                condition
+            ):
+                findings.append(
+                    Finding(
+                        "AIG007",
+                        "medium",
+                        f"Sensitive-data action {action} has no visible principal/session tag condition.",
+                        "Use principal tags, session tags, or resource tags to bind data access to agent owner and tenant context.",
+                        index,
+                    )
+                )
     return findings

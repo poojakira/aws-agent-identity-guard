@@ -28,7 +28,9 @@ def _print_text(findings: list[Finding]) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Scan AWS IAM policy JSON for agent identity risks")
+    parser = argparse.ArgumentParser(
+        description="Scan AWS IAM policy JSON for agent identity risks"
+    )
     parser.add_argument("policy", type=Path)
     parser.add_argument("--format", choices=("text", "json"), default="text")
     args = parser.parse_args(argv)
