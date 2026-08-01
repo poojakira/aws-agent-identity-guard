@@ -52,7 +52,7 @@ jobs:
       - name: Install security tools
         run: |
           python -m pip install --upgrade pip
-          pip install bandit==${{ env.BANDIT_VERSION }} pip-audit==${{ env.PIP_AUDIT_VERSION }} cyclonedx-bom==${{ env.CYCLONEDX_VERSION }}
+          pip install bandit==${{ env.BANDIT_VERSION }} pip-audit==${{ env.PIP_AUDIT_VERSION }} cyclonedx-bom==${{ env.CYCLONEDX_VERSION }} "lxml>=6.1.0"
           pip install -e ".[dev]"
       - run: bandit -r src/aws_agent_identity_guard -ll
       - run: pip-audit
