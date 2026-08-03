@@ -1,36 +1,72 @@
 # AWS Agent Identity Guard
 
-Static IAM and trust-policy checks for agentic AI workloads on AWS.
-
-The July/August 2026 security problem this targets is not another generic cloud misconfiguration scanner. AWS guidance for generative AI agents calls out excessive autonomy, session isolation, and IAM complexity as first-order risks for agents that can call tools, hold memory, and act across systems. CSA's 2026 cloud-threat survey also moved identity, AI, third-party dependencies, and APIs to the center of cloud risk. This project focuses on that intersection: agent identities with too much AWS authority.
+A static linter for IAM policies attached to AI agent roles on AWS. It reads IAM policy JSON files, flags overly permissive patterns, and exits non-zero if it finds problems. No AWS credentials needed — it's pure static analysis.
 
 ## What It Checks
 
-- Wildcard actions or resources in policies attached to agent runtimes
-- `iam:PassRole` without `iam:PassedToService` constraints
-- Privilege-management actions such as `iam:*`, `sts:AssumeRole`, and policy attachment APIs
-- Broad Bedrock, Lambda, SSM, Secrets Manager, KMS, S3, and CloudWatch Logs permissions
-- Trust policies missing external IDs, source-account/source-ARN constraints, or session-tag expectations
-- Findings mapped to severity and a concrete remediation note
+**Wildcard abuse**
+- `Action: *` or `Resource: *` in policies meant for agent runtimes
+
+**PassRole without constraints**
+- `iam:PassRole` missing `iam:PassedToService` conditions
+
+**Privilege escalation paths**
+- `iam:*`, `sts:AssumeRole`, policy attachment APIs (`iam:AttachRolePolicy`, `iam:PutRolePolicy`, etc.)
+
+**Overly broad service permissions**
+- Wide access to Bedrock, Lambda, SSM, Secrets Manager, KMS, S3, CloudWatch Logs
+
+**Weak trust policies**
+- Missing external ID, missing `aws:SourceAccount` / `aws:SourceArn` constraints, no session-tag expectations
+
+Each finding includes a severity level and a remediation suggestion.
+
+## Install
+
+Requires Python 3.10+. No external dependencies.
+
+```bash
+# From the repo root
+pip install -e .
+
+# Or install from a built wheel
+pip install aws-agent-identity-guard
+```
 
 ## Usage
 
 ```bash
-python -m pip install -e .
+# Text output (human-readable)
 aws-agent-identity-guard examples/agent_policy_wildcard.json --format text
+
+# JSON output (for CI pipelines)
 aws-agent-identity-guard examples/agent_policy_wildcard.json --format json
 ```
 
-Exit codes:
+### Exit codes
 
-- `0`: no high or critical findings
-- `1`: at least one high or critical finding
-- `2`: invalid input or CLI usage
+| Code | Meaning |
+|------|---------|
+| 0 | No high or critical findings |
+| 1 | At least one high or critical finding |
+| 2 | Invalid input or CLI error |
 
-## Scope
+## Use in CI
 
-This is a deterministic static analyzer for IAM JSON documents. It does not call AWS APIs, does not need credentials, and does not claim runtime enforcement. Use it in CI before deploying Bedrock agents, MCP servers, Lambda tools, Security Agent jobs, or other autonomous workloads that receive AWS permissions.
+Run it in a GitHub Actions step before deploying any agent that gets AWS permissions — Bedrock agents, MCP servers, Lambda-based tools, etc. If it exits 1, block the deploy.
 
-## Evidence
+```yaml
+- name: Lint agent IAM policy
+  run: aws-agent-identity-guard deploy/agent-role-policy.json --format text
+```
 
-The current repository ships unit tests and example policies. Public benchmark, false-positive, or enterprise deployment claims require committed evaluation artifacts and should not be inferred from this README.
+## Running Tests
+
+```bash
+pip install -e ".[dev]"
+pytest
+```
+
+## License
+
+MIT
