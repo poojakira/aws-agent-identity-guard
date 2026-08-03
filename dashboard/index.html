@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS Agent Identity Guard — IAM Findings Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d1117;color:#c9d1d9;line-height:1.6;padding:2rem}
+h1{color:#58a6ff;font-size:1.8rem;margin-bottom:0.5rem}
+h2{color:#79c0ff;font-size:1.3rem;margin:2rem 0 1rem;border-bottom:1px solid #21262d;padding-bottom:0.5rem}
+h3{color:#d2a8ff;font-size:1.1rem;margin:1.5rem 0 0.75rem}
+.subtitle{color:#8b949e;font-size:0.95rem;margin-bottom:2rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1.25rem;text-align:center}
+.card .count{font-size:2.2rem;font-weight:700;margin-bottom:0.25rem}
+.card .label{color:#8b949e;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.5px}
+.critical .count{color:#f85149}
+.high .count{color:#f0883e}
+.medium .count{color:#d29922}
+.low .count{color:#3fb950}
+.pass .count{color:#58a6ff}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem}
+th,td{padding:0.75rem 1rem;text-align:left;border-bottom:1px solid #21262d}
+th{background:#161b22;color:#79c0ff;font-weight:600;position:sticky;top:0}
+tr:hover{background:#1c2128}
+.badge{display:inline-block;padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:600;text-transform:uppercase}
+.badge-critical{background:#f8514922;color:#f85149;border:1px solid #f8514955}
+.badge-high{background:#f0883e22;color:#f0883e;border:1px solid #f0883e55}
+.badge-medium{background:#d2992222;color:#d29922;border:1px solid #d2992255}
+.badge-low{background:#3fb95022;color:#3fb950;border:1px solid #3fb95055}
+code{background:#1c2128;padding:0.15rem 0.4rem;border-radius:4px;font-size:0.85rem;color:#79c0ff}
+pre{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1.25rem;overflow-x:auto;font-size:0.85rem;line-height:1.5;color:#c9d1d9;margin:1rem 0}
+.json-key{color:#79c0ff}
+.json-str{color:#a5d6ff}
+.json-val{color:#d2a8ff}
+.finding-box{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1rem 1.25rem;margin:0.75rem 0}
+.finding-box .title{color:#f0f6fc;font-weight:600;margin-bottom:0.25rem}
+.finding-box .remediation{color:#8b949e;font-size:0.85rem;margin-top:0.5rem;padding-left:1rem;border-left:2px solid #30363d}
+.run-box{background:#0d1117;border:1px solid #238636;border-radius:8px;padding:1.25rem;margin:1rem 0}
+.run-box code{background:#161b22;display:block;padding:0.75rem 1rem;margin:0.5rem 0;border-radius:4px;color:#3fb950}
+.section{margin-bottom:3rem}
+.header-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:1.5rem}
+.timestamp{color:#8b949e;font-size:0.8rem}
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem}
+.check-card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1rem 1.25rem}
+.check-card .rule-id{color:#d2a8ff;font-weight:700;font-size:0.9rem}
+.check-card .desc{margin-top:0.4rem;font-size:0.88rem;color:#c9d1d9}
+.check-card .patterns{margin-top:0.5rem;font-size:0.8rem;color:#8b949e}
+</style>
+</head>
+<body>
+<div class="header-bar">
+<div>
+<h1>&#x1F6E1; AWS Agent Identity Guard</h1>
+<p class="subtitle">Static IAM Policy Scanner for AI Agent Workloads — Findings Dashboard</p>
+</div>
+<div class="timestamp">Last scan: <span id="scan-time"></span></div>
+</div>
+
+<!-- Section 1: Scan Results Summary -->
+<div class="section">
+<h2>&#x1F4CA; Scan Results Summary — Example Agent Policy</h2>
+<p style="color:#8b949e;margin-bottom:1rem;">Results from scanning <code>examples/agent_policy_wildcard.json</code></p>
+<div class="grid">
+<div class="card critical"><div class="count">3</div><div class="label">Critical</div></div>
+<div class="card high"><div class="count">2</div><div class="label">High</div></div>
+<div class="card medium"><div class="count">0</div><div class="label">Medium</div></div>
+<div class="card low"><div class="count">0</div><div class="label">Low</div></div>
+<div class="card pass"><div class="count">5</div><div class="label">Total Findings</div></div>
+</div>
+</div>
+
+<!-- Section 2: Finding Details Table -->
+<div class="section">
+<h2>&#x1F50D; Finding Details</h2>
+<p style="color:#8b949e;margin-bottom:1rem;">Detailed findings from scanning the example wildcard agent policy</p>
+<div style="overflow-x:auto;">
+<table>
+<thead>
+<tr><th>Rule</th><th>Severity</th><th>Finding</th><th>Remediation</th><th>Statement</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AIG002</code></td>
+<td><span class="badge badge-critical">Critical</span></td>
+<td>Agent policy grants wildcard service or account actions.</td>
+<td>Scope actions to the exact services and APIs the agent tool is allowed to call.</td>
+<td>#0</td>
+</tr>
+<tr>
+<td><code>AIG003</code></td>
+<td><span class="badge badge-high">High</span></td>
+<td>Agent policy grants access to all resources.</td>
+<td>Bind permissions to specific ARNs and add tenant/session conditions where possible.</td>
+<td>#0</td>
+</tr>
+<tr>
+<td><code>AIG004</code></td>
+<td><span class="badge badge-critical">Critical</span></td>
+<td>iam:PassRole is allowed without an iam:PassedToService condition.</td>
+<td>Constrain PassRole to the one AWS service that runs the agent or tool workload.</td>
+<td>#0</td>
+</tr>
+<tr>
+<td><code>AIG005</code></td>
+<td><span class="badge badge-critical">Critical</span></td>
+<td>Agent policy includes privilege-management action iam:PassRole.</td>
+<td>Separate agent runtime roles from IAM administration and role-broker permissions.</td>
+<td>#0</td>
+</tr>
+<tr>
+<td><code>AIG006</code></td>
+<td><span class="badge badge-high">High</span></td>
+<td>Tool execution action lambda:InvokeFunction is not resource-scoped.</td>
+<td>Restrict tool execution to approved Lambda, SSM, Step Functions, ECS, or Bedrock resources.</td>
+<td>#0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+<!-- Section 3: Example Scan Output Visualization -->
+<div class="section">
+<h2>&#x1F4C4; Example Policy &amp; Scan Output</h2>
+<h3>Input Policy: <code>agent_policy_wildcard.json</code></h3>
+<pre>{
+  <span class="json-key">"Version"</span>: <span class="json-str">"2012-10-17"</span>,
+  <span class="json-key">"Statement"</span>: [
+    {
+      <span class="json-key">"Effect"</span>: <span class="json-str">"Allow"</span>,
+      <span class="json-key">"Action"</span>: [<span class="json-str">"bedrock:*"</span>, <span class="json-str">"lambda:InvokeFunction"</span>, <span class="json-str">"iam:PassRole"</span>],
+      <span class="json-key">"Resource"</span>: <span class="json-str">"*"</span>
+    }
+  ]
+}</pre>
+<h3>Scanner JSON Output</h3>
+<pre>[
+  {<span class="json-key">"rule_id"</span>: <span class="json-str">"AIG002"</span>, <span class="json-key">"severity"</span>: <span class="json-str">"critical"</span>, <span class="json-key">"message"</span>: <span class="json-str">"Agent policy grants wildcard service or account actions."</span>, <span class="json-key">"statement_index"</span>: <span class="json-val">0</span>},
+  {<span class="json-key">"rule_id"</span>: <span class="json-str">"AIG003"</span>, <span class="json-key">"severity"</span>: <span class="json-str">"high"</span>, <span class="json-key">"message"</span>: <span class="json-str">"Agent policy grants access to all resources."</span>, <span class="json-key">"statement_index"</span>: <span class="json-val">0</span>},
+  {<span class="json-key">"rule_id"</span>: <span class="json-str">"AIG004"</span>, <span class="json-key">"severity"</span>: <span class="json-str">"critical"</span>, <span class="json-key">"message"</span>: <span class="json-str">"iam:PassRole is allowed without an iam:PassedToService condition."</span>, <span class="json-key">"statement_index"</span>: <span class="json-val">0</span>},
+  {<span class="json-key">"rule_id"</span>: <span class="json-str">"AIG005"</span>, <span class="json-key">"severity"</span>: <span class="json-str">"critical"</span>, <span class="json-key">"message"</span>: <span class="json-str">"Agent policy includes privilege-management action iam:PassRole."</span>, <span class="json-key">"statement_index"</span>: <span class="json-val">0</span>},
+  {<span class="json-key">"rule_id"</span>: <span class="json-str">"AIG006"</span>, <span class="json-key">"severity"</span>: <span class="json-str">"high"</span>, <span class="json-key">"message"</span>: <span class="json-str">"Tool execution action lambda:InvokeFunction is not resource-scoped."</span>, <span class="json-key">"statement_index"</span>: <span class="json-val">0</span>}
+]</pre>
+</div>
+
+
+<!-- Section 4: Quick Reference of Checks -->
+<div class="section">
+<h2>&#x2705; Scanner Rules Reference</h2>
+<p style="color:#8b949e;margin-bottom:1rem;">All checks performed by <code>scan_policy_document()</code> on each Allow statement</p>
+<div class="check-grid">
+<div class="check-card">
+<div class="rule-id">AIG001 <span class="badge badge-high">High</span></div>
+<div class="desc">Detects use of <code>NotAction</code> or <code>NotResource</code> in agent policies — difficult to reason about for autonomous workloads.</div>
+<div class="patterns">Trigger: Statement contains NotAction or NotResource key</div>
+</div>
+<div class="check-card">
+<div class="rule-id">AIG002 <span class="badge badge-critical">Critical</span></div>
+<div class="desc">Flags wildcard service actions (<code>*</code> or <code>service:*</code>) that give agents unrestricted API access.</div>
+<div class="patterns">Trigger: Action ends with <code>:*</code> or is <code>*</code></div>
+</div>
+<div class="check-card">
+<div class="rule-id">AIG003 <span class="badge badge-high">High</span></div>
+<div class="desc">Flags <code>Resource: "*"</code> — agent has access to all resources in the account.</div>
+<div class="patterns">Trigger: Resource list contains <code>"*"</code></div>
+</div>
+<div class="check-card">
+<div class="rule-id">AIG004 <span class="badge badge-critical">Critical</span></div>
+<div class="desc">Detects <code>iam:PassRole</code> without <code>iam:PassedToService</code> condition — agent can pass roles to any service.</div>
+<div class="patterns">Trigger: iam:PassRole action without condition constraint</div>
+</div>
+<div class="check-card">
+<div class="rule-id">AIG005 <span class="badge badge-critical">Critical</span></div>
+<div class="desc">Flags privilege-management actions that let agents modify IAM or assume other roles.</div>
+<div class="patterns">Actions: <code>iam:*</code>, <code>iam:CreateRole</code>, <code>iam:PutRolePolicy</code>, <code>iam:AttachRolePolicy</code>, <code>iam:CreatePolicy</code>, <code>iam:CreatePolicyVersion</code>, <code>iam:SetDefaultPolicyVersion</code>, <code>iam:PassRole</code>, <code>sts:AssumeRole</code></div>
+</div>
+<div class="check-card">
+<div class="rule-id">AIG006 <span class="badge badge-high">High</span></div>
+<div class="desc">Tool-execution actions without resource scoping — agent can invoke any function/command/task.</div>
+<div class="patterns">Actions: <code>lambda:InvokeFunction</code>, <code>ssm:SendCommand</code>, <code>ssm:StartSession</code>, <code>states:StartExecution</code>, <code>ecs:RunTask</code>, <code>bedrock:Invoke*</code>, <code>bedrock-agent*:Invoke*</code></div>
+</div>
+<div class="check-card">
+<div class="rule-id">AIG007 <span class="badge badge-medium">Medium</span></div>
+<div class="desc">Sensitive data access without principal/session tag conditions — no tenant isolation for agent data reads.</div>
+<div class="patterns">Actions: <code>secretsmanager:GetSecretValue</code>, <code>ssm:GetParameter*</code>, <code>kms:Decrypt</code>, <code>s3:GetObject</code>, <code>logs:GetLogEvents</code></div>
+</div>
+</div>
+</div>
+
+
+<!-- Section 5: Run Instructions -->
+<div class="section">
+<h2>&#x1F680; Run Instructions</h2>
+<div class="run-box">
+<h3 style="color:#3fb950;margin-bottom:0.75rem">Install</h3>
+<code>pip install aws-agent-identity-guard</code>
+</div>
+<div class="run-box">
+<h3 style="color:#3fb950;margin-bottom:0.75rem">Scan a Policy File (CLI)</h3>
+<code>aws-agent-identity-guard scan examples/agent_policy_wildcard.json</code>
+</div>
+<div class="run-box">
+<h3 style="color:#3fb950;margin-bottom:0.75rem">Scan Programmatically (Python)</h3>
+<code>from aws_agent_identity_guard import scan_policy_document</code>
+<code>import json</code>
+<code style="margin-top:0.5rem">with open("policy.json") as f:</code>
+<code>&nbsp;&nbsp;&nbsp;&nbsp;doc = json.load(f)</code>
+<code style="margin-top:0.5rem">findings = scan_policy_document(doc)</code>
+<code>for f in findings:</code>
+<code>&nbsp;&nbsp;&nbsp;&nbsp;print(f"{f.severity.upper()} [{f.rule_id}] {f.message}")</code>
+</div>
+<div class="run-box">
+<h3 style="color:#3fb950;margin-bottom:0.75rem">Run Tests</h3>
+<code>pytest tests/ -v --cov --cov-fail-under=80</code>
+</div>
+</div>
+
+<footer style="text-align:center;color:#484f58;font-size:0.8rem;margin-top:3rem;padding-top:1rem;border-top:1px solid #21262d;">
+AWS Agent Identity Guard — Static IAM Policy Scanner for AI Agent Workloads<br>
+Dashboard generated for security review. Open this file in any browser — no server required.
+</footer>
+
+<script>
+document.getElementById('scan-time').textContent = new Date().toLocaleString();
+</script>
+</body>
+</html>
