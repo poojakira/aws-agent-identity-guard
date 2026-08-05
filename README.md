@@ -4,6 +4,16 @@
 
 A static linter for IAM policies attached to AI agent roles on AWS. It reads IAM policy JSON files, flags overly permissive patterns, and exits non-zero if it finds problems. No AWS credentials needed — it's pure static analysis.
 
+## Scope and Limitations
+
+This is a **static IAM policy linter** with 7 core rule categories. It reads policy JSON and flags specific anti-patterns. It does not:
+
+- Calculate effective permissions by combining identity policies, resource policies, SCPs, permission boundaries, session policies, and trust relationships
+- Understand cross-account trust or condition key semantics at runtime
+- Simulate AWS authorization logic
+
+For complete effective-permission analysis, use AWS IAM Access Analyzer or the AWS Policy Simulator. This tool catches the most common agent-role mistakes quickly in CI, without requiring AWS credentials.
+
 ## What It Checks
 
 **Wildcard abuse**
