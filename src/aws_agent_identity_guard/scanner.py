@@ -166,13 +166,9 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
 # ---------------------------------------------------------------------------
 
 def _is_cross_account_principal(principal: Any) -> bool:
-    """Return True if any principal ARN references an account via arn:aws:iam::."""
+    """Return True if any principal ARN references an external account via arn:aws:iam::<id>:..."""
     arns = _as_list(principal)
-    return any(
-        arn.startswith("arn:aws:iam::") and not arn.endswith(":root")
-        or (arn.startswith("arn:aws:iam::") and arn.endswith(":root"))
-        for arn in arns
-    )
+    return any(arn.startswith("arn:aws:iam::") for arn in arns)
 
 
 def scan_trust_policy(document: dict[str, Any]) -> list[Finding]:

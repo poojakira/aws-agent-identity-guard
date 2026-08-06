@@ -68,13 +68,10 @@ data "aws_iam_policy_document" "scanner_permissions" {
       "iam:ListUserTags",
     ]
     resources = ["*"]
-    # Restrict to the account containing this role to prevent data from
-    # being collected from unintended accounts.
-    condition {
-      test     = "StringEquals"
-      variable = "aws:RequestedRegion"
-      values   = ["us-east-1", "us-west-2"]
-    }
+    # NOTE: IAM is a global service — region conditions do NOT apply.
+    # Resource-level restriction is not possible for iam:List*/Get* actions
+    # because they operate on account-wide resources.
+    # The scope is inherently limited to the account containing this role.
   }
 
   statement {

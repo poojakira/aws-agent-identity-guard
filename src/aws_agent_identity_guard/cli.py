@@ -192,9 +192,13 @@ def main(argv: list[str] | None = None) -> int:
                 role_name_filter=args.role_name,
             )
             report = scanner.scan_account()
+        except (ImportError, ValueError) as exc:
+            print(f"ERROR: configuration problem: {exc}")
+            return 2
         except Exception as exc:  # noqa: BLE001
+            # Boto3 ClientError, NoCredentialsError, etc.
             # Surface the real error — do not swallow it
-            print(f"ERROR during live scan: {exc}")
+            print(f"ERROR during live scan: {type(exc).__name__}: {exc}")
             return 2
 
         report_dict = report.to_dict()
