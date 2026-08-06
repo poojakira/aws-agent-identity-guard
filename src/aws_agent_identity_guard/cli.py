@@ -111,13 +111,130 @@ def _build_sarif(policy_path: Path, findings: list[Finding]) -> dict:
     }
 
 
+def _print_live_text(report: dict) -> None:
+    """Print a live-scan report in human-readable format."""
+    print(f"Account : {report['account_id']}")
+    print(f"Region  : {report['region']}")
+    print(f"Scanned : {report['roles_scanned']} roles, {report['users_scanned']} users")
+    print(f"Summary : {report['summary']}")
+    print()
+    if not report["findings"]:
+        print("PASS: no findings")
+        return
+    for f in report["findings"]:
+        resource = f.get("resource_name") or f.get("resource_arn", "?")
+        policy = f" [{f['policy_name']}]" if f.get("policy_name") else ""
+        print(f"{f['severity'].upper()} {f['rule_id']} {resource}{policy}: {f['message']}")
+        print(f"  remediation: {f['remediation']}")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Scan AWS IAM policy JSON for agent identity risks"
     )
-    parser.add_argument("policy", type=Path)
-    parser.add_argument("--format", choices=("text", "json", "sarif"), default="text")
+
+    # Static analysis (existing behaviour)
+    parser.add_argument(
+        "policy",
+        type=Path,
+        nargs="?",
+        help="Path to a local IAM policy JSON file (static analysis mode).",
+    )
+
+    # Live scan mode
+    parser.add_argument(
+        "--live-scan",
+        action="store_true",
+        help=(
+            "Scan the live AWS account using Boto3. "
+            "Requires AWS credentials and iam:List*/Get* permissions. "
+            "Install boto3 with: pip install 'aws-agent-identity-guard[live]'"
+        ),
+    )
+    parser.add_argument(
+        "--role-name",
+        default=None,
+        help="Scan only this specific IAM role name (used with --live-scan).",
+    )
+    parser.add_argument(
+        "--region",
+        default=None,
+        help="AWS region for live scanning (default: session default or us-east-1).",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help="Write output to this file instead of stdout.",
+    )
+    parser.add_argument(
+        "--format",
+        choices=("text", "json", "sarif"),
+        default="text",
+    )
     args = parser.parse_args(argv)
+
+    # ── Live scan mode ────────────────────────────────────────────────────────
+    if args.live_scan:
+        try:
+            from .live_scanner import LiveAccountScanner  # noqa: PLC0415
+        except ImportError:
+            print(
+                "ERROR: boto3 is not installed. "
+                "Run: pip install 'aws-agent-identity-guard[live]'",
+                flush=True,
+            )
+            return 2
+
+        try:
+            scanner = LiveAccountScanner(
+                region=args.region,
+                role_name_filter=args.role_name,
+            )
+            report = scanner.scan_account()
+        except Exception as exc:  # noqa: BLE001
+            # Surface the real error — do not swallow it
+            print(f"ERROR during live scan: {exc}")
+            return 2
+
+        report_dict = report.to_dict()
+        has_high = report_dict["summary"].get("critical", 0) + report_dict["summary"].get("high", 0) > 0
+
+        if args.format == "json":
+            output_text = json.dumps(report_dict, indent=2, default=str)
+        elif args.format == "sarif":
+            # Convert live findings to SARIF format
+            from .scanner import Finding  # noqa: PLC0415
+            sarif_findings = [
+                Finding(
+                    rule_id=f["rule_id"],
+                    severity=f["severity"],
+                    message=f["message"],
+                    remediation=f["remediation"],
+                    statement_index=f.get("statement_index"),
+                )
+                for f in report_dict["findings"]
+            ]
+            sarif_path = args.output or Path(f"scan-{report_dict['account_id']}.sarif")
+            output_text = json.dumps(
+                _build_sarif(sarif_path, sarif_findings), indent=2
+            )
+        else:
+            _print_live_text(report_dict)
+            return 1 if has_high else 0
+
+        if args.output:
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(output_text, encoding="utf-8")
+            print(f"Written to {args.output}")
+        else:
+            print(output_text)
+
+        return 1 if has_high else 0
+
+    # ── Static analysis mode ──────────────────────────────────────────────────
+    if args.policy is None:
+        parser.error("Either provide a policy JSON file or use --live-scan")
 
     findings = scan_policy_document(_load_json(args.policy))
     if args.format == "json":
