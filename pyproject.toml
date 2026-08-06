@@ -14,7 +14,9 @@ keywords = ["aws", "iam", "agentic-ai", "bedrock", "security", "least-privilege"
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=8.2", "ruff>=0.8"]
+# Live scanning requires boto3 and an AWS account with IAM read permissions
+live = ["boto3>=1.34.0"]
+dev = ["pytest>=8.2", "ruff>=0.8", "moto[iam]>=5.0.0", "boto3>=1.34.0"]
 
 [project.scripts]
 aws-agent-identity-guard = "aws_agent_identity_guard.cli:main"

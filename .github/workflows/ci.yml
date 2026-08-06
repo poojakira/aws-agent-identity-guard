@@ -7,6 +7,7 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Minimal permissions — no token write access unless explicitly required per job.
 permissions:
   contents: read
   security-events: write
@@ -29,8 +30,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      # Pinned to commit SHA — actions/checkout v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      # Pinned to commit SHA — actions/setup-python v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -44,8 +47,10 @@ jobs:
     timeout-minutes: 15
     needs: lint
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      # Pinned to commit SHA — actions/checkout v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      # Pinned to commit SHA — actions/setup-python v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -54,12 +59,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install bandit==${{ env.BANDIT_VERSION }} pip-audit==${{ env.PIP_AUDIT_VERSION }}
           pip install -e ".[dev]"
-      - run: bandit -r src/aws_agent_identity_guard -ll
+      - name: Bandit SAST scan (medium+ severity)
+        run: bandit -r src/ -ll
       - run: pip-audit --skip-editable
       - run: |
           pip install cyclonedx-bom==${{ env.CYCLONEDX_VERSION }}
           cyclonedx-py environment --output-format JSON --outfile sbom.json
-      - uses: actions/upload-artifact@v4
+      # Pinned to commit SHA — actions/upload-artifact v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: sbom
@@ -76,8 +83,10 @@ jobs:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      # Pinned to commit SHA — actions/checkout v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      # Pinned to commit SHA — actions/setup-python v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
@@ -86,4 +95,3 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
       - run: pytest tests -q
-

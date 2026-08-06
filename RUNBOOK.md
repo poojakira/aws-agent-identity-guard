@@ -3,7 +3,8 @@
 ## Prerequisites
 
 - Python 3.10+
-- No AWS credentials needed (this is pure static analysis of JSON policy files)
+- **Static mode**: No AWS credentials needed (pure JSON analysis)
+- **Live mode**: AWS credentials with read-only IAM permissions (see README)
 
 ## Setup
 
@@ -17,71 +18,120 @@ python -m venv .venv
 # Linux/macOS
 source .venv/bin/activate
 
+# Static analysis only (no external deps)
+pip install -e .
+
+# With live AWS scanning support
+pip install -e ".[live]"
+
+# Development (includes test + lint tools)
 pip install -e ".[dev]"
 ```
 
-## Run the Scanner
+## Run the Scanner — Static Mode
 
-Scan a policy file:
-
-```bash
-aws-agent-identity-guard examples/agent_policy_wildcard.json
-```
-
-Output formats:
+Scan a local policy JSON file:
 
 ```bash
-# Plain text (default)
-aws-agent-identity-guard policy.json --format text
+# Human-readable text output (default)
+aws-agent-identity-guard examples/agent_policy_wildcard.json --format text
 
-# JSON output
-aws-agent-identity-guard policy.json --format json
+# JSON output (for CI pipelines)
+aws-agent-identity-guard examples/agent_policy_wildcard.json --format json
 
-# Exit code only (for CI)
-aws-agent-identity-guard policy.json --format quiet
+# SARIF 2.1.0 output (for GitHub Code Scanning)
+aws-agent-identity-guard examples/agent_policy_wildcard.json --format sarif
 ```
 
-## What It Checks
+## Run the Scanner — Live AWS Mode
+
+Scan all IAM roles in a live AWS account:
+
+```bash
+# Requires AWS credentials configured (env vars, ~/.aws/, instance profile)
+aws-agent-identity-guard --live-scan --format json
+
+# Scan a single role
+aws-agent-identity-guard --live-scan --role-name my-bedrock-agent-role --format text
+
+# Write SARIF to file
+aws-agent-identity-guard --live-scan --format sarif --output scan-results.sarif
+```
+
+## Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | No high or critical findings |
+| 1 | At least one high or critical finding (deploy should be blocked) |
+| 2 | Invalid input, missing credentials, or runtime error |
+
+## Rules
+
+### Identity Policy Rules (scan_policy_document)
 
 | Rule | Severity | Detects |
 |------|----------|---------|
-| AIG001 | CRITICAL | Wildcard actions (`*`) in agent policies |
-| AIG002 | HIGH | `iam:PassRole` without `iam:PassedToService` constraint |
-| AIG003 | HIGH | Privilege escalation actions (iam:*, sts:AssumeRole, policy attachment) |
-| AIG004 | MEDIUM | Broad Bedrock/Lambda/SSM/Secrets Manager permissions |
-| AIG005 | MEDIUM | Broad S3/CloudWatch Logs permissions |
-| AIG006 | HIGH | Trust policy missing external ID or source constraints |
-| AIG007 | MEDIUM | Trust policy missing session-tag expectations |
+| AIG001 | HIGH | NotAction or NotResource (hard to reason about for agents) |
+| AIG002 | CRITICAL | Wildcard actions (`*` or `service:*`) |
+| AIG003 | HIGH | Wildcard resources (`Resource: *`) |
+| AIG004 | CRITICAL | `iam:PassRole` without `iam:PassedToService` condition |
+| AIG005 | CRITICAL | Privilege-management actions (iam:*, sts:AssumeRole, policy attachment) |
+| AIG006 | HIGH | Tool execution actions (Lambda, SSM, ECS, Bedrock) not resource-scoped |
+| AIG007 | MEDIUM | Sensitive-data actions without principal/session tag condition |
+
+### Trust Policy Rules (scan_trust_policy)
+
+| Rule | Severity | Detects |
+|------|----------|---------|
+| AIG-TP001 | CRITICAL | Wildcard principal (`"*"`) — any identity can assume the role |
+| AIG-TP002 | HIGH | Cross-account trust without `sts:ExternalId` (confused-deputy) |
+| AIG-TP003 | HIGH | Cross-account trust without `aws:SourceArn` condition |
+
+### Live Scan Additional
+
+| Rule | Severity | Detects |
+|------|----------|---------|
+| AIG-PB001 | MEDIUM | Role with high/critical findings and no permission boundary |
 
 ## Run Tests
 
 ```bash
-pytest tests/ -v
+# Static scanner tests (no AWS credentials needed)
+pytest tests/test_scanner.py -v
+
+# Live scanner tests (uses moto — no real AWS calls)
+pytest tests/test_live_scanner.py -v
+
+# All tests
+pytest -v
 ```
 
 ## CI Usage
 
 ```yaml
-- name: Check agent IAM policy
+- name: Lint agent IAM policy
   run: |
-    pip install -e .
-    aws-agent-identity-guard path/to/agent_policy.json --format quiet
+    pip install aws-agent-identity-guard
+    aws-agent-identity-guard deploy/agent-role-policy.json --format text
 ```
-
-The CLI exits non-zero if any CRITICAL or HIGH findings are found.
-
-## View the Dashboard
-
-```bash
-python -m http.server 8080 --directory dashboard
-# Open http://localhost:8080
-```
-
-Or view hosted: https://poojakira.github.io/mlsec-dashboards/aws-agent-identity-guard/
 
 ## Known Limitations
 
-- Static analysis only — does not connect to AWS APIs
-- Cannot detect runtime privilege escalation chains
-- Does not evaluate resource-based policies or SCPs
-- Small rule set (7 rules) — not comprehensive
+- **Static mode**: Analyzes one policy document at a time. Cannot compute effective permissions (requires combining identity policies + resource policies + SCPs + permission boundaries + session policies + explicit denies).
+- **Live mode**: Enumerates roles and users but does not:
+  - Evaluate resource-based policies on target resources
+  - Query SCPs from AWS Organizations
+  - Simulate authorization decisions (use IAM Policy Simulator for that)
+  - Analyze session policies from STS AssumeRole calls
+- Rule set covers 10 rules across 3 categories. Not a replacement for IAM Access Analyzer.
+- No support for ABAC-heavy environments where tag conditions are the primary control.
+
+## Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| `ModuleNotFoundError: No module named 'boto3'` | Install with `pip install 'aws-agent-identity-guard[live]'` |
+| `NoCredentialsError` during live scan | Configure AWS credentials (env vars, `~/.aws/credentials`, or instance profile) |
+| `AccessDenied` errors | Ensure the scanning identity has the IAM read-only permissions listed in README |
+| Exit code 2 with no output | Check stderr — likely a JSON parse error or missing file |

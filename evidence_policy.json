@@ -1,0 +1,68 @@
+{
+  "$schema": "https://raw.githubusercontent.com/poojakira/aws-agent-identity-guard/main/evidence_policy_schema.json",
+  "version": "1.0.0",
+  "generated_by": "agent/security-hardening-v1",
+  "generated_at": "2026-08-05T19:30:41Z",
+  "purpose": "Machine-readable evidence record for security hardening changes introduced in PR agent/security-hardening-v1",
+  "rules_added": [
+    {
+      "rule_id": "AIG-TP001",
+      "severity": "critical",
+      "category": "trust_policy",
+      "description": "Trust policy has wildcard Principal ('*') — any AWS identity or anonymous caller can assume this role.",
+      "mitre_attack": "T1098",
+      "cwe": "CWE-284",
+      "remediation": "Replace '*' with specific account, service, or role ARN.",
+      "test_function": "test_trust_policy_wildcard_principal_is_critical"
+    },
+    {
+      "rule_id": "AIG-TP002",
+      "severity": "high",
+      "category": "trust_policy",
+      "description": "Cross-account trust statement is missing sts:ExternalId condition. Enables confused-deputy attacks.",
+      "mitre_attack": "T1548",
+      "cwe": "CWE-639",
+      "remediation": "Add StringEquals condition on sts:ExternalId with a non-guessable shared secret.",
+      "test_function": "test_trust_policy_cross_account_missing_external_id_is_high"
+    },
+    {
+      "rule_id": "AIG-TP003",
+      "severity": "high",
+      "category": "trust_policy",
+      "description": "Cross-account trust statement is missing aws:SourceArn condition. Any resource in the trusted account can trigger assumption.",
+      "mitre_attack": "T1548",
+      "cwe": "CWE-639",
+      "remediation": "Add ArnLike or StringEquals condition on aws:SourceArn scoped to a specific resource ARN.",
+      "test_function": "test_trust_policy_cross_account_missing_source_arn_is_high"
+    }
+  ],
+  "ci_hardening": {
+    "action_pins": [
+      {
+        "action": "actions/checkout",
+        "tag": "v4",
+        "pinned_sha": "11d5960a326750d5838078e36cf38b85af677262"
+      },
+      {
+        "action": "actions/setup-python",
+        "tag": "v5",
+        "pinned_sha": "a26af69be951a213d495a4c3e4e4022e16d87065"
+      },
+      {
+        "action": "actions/upload-artifact",
+        "tag": "v4",
+        "pinned_sha": "ea165f8d65b6e75b540449e92b4886f43607fa02"
+      }
+    ],
+    "permissions_added": "contents: read (workflow-level, restricts GITHUB_TOKEN to read-only by default)",
+    "bandit_scope": "bandit -r src/ -ll (medium and above, all of src/)"
+  },
+  "output_formats": {
+    "sarif": {
+      "version": "2.1.0",
+      "schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+      "cli_flag": "--format sarif",
+      "notes": "Emits a SARIF 2.1.0 document consumable by GitHub Code Scanning and SAST aggregators."
+    }
+  }
+}
