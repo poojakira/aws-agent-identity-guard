@@ -159,3 +159,102 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                     )
                 )
     return findings
+
+
+# ---------------------------------------------------------------------------
+# Trust-policy rules
+# ---------------------------------------------------------------------------
+
+def _is_cross_account_principal(principal: Any) -> bool:
+    """Return True if any principal ARN references an account via arn:aws:iam::."""
+    arns = _as_list(principal)
+    return any(
+        arn.startswith("arn:aws:iam::") and not arn.endswith(":root")
+        or (arn.startswith("arn:aws:iam::") and arn.endswith(":root"))
+        for arn in arns
+    )
+
+
+def scan_trust_policy(document: dict[str, Any]) -> list[Finding]:
+    """Scan an IAM role *trust* policy (AssumeRolePolicyDocument) for agent identity risks.
+
+    Rules
+    -----
+    AIG-TP001  CRITICAL  Wildcard principal — any AWS identity can assume this role.
+    AIG-TP002  HIGH      Cross-account trust without sts:ExternalId condition (confused-deputy).
+    AIG-TP003  HIGH      Cross-account trust without aws:SourceArn condition (lateral-movement).
+    """
+    if not isinstance(document, dict):
+        raise TypeError(f"trust policy document must be a dict, got {type(document).__name__}")
+
+    findings: list[Finding] = []
+
+    for index, statement in enumerate(_statements(document)):
+        if statement.get("Effect", "Allow") != "Allow":
+            continue
+
+        principal = statement.get("Principal")
+        condition = statement.get("Condition") or {}
+
+        # AIG-TP001 — wildcard principal
+        principals_flat: list[str] = []
+        if isinstance(principal, str):
+            principals_flat = [principal]
+        elif isinstance(principal, dict):
+            for v in principal.values():
+                principals_flat.extend(_as_list(v))
+        elif isinstance(principal, list):
+            principals_flat = [str(p) for p in principal]
+
+        if principal == "*" or "*" in principals_flat:
+            findings.append(
+                Finding(
+                    "AIG-TP001",
+                    "critical",
+                    "Trust policy grants AssumeRole to a wildcard principal ('*'). "
+                    "Any AWS identity — or unauthenticated caller — can assume this role.",
+                    "Replace '*' with the specific AWS account, service, or role ARN that "
+                    "legitimately needs to assume this role.",
+                    index,
+                )
+            )
+
+        # AIG-TP002 / AIG-TP003 — cross-account trust conditions
+        # Identify cross-account ARN principals (arn:aws:iam::<account>:...)
+        cross_account_arns = [
+            p for p in principals_flat if p.startswith("arn:aws:iam::")
+        ]
+        if cross_account_arns:
+            condition_str = str(condition)
+
+            # AIG-TP002 — missing ExternalId
+            if "sts:ExternalId" not in condition_str:
+                findings.append(
+                    Finding(
+                        "AIG-TP002",
+                        "high",
+                        f"Cross-account trust to {cross_account_arns} is missing a "
+                        "sts:ExternalId condition. This enables confused-deputy attacks "
+                        "from any resource in the trusted account.",
+                        "Add a StringEquals condition on sts:ExternalId with a non-guessable "
+                        "value agreed with the trusted account.",
+                        index,
+                    )
+                )
+
+            # AIG-TP003 — missing aws:SourceArn
+            if "aws:SourceArn" not in condition_str and "aws:sourceArn" not in condition_str:
+                findings.append(
+                    Finding(
+                        "AIG-TP003",
+                        "high",
+                        f"Cross-account trust to {cross_account_arns} is missing an "
+                        "aws:SourceArn condition. Without it, any resource in the trusted "
+                        "account can trigger role assumption.",
+                        "Add a StringEquals or ArnLike condition on aws:SourceArn scoped "
+                        "to the specific resource ARN that should be allowed to assume this role.",
+                        index,
+                    )
+                )
+
+    return findings
