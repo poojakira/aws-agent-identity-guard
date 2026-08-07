@@ -4,31 +4,56 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aws-agent-identity-guard"
-version = "0.1.0"
-description = "Static IAM and trust-policy guardrails for agentic AI workloads on AWS."
+version = "0.2.0"
+description = "Static IAM policy linter for AI agent roles on AWS. 25 rules targeting Bedrock, SageMaker, Lambda, and ECS agent permissions."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [{name = "Pooja Kiran"}]
-keywords = ["aws", "iam", "agentic-ai", "bedrock", "security", "least-privilege"]
+keywords = ["aws", "iam", "agentic-ai", "bedrock", "sagemaker", "security", "least-privilege", "policy-linter", "sarif"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: Software Development :: Quality Assurance",
+    "Typing :: Typed",
+]
 dependencies = []
 
 [project.optional-dependencies]
-# Live scanning requires boto3 and an AWS account with IAM read permissions
 live = ["boto3>=1.34.0"]
-dev = ["pytest>=8.2", "ruff>=0.8", "moto[iam]>=5.0.0", "boto3>=1.34.0"]
+dev = ["pytest>=8.2", "ruff>=0.8", "pyright>=1.1.380", "moto[iam]>=5.0.0", "boto3>=1.34.0"]
 
 [project.scripts]
 aws-agent-identity-guard = "aws_agent_identity_guard.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/poojakira/aws-agent-identity-guard"
+Issues = "https://github.com/poojakira/aws-agent-identity-guard/issues"
+Documentation = "https://github.com/poojakira/aws-agent-identity-guard#readme"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q --tb=short"
 pythonpath = ["src"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "TCH"]
+
+[tool.pyright]
+pythonVersion = "3.10"
+typeCheckingMode = "standard"
