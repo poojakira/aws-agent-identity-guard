@@ -1,0 +1,23 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "WRONG_GiveAgentEverything",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:*",
+        "lambda:InvokeFunction",
+        "iam:PassRole",
+        "iam:AttachRolePolicy",
+        "secretsmanager:GetSecretValue",
+        "s3:*",
+        "cloudtrail:StopLogging",
+        "sagemaker:CreateEndpoint",
+        "ec2:CreateNetworkInterface",
+        "dynamodb:Scan",
+        "sts:AssumeRole"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

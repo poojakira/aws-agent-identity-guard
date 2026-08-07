@@ -1,0 +1,61 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "InvokeFoundationModel",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      "Resource": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0"
+    },
+    {
+      "Sid": "InvokeAgentTools",
+      "Effect": "Allow",
+      "Action": "lambda:InvokeFunction",
+      "Resource": "arn:aws:lambda:us-east-1:111122223333:function:agent-tool-*",
+      "Condition": {
+        "StringEquals": {
+          "aws:PrincipalTag/agent-owner": "security-team"
+        }
+      }
+    },
+    {
+      "Sid": "ReadAgentSecrets",
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "arn:aws:secretsmanager:us-east-1:111122223333:secret:agents/${aws:PrincipalTag/agent-id}/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/tenant": "${aws:PrincipalTag/tenant}"
+        }
+      }
+    },
+    {
+      "Sid": "WriteAgentWorkspace",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::agent-workspace-bucket/${aws:PrincipalTag/agent-id}/outputs/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:PrincipalTag/agent-owner": "security-team"
+        }
+      }
+    },
+    {
+      "Sid": "QueryTenantData",
+      "Effect": "Allow",
+      "Action": "dynamodb:Query",
+      "Resource": "arn:aws:dynamodb:us-east-1:111122223333:table/agent-context",
+      "Condition": {
+        "ForAllValues:StringEquals": {
+          "dynamodb:LeadingKeys": ["tenant#${aws:PrincipalTag/tenant}"]
+        }
+      }
+    }
+  ]
+}
