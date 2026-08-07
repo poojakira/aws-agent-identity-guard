@@ -4,7 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased] — agent/security-hardening-v1
+## [0.2.0] — 2026-08-07
+
+### Added
+- 11 new agent-specific detection rules (AIG008-AIG018)
+- Bedrock control-plane detection (AIG008)
+- SageMaker control-plane detection (AIG009)
+- Network egress modification detection (AIG010)
+- Audit trail tampering detection (AIG011)
+- Excessive action breadth check (AIG012)
+- Missing condition keys check (AIG013)
+- S3 write without prefix scoping (AIG014)
+- Bedrock model-ID scoping check (AIG015)
+- Lambda function-name scoping check (AIG016)
+- AssumeRole session tag check (AIG017)
+- Database access scoping check (AIG018)
+- Well-scoped and overprivileged example policies
+
+### Changed
+- Expanded PRIVILEGE_ACTIONS, TOOL_EXECUTION_PATTERNS, SENSITIVE_DATA_PATTERNS
+- Improved _matches_any function for pattern vs exact matching
+
+## [0.1.1] — agent/security-hardening-v1
 
 ### Added
 - `scan_trust_policy()` function with 3 rules: wildcard principal (AIG-TP001), missing ExternalId (AIG-TP002), missing aws:SourceArn (AIG-TP003)

@@ -1,6 +1,6 @@
 # Security Audit — aws-agent-identity-guard
 
-**Auditor:** agent/security-hardening-v1 (automated, strictness 10/10)
+**Auditor:** agent/security-hardening-v1 (automated)
 **Date:** 2026-08-05
 **Commit base:** main (cloned fresh)
 **Files audited:** `src/aws_agent_identity_guard/scanner.py`, `cli.py`, `tests/test_scanner.py`, `pyproject.toml`, `.github/workflows/ci.yml`
