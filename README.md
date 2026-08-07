@@ -14,7 +14,7 @@ This tool catches those mistakes in CI before they become production incidents.
 
 Parliament and Prowler check 300+ general AWS rules, but they don't understand agent-specific risks: an AI agent with `bedrock:CreateAgent` can reconfigure its own capabilities. An agent with `cloudtrail:StopLogging` can cover its tracks. These are the patterns we catch.
 
-## What It Checks (25 Rules)
+## What It Checks (22 Rules)
 
 ### Identity Policy Rules (AIG001–AIG018)
 

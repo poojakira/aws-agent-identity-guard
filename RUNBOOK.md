@@ -79,6 +79,7 @@ aws-agent-identity-guard --live-scan --format sarif --output scan-results.sarif
 | AIG005 | CRITICAL | Privilege-management actions (iam:*, sts:AssumeRole, policy attachment) |
 | AIG006 | HIGH | Tool execution actions (Lambda, SSM, ECS, Bedrock) not resource-scoped |
 | AIG007 | MEDIUM | Sensitive-data actions without principal/session tag condition |
+| AIG008-AIG018 | HIGH–CRITICAL | Agent-specific escalation and blast-radius rules targeting Bedrock, SageMaker, network, and audit controls |
 
 ### Trust Policy Rules (scan_trust_policy)
 
@@ -124,7 +125,7 @@ pytest -v
   - Query SCPs from AWS Organizations
   - Simulate authorization decisions (use IAM Policy Simulator for that)
   - Analyze session policies from STS AssumeRole calls
-- Rule set covers 10 rules across 3 categories. Not a replacement for IAM Access Analyzer.
+- Rule set covers 22 rules across 3 categories. Not a replacement for IAM Access Analyzer.
 - No support for ABAC-heavy environments where tag conditions are the primary control.
 
 ## Troubleshooting
