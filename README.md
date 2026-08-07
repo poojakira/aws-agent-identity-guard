@@ -1,6 +1,6 @@
 # AWS Agent Identity Guard
 
-[![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-View-blue)](https://poojakira.github.io/aws-agent-identity-guard/)
+[![Demo Dashboard (static)](https://img.shields.io/badge/Demo_Dashboard-Static-lightgrey)](https://poojakira.github.io/aws-agent-identity-guard/)
 
 A static linter for IAM policies attached to AI agent roles on AWS. It reads IAM policy JSON files, flags overly permissive patterns, and exits non-zero if it finds problems. No AWS credentials needed — it's pure static analysis.
 
