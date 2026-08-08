@@ -39,6 +39,7 @@ CLI:
 
 from __future__ import annotations
 
+import contextlib
 import logging
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
@@ -345,10 +346,8 @@ class LiveAccountScanner:
                     user_name = user_data["UserName"]
                     user_arn = user_data["Arn"]
                     tags_resp = []
-                    try:
+                    with contextlib.suppress(botocore.exceptions.ClientError):
                         tags_resp = self._iam.list_user_tags(UserName=user_name).get("Tags", [])
-                    except botocore.exceptions.ClientError:
-                        pass
                     tags = {t["Key"]: t["Value"] for t in tags_resp}
                     policies = self._collect_user_policies(user_name, user_arn)
                     users.append(
