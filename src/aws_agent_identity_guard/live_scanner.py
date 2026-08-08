@@ -397,8 +397,8 @@ class LiveAccountScanner:
                 {
                     "rule_id": "AIG-PB001",
                     "severity": "medium",
-                    "message": f"Role {role.role_name} has high/critical findings and no permission boundary.",
-                    "remediation": "Attach a permission boundary to cap the maximum permissions this role can use.",
+                    "message": f"Role {role.role_name} has high/critical findings and no permission boundary.",  # noqa: E501
+                    "remediation": "Attach a permission boundary to cap the maximum permissions this role can use.",  # noqa: E501
                     "source": "configuration",
                     "resource_arn": role.role_arn,
                     "resource_name": role.role_name,

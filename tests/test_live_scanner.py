@@ -20,9 +20,9 @@ import pytest
 boto3 = pytest.importorskip("boto3", reason="boto3 required for live scanner tests")
 moto = pytest.importorskip("moto", reason="moto required for live scanner tests")
 
-from moto import mock_aws  # type: ignore[import]
+from moto import mock_aws  # type: ignore[import]  # noqa: E402
 
-from aws_agent_identity_guard.live_scanner import LiveAccountScanner
+from aws_agent_identity_guard.live_scanner import LiveAccountScanner  # noqa: E402
 
 
 def _session():
