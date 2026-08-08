@@ -877,7 +877,7 @@ class TestCrossAccountTrustPolicyConfusedDeputy:
                             "sts:ExternalId": "a1b2c3d4-unique-secret-per-relationship"
                         },
                         "ArnLike": {
-                            "aws:SourceArn": "arn:aws:ecs:us-east-1:999888777666:task/agent-cluster/*"
+                            "aws:SourceArn": "arn:aws:ecs:us-east-1:999888777666:task/agent-cluster/*"  # noqa: E501
                         },
                     },
                 }
