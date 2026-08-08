@@ -4,14 +4,22 @@
     {
       "parameters": {
         "rule": {
-          "interval": [{ "field": "cronExpression", "expression": "0 6 * * 1-5" }]
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * 1-5"
+            }
+          ]
         }
       },
       "id": "cron-trigger",
       "name": "Daily 6AM Weekdays",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [240, 300]
+      "position": [
+        240,
+        300
+      ]
     },
     {
       "parameters": {
@@ -24,7 +32,10 @@
       "name": "Run IAM Live Scan",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [460, 300]
+      "position": [
+        460,
+        300
+      ]
     },
     {
       "parameters": {
@@ -34,18 +45,26 @@
       "name": "Parse & Categorize",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [680, 300]
+      "position": [
+        680,
+        300
+      ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": false },
+          "options": {
+            "caseSensitive": false
+          },
           "conditions": [
             {
               "id": "has-critical-high",
               "leftValue": "={{ $json.needs_action }}",
               "rightValue": true,
-              "operator": { "type": "boolean", "operation": "equals" }
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
             }
           ]
         }
@@ -54,7 +73,10 @@
       "name": "Action Needed?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [900, 300]
+      "position": [
+        900,
+        300
+      ]
     },
     {
       "parameters": {
@@ -62,13 +84,16 @@
         "url": "={{ $env.SLACK_WEBHOOK_URL }}",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"channel\": \"#cloud-security\",\n  \"username\": \"IAM Scanner\",\n  \"icon_emoji\": \":lock:\",\n  \"blocks\": [\n    {\n      \"type\": \"header\",\n      \"text\": { \"type\": \"plain_text\", \"text\": \":rotating_light: Agent IAM Posture Alert\" }\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Account:* {{ $json.account_id }}\\n*Roles Scanned:* {{ $json.roles_scanned }}\\n*Critical:* {{ $json.critical_count }} | *High:* {{ $json.high_count }} | *Medium:* {{ $json.medium_count }}\"\n      }\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Top findings:*\\n{{ $json.top_findings.slice(0, 5).map(f => `• ${f.rule_id} on \\`${f.resource_name}\\`: ${f.message.substring(0, 80)}`).join('\\n') }}\"\n      }\n    },\n    {\n      \"type\": \"context\",\n      \"elements\": [{ \"type\": \"mrkdwn\", \"text\": \"Scan ran at {{ $json.scan_timestamp }}\" }]\n    }\n  ]\n}"
+        "jsonBody": "={\n  \"channel\": \"#cloud-security\",\n  \"username\": \"IAM Scanner\",\n  \"icon_emoji\": \":lock:\",\n  \"blocks\": [\n    {\n      \"type\": \"header\",\n      \"text\": { \"type\": \"plain_text\", \"text\": \":rotating_light: Agent IAM Posture Alert\" }\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Account:* {{ $json.account_id }}\\n*Roles Scanned:* {{ $json.roles_scanned }}\\n*Critical:* {{ $json.critical_count }} | *High:* {{ $json.high_count }} | *Medium:* {{ $json.medium_count }}\"\n      }\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Top findings:*\\n{{ $json.top_findings.slice(0, 5).map(f => `\u00e2\u20ac\u00a2 ${f.rule_id} on \\`${f.resource_name}\\`: ${f.message.substring(0, 80)}`).join('\\n') }}\"\n      }\n    },\n    {\n      \"type\": \"context\",\n      \"elements\": [{ \"type\": \"mrkdwn\", \"text\": \"Scan ran at {{ $json.scan_timestamp }}\" }]\n    }\n  ]\n}"
       },
       "id": "alert-team",
       "name": "Alert Security Team",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1120, 240]
+      "position": [
+        1120,
+        240
+      ]
     },
     {
       "parameters": {
@@ -78,7 +103,10 @@
       "name": "Generate Remediations",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1120, 380]
+      "position": [
+        1120,
+        380
+      ]
     },
     {
       "parameters": {
@@ -94,7 +122,10 @@
       "name": "Create Remediation Ticket",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1340, 300]
+      "position": [
+        1340,
+        300
+      ]
     },
     {
       "parameters": {
@@ -108,40 +139,109 @@
       "name": "Post Clean Report",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1120, 480]
+      "position": [
+        1120,
+        480
+      ]
     }
   ],
   "connections": {
     "Daily 6AM Weekdays": {
-      "main": [[{ "node": "Run IAM Live Scan", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Run IAM Live Scan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Run IAM Live Scan": {
-      "main": [[{ "node": "Parse & Categorize", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Parse & Categorize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Parse & Categorize": {
-      "main": [[{ "node": "Action Needed?", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Action Needed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Action Needed?": {
       "main": [
         [
-          { "node": "Alert Security Team", "type": "main", "index": 0 },
-          { "node": "Generate Remediations", "type": "main", "index": 0 }
+          {
+            "node": "Alert Security Team",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Remediations",
+            "type": "main",
+            "index": 0
+          }
         ],
-        [{ "node": "Post Clean Report", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Post Clean Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Alert Security Team": {
-      "main": [[{ "node": "Create Remediation Ticket", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Create Remediation Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Generate Remediations": {
-      "main": [[{ "node": "Create Remediation Ticket", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Create Remediation Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "settings": { "executionOrder": "v1" },
-  "meta": { "templateCredsSetupCompleted": true, "instanceId": "aws-agent-identity-guard" },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "aws-agent-identity-guard"
+  },
   "tags": [
-    { "name": "iam-security" },
-    { "name": "scheduled-scan" },
-    { "name": "aws" }
-  ]
+    {
+      "name": "iam-security"
+    },
+    {
+      "name": "scheduled-scan"
+    },
+    {
+      "name": "aws"
+    }
+  ],
+  "id": "n8n_iam_posture_scan"
 }
