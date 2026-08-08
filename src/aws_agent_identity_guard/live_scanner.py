@@ -36,15 +36,15 @@ CLI:
     aws-agent-identity-guard --live-scan --output-format sarif --output scan.sarif
     aws-agent-identity-guard --live-scan --role-name my-agent-role
 """
+
 from __future__ import annotations
 
-import json
 import logging
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
-from .scanner import Finding, scan_policy_document, scan_trust_policy
+from .scanner import scan_policy_document, scan_trust_policy
 
 logger = logging.getLogger(__name__)
 
@@ -61,19 +61,22 @@ except ImportError as _boto_err:
 
 # ── Data models ────────────────────────────────────────────────────────────────
 
+
 @dataclass
 class PolicySummary:
     """A single IAM policy document with its source metadata."""
+
     policy_name: str
     policy_arn: str | None
-    policy_type: str          # "inline_role" | "managed" | "inline_user"
-    attached_to: str          # role ARN, user ARN, or group ARN
+    policy_type: str  # "inline_role" | "managed" | "inline_user"
+    attached_to: str  # role ARN, user ARN, or group ARN
     document: dict[str, Any]
 
 
 @dataclass
 class RoleSummary:
     """An IAM role with all its attached and inline policies."""
+
     role_name: str
     role_arn: str
     trust_policy: dict[str, Any]
@@ -86,6 +89,7 @@ class RoleSummary:
 @dataclass
 class UserSummary:
     """An IAM user with all its attached and inline policies."""
+
     user_name: str
     user_arn: str
     policies: list[PolicySummary] = field(default_factory=list)
@@ -96,6 +100,7 @@ class UserSummary:
 @dataclass
 class AccountScanReport:
     """Full report of a live account scan."""
+
     account_id: str
     scan_timestamp: str
     region: str
@@ -111,6 +116,7 @@ class AccountScanReport:
 
 
 # ── Live scanner ───────────────────────────────────────────────────────────────
+
 
 class LiveAccountScanner:
     """Boto3-based live AWS IAM scanner.
@@ -187,15 +193,19 @@ class LiveAccountScanner:
                             RoleName=role_name,
                             PolicyName=policy_name,
                         )
-                        policies.append(PolicySummary(
-                            policy_name=policy_name,
-                            policy_arn=None,
-                            policy_type="inline_role",
-                            attached_to=role_arn,
-                            document=resp["PolicyDocument"],
-                        ))
+                        policies.append(
+                            PolicySummary(
+                                policy_name=policy_name,
+                                policy_arn=None,
+                                policy_type="inline_role",
+                                attached_to=role_arn,
+                                document=resp["PolicyDocument"],
+                            )
+                        )
                     except botocore.exceptions.ClientError as exc:
-                        logger.warning("Could not fetch inline policy %s/%s: %s", role_name, policy_name, exc)
+                        logger.warning(
+                            "Could not fetch inline policy %s/%s: %s", role_name, policy_name, exc
+                        )
         except botocore.exceptions.ClientError as exc:
             logger.warning("Could not list inline policies for role %s: %s", role_name, exc)
 
@@ -206,13 +216,15 @@ class LiveAccountScanner:
                 for policy in page.get("AttachedPolicies", []):
                     doc = self._get_managed_policy_document(policy["PolicyArn"])
                     if doc is not None:
-                        policies.append(PolicySummary(
-                            policy_name=policy["PolicyName"],
-                            policy_arn=policy["PolicyArn"],
-                            policy_type="managed",
-                            attached_to=role_arn,
-                            document=doc,
-                        ))
+                        policies.append(
+                            PolicySummary(
+                                policy_name=policy["PolicyName"],
+                                policy_arn=policy["PolicyArn"],
+                                policy_type="managed",
+                                attached_to=role_arn,
+                                document=doc,
+                            )
+                        )
         except botocore.exceptions.ClientError as exc:
             logger.warning("Could not list attached policies for role %s: %s", role_name, exc)
 
@@ -232,15 +244,22 @@ class LiveAccountScanner:
                             UserName=user_name,
                             PolicyName=policy_name,
                         )
-                        policies.append(PolicySummary(
-                            policy_name=policy_name,
-                            policy_arn=None,
-                            policy_type="inline_user",
-                            attached_to=user_arn,
-                            document=resp["PolicyDocument"],
-                        ))
+                        policies.append(
+                            PolicySummary(
+                                policy_name=policy_name,
+                                policy_arn=None,
+                                policy_type="inline_user",
+                                attached_to=user_arn,
+                                document=resp["PolicyDocument"],
+                            )
+                        )
                     except botocore.exceptions.ClientError as exc:
-                        logger.warning("Could not fetch inline user policy %s/%s: %s", user_name, policy_name, exc)
+                        logger.warning(
+                            "Could not fetch inline user policy %s/%s: %s",
+                            user_name,
+                            policy_name,
+                            exc,
+                        )
         except botocore.exceptions.ClientError as exc:
             logger.warning("Could not list inline user policies for %s: %s", user_name, exc)
 
@@ -251,13 +270,15 @@ class LiveAccountScanner:
                 for policy in page.get("AttachedPolicies", []):
                     doc = self._get_managed_policy_document(policy["PolicyArn"])
                     if doc is not None:
-                        policies.append(PolicySummary(
-                            policy_name=policy["PolicyName"],
-                            policy_arn=policy["PolicyArn"],
-                            policy_type="managed",
-                            attached_to=user_arn,
-                            document=doc,
-                        ))
+                        policies.append(
+                            PolicySummary(
+                                policy_name=policy["PolicyName"],
+                                policy_arn=policy["PolicyArn"],
+                                policy_type="managed",
+                                attached_to=user_arn,
+                                document=doc,
+                            )
+                        )
         except botocore.exceptions.ClientError as exc:
             logger.warning("Could not list attached user policies for %s: %s", user_name, exc)
 
@@ -289,9 +310,7 @@ class LiveAccountScanner:
             role_name = role_data["RoleName"]
             role_arn = role_data["Arn"]
             trust_policy = role_data.get("AssumeRolePolicyDocument", {})
-            boundary_arn = (
-                role_data.get("PermissionsBoundary", {}).get("PermissionsBoundaryArn")
-            )
+            boundary_arn = role_data.get("PermissionsBoundary", {}).get("PermissionsBoundaryArn")
             last_used = None
             if "RoleLastUsed" in role_data:
                 lu = role_data["RoleLastUsed"].get("LastUsedDate")
@@ -302,15 +321,17 @@ class LiveAccountScanner:
             tags = {t["Key"]: t["Value"] for t in tags_list}
 
             policies = self._collect_role_policies(role_name, role_arn)
-            roles.append(RoleSummary(
-                role_name=role_name,
-                role_arn=role_arn,
-                trust_policy=trust_policy,
-                policies=policies,
-                permission_boundary_arn=boundary_arn,
-                last_used=last_used,
-                tags=tags,
-            ))
+            roles.append(
+                RoleSummary(
+                    role_name=role_name,
+                    role_arn=role_arn,
+                    trust_policy=trust_policy,
+                    policies=policies,
+                    permission_boundary_arn=boundary_arn,
+                    last_used=last_used,
+                    tags=tags,
+                )
+            )
 
         return roles
 
@@ -330,12 +351,14 @@ class LiveAccountScanner:
                         pass
                     tags = {t["Key"]: t["Value"] for t in tags_resp}
                     policies = self._collect_user_policies(user_name, user_arn)
-                    users.append(UserSummary(
-                        user_name=user_name,
-                        user_arn=user_arn,
-                        policies=policies,
-                        tags=tags,
-                    ))
+                    users.append(
+                        UserSummary(
+                            user_name=user_name,
+                            user_arn=user_arn,
+                            policies=policies,
+                            tags=tags,
+                        )
+                    )
         except botocore.exceptions.ClientError as exc:
             logger.error("Could not enumerate users: %s", exc)
 
@@ -371,19 +394,21 @@ class LiveAccountScanner:
         if role.permission_boundary_arn is None and any(
             f["severity"] in ("critical", "high") for f in all_findings
         ):
-            all_findings.append({
-                "rule_id": "AIG-PB001",
-                "severity": "medium",
-                "message": f"Role {role.role_name} has high/critical findings and no permission boundary.",
-                "remediation": "Attach a permission boundary to cap the maximum permissions this role can use.",
-                "source": "configuration",
-                "resource_arn": role.role_arn,
-                "resource_name": role.role_name,
-                "policy_name": None,
-                "policy_arn": None,
-                "policy_type": None,
-                "statement_index": None,
-            })
+            all_findings.append(
+                {
+                    "rule_id": "AIG-PB001",
+                    "severity": "medium",
+                    "message": f"Role {role.role_name} has high/critical findings and no permission boundary.",
+                    "remediation": "Attach a permission boundary to cap the maximum permissions this role can use.",
+                    "source": "configuration",
+                    "resource_arn": role.role_arn,
+                    "resource_name": role.role_name,
+                    "policy_name": None,
+                    "policy_arn": None,
+                    "policy_type": None,
+                    "statement_index": None,
+                }
+            )
 
         return all_findings
 
@@ -417,17 +442,19 @@ class LiveAccountScanner:
         for role in roles:
             findings = self._scan_role(role)
             all_findings.extend(findings)
-            role_rows.append({
-                "role_name": role.role_name,
-                "role_arn": role.role_arn,
-                "last_used": role.last_used,
-                "permission_boundary": role.permission_boundary_arn,
-                "findings_count": len(findings),
-                "critical": sum(1 for f in findings if f["severity"] == "critical"),
-                "high": sum(1 for f in findings if f["severity"] == "high"),
-                "medium": sum(1 for f in findings if f["severity"] == "medium"),
-                "tags": role.tags,
-            })
+            role_rows.append(
+                {
+                    "role_name": role.role_name,
+                    "role_arn": role.role_arn,
+                    "last_used": role.last_used,
+                    "permission_boundary": role.permission_boundary_arn,
+                    "findings_count": len(findings),
+                    "critical": sum(1 for f in findings if f["severity"] == "critical"),
+                    "high": sum(1 for f in findings if f["severity"] == "high"),
+                    "medium": sum(1 for f in findings if f["severity"] == "medium"),
+                    "tags": role.tags,
+                }
+            )
 
         # Scan users
         users = self._enumerate_users()

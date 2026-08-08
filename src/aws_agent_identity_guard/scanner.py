@@ -13,12 +13,12 @@ Rule categories:
   AIG008-AIG018  Agent-specific escalation and blast-radius rules (expanded)
   AIG-TP001-003  Trust policy rules
 """
+
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from fnmatch import fnmatchcase
 from typing import Any
-
 
 # ─── Action pattern sets ──────────────────────────────────────────────────────
 # Each set represents a category of risk. When an agent policy grants actions
@@ -278,9 +278,10 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
             )
 
         # ─── AIG004: PassRole without PassedToService ────────────────────────
-        if any(
-            _matches_any(a, {"iam:PassRole", "iam:passrole"}) for a in actions
-        ) and "iam:PassedToService" not in condition_str:
+        if (
+            any(_matches_any(a, {"iam:PassRole", "iam:passrole"}) for a in actions)
+            and "iam:PassedToService" not in condition_str
+        ):
             findings.append(
                 Finding(
                     "AIG004",
@@ -370,10 +371,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
             # ─── NEW RULES: AIG008-AIG018 ─────────────────────────────────────
 
             # AIG008: Bedrock control plane — agent can modify itself
-            if (
-                _matches_any(action, BEDROCK_CONTROL_PLANE)
-                and action_lower not in seen_bedrock_cp
-            ):
+            if _matches_any(action, BEDROCK_CONTROL_PLANE) and action_lower not in seen_bedrock_cp:
                 seen_bedrock_cp.add(action_lower)
                 findings.append(
                     Finding(
@@ -411,10 +409,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                 )
 
             # AIG010: Network egress — agent can create network paths
-            if (
-                _matches_any(action, NETWORK_EGRESS_PATTERNS)
-                and action_lower not in seen_egress
-            ):
+            if _matches_any(action, NETWORK_EGRESS_PATTERNS) and action_lower not in seen_egress:
                 seen_egress.add(action_lower)
                 findings.append(
                     Finding(
@@ -503,7 +498,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                     break
                 if r.startswith("arn:aws:s3:::"):
                     # Extract the path portion after the bucket name
-                    path_part = r[len("arn:aws:s3:::"):]
+                    path_part = r[len("arn:aws:s3:::") :]
                     # bucket/* or bucket* = entire bucket, no prefix
                     if "/" not in path_part:
                         has_broad_s3 = True
@@ -535,8 +530,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
         if any(a.lower() in bedrock_invoke for a in actions):
             # Check if resource is scoped to specific model IDs
             has_model_scope = any(
-                ":foundation-model/" in r or ":provisioned-model/" in r
-                or ":custom-model/" in r
+                ":foundation-model/" in r or ":provisioned-model/" in r or ":custom-model/" in r
                 for r in resources
             )
             if not has_model_scope:
@@ -579,9 +573,11 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                 )
 
         # ─── AIG017: STS AssumeRole without session tags ─────────────────────
-        if any(
-            _matches_any(a, {"sts:AssumeRole"}) for a in actions
-        ) and "aws:RequestTag" not in condition_str and "sts:TransitiveTagKeys" not in condition_str:
+        if (
+            any(_matches_any(a, {"sts:AssumeRole"}) for a in actions)
+            and "aws:RequestTag" not in condition_str
+            and "sts:TransitiveTagKeys" not in condition_str
+        ):
             findings.append(
                 Finding(
                     "AIG017",
@@ -674,9 +670,7 @@ def scan_trust_policy(document: dict[str, Any]) -> list[Finding]:
             )
 
         # Identify cross-account principals for TP002/TP003
-        cross_account_arns = [
-            p for p in principals_flat if p.startswith("arn:aws:iam::")
-        ]
+        cross_account_arns = [p for p in principals_flat if p.startswith("arn:aws:iam::")]
         if cross_account_arns:
             condition_str = str(condition)
 

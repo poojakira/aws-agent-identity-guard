@@ -210,13 +210,16 @@ def main(argv: list[str] | None = None) -> int:
             return 2
 
         report_dict = report.to_dict()
-        has_high = report_dict["summary"].get("critical", 0) + report_dict["summary"].get("high", 0) > 0
+        has_high = (
+            report_dict["summary"].get("critical", 0) + report_dict["summary"].get("high", 0) > 0
+        )
 
         if args.format == "json":
             output_text = json.dumps(report_dict, indent=2, default=str)
         elif args.format == "sarif":
             # Convert live findings to SARIF format
             from .scanner import Finding  # noqa: PLC0415
+
             sarif_findings = [
                 Finding(
                     rule_id=f["rule_id"],
@@ -228,9 +231,7 @@ def main(argv: list[str] | None = None) -> int:
                 for f in report_dict["findings"]
             ]
             sarif_path = args.output or Path(f"scan-{report_dict['account_id']}.sarif")
-            output_text = json.dumps(
-                _build_sarif(sarif_path, sarif_findings), indent=2
-            )
+            output_text = json.dumps(_build_sarif(sarif_path, sarif_findings), indent=2)
         else:
             _print_live_text(report_dict)
             return 1 if has_high else 0
@@ -258,7 +259,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # ── Remediation output ────────────────────────────────────────────────────
     if getattr(args, "remediate", False) and findings:
-        from .remediate import generate_remediations, remediate_to_json  # noqa: PLC0415
+        from .remediate import generate_remediations  # noqa: PLC0415
 
         role_name = args.policy.stem.replace("_policy", "").replace("_", "-")
         remediations = generate_remediations(findings, resource_name=role_name)
@@ -269,7 +270,7 @@ def main(argv: list[str] | None = None) -> int:
             for r in remediations:
                 print(f"\n--- Fix for {', '.join(r.findings_addressed)} ---")
                 print(f"Explanation: {r.explanation}")
-                print(f"\nTerraform HCL:")
+                print("\nTerraform HCL:")
                 print(r.terraform_hcl)
                 print()
 
