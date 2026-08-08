@@ -19,9 +19,10 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from .scanner import Finding
+if TYPE_CHECKING:
+    from .scanner import Finding
 
 
 @dataclass
