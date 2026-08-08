@@ -1,0 +1,75 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "BedrockAgentOverlyBroadAccess",
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:InvokeModel",
+                "bedrock:InvokeModelWithResponseStream"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "BedrockAgentS3Access",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "BedrockKnowledgeBaseAccess",
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:Retrieve",
+                "bedrock:RetrieveAndGenerate"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "BedrockAgentLambdaInvoke",
+            "Effect": "Allow",
+            "Action": [
+                "lambda:InvokeFunction"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "BedrockAgentPassRole",
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "*"
+        },
+        {
+            "Sid": "BedrockAgentControlPlane",
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:CreateAgent",
+                "bedrock:UpdateAgent",
+                "bedrock:CreateAgentActionGroup",
+                "bedrock:UpdateAgentActionGroup",
+                "bedrock:CreateKnowledgeBase",
+                "bedrock:UpdateKnowledgeBase",
+                "bedrock:AssociateAgentKnowledgeBase",
+                "bedrock:GetAgent",
+                "bedrock:GetAgentAlias",
+                "bedrock:ListAgents",
+                "bedrock:ListAgentAliases"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "BedrockGuardrailManagement",
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:CreateGuardrail",
+                "bedrock:UpdateGuardrail",
+                "bedrock:DeleteGuardrail",
+                "bedrock:ApplyGuardrail"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
