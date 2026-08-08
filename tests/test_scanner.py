@@ -246,7 +246,7 @@ class TestAIG006ToolExecutionScope:
                     {
                         "Effect": "Allow",
                         "Action": "lambda:InvokeFunction",
-                        "Resource": "arn:aws:lambda:us-east-1:111122223333:function:agent-tool-search",
+                        "Resource": "arn:aws:lambda:us-east-1:111122223333:function:agent-tool-search",  # noqa: E501
                     }
                 ]
             }
@@ -333,7 +333,7 @@ class TestAIG008BedrockControlPlane:
                     {
                         "Effect": "Allow",
                         "Action": "bedrock:InvokeModel",
-                        "Resource": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",
+                        "Resource": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",  # noqa: E501
                     }
                 ]
             }
@@ -619,7 +619,7 @@ class TestAIG015BedrockModelScoping:
                     {
                         "Effect": "Allow",
                         "Action": "bedrock:InvokeModel",
-                        "Resource": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",
+                        "Resource": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",  # noqa: E501
                     }
                 ]
             }
@@ -651,7 +651,7 @@ class TestAIG016LambdaFunctionScope:
                     {
                         "Effect": "Allow",
                         "Action": "lambda:InvokeFunction",
-                        "Resource": "arn:aws:lambda:us-east-1:111122223333:function:agent-tool-search",
+                        "Resource": "arn:aws:lambda:us-east-1:111122223333:function:agent-tool-search",  # noqa: E501
                     }
                 ]
             }
@@ -853,7 +853,7 @@ class TestRealisticAgentPolicies:
                         "Sid": "InvokeModel",
                         "Effect": "Allow",
                         "Action": "bedrock:InvokeModel",
-                        "Resource": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",
+                        "Resource": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",  # noqa: E501
                     },
                     {
                         "Sid": "InvokeTool",
