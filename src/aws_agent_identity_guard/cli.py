@@ -172,6 +172,14 @@ def main(argv: list[str] | None = None) -> int:
         choices=("text", "json", "sarif"),
         default="text",
     )
+    parser.add_argument(
+        "--remediate",
+        action="store_true",
+        help=(
+            "Generate IaC remediation code (Terraform HCL + CloudFormation YAML) "
+            "for each finding. Outputs ready-to-apply infrastructure fixes."
+        ),
+    )
     args = parser.parse_args(argv)
 
     # ── Live scan mode ────────────────────────────────────────────────────────
@@ -247,6 +255,24 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(_build_sarif(args.policy, findings), indent=2))
     else:
         _print_text(findings)
+
+    # ── Remediation output ────────────────────────────────────────────────────
+    if getattr(args, "remediate", False) and findings:
+        from .remediate import generate_remediations, remediate_to_json  # noqa: PLC0415
+
+        role_name = args.policy.stem.replace("_policy", "").replace("_", "-")
+        remediations = generate_remediations(findings, resource_name=role_name)
+        if remediations:
+            print("\n" + "=" * 70)
+            print("GENERATED REMEDIATIONS (AI-Powered Infrastructure Automation)")
+            print("=" * 70)
+            for r in remediations:
+                print(f"\n--- Fix for {', '.join(r.findings_addressed)} ---")
+                print(f"Explanation: {r.explanation}")
+                print(f"\nTerraform HCL:")
+                print(r.terraform_hcl)
+                print()
+
     return 1 if any(f.severity in {"high", "critical"} for f in findings) else 0
 
 
