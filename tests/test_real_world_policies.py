@@ -7,14 +7,11 @@ known misconfiguration patterns observed in production agent deployments.
 Each test uses actual policy JSON (not simplified versions) and asserts
 which specific AIG rules should fire. Sources are cited in comments.
 """
+
 import json
 from pathlib import Path
 
-import pytest
-
 from aws_agent_identity_guard import scan_policy_document, scan_trust_policy
-from aws_agent_identity_guard.scanner import Finding
-
 
 EXAMPLES_DIR = Path(__file__).parent.parent / "examples" / "real_world"
 
@@ -47,43 +44,32 @@ class TestBedrockAgentDefaultOverprivileged:
             {
                 "Sid": "BedrockAgentOverlyBroadAccess",
                 "Effect": "Allow",
-                "Action": [
-                    "bedrock:InvokeModel",
-                    "bedrock:InvokeModelWithResponseStream"
-                ],
-                "Resource": "*"
+                "Action": ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
+                "Resource": "*",
             },
             {
                 "Sid": "BedrockAgentS3Access",
                 "Effect": "Allow",
-                "Action": [
-                    "s3:GetObject",
-                    "s3:ListBucket"
-                ],
-                "Resource": "*"
+                "Action": ["s3:GetObject", "s3:ListBucket"],
+                "Resource": "*",
             },
             {
                 "Sid": "BedrockKnowledgeBaseAccess",
                 "Effect": "Allow",
-                "Action": [
-                    "bedrock:Retrieve",
-                    "bedrock:RetrieveAndGenerate"
-                ],
-                "Resource": "*"
+                "Action": ["bedrock:Retrieve", "bedrock:RetrieveAndGenerate"],
+                "Resource": "*",
             },
             {
                 "Sid": "BedrockAgentLambdaInvoke",
                 "Effect": "Allow",
-                "Action": [
-                    "lambda:InvokeFunction"
-                ],
-                "Resource": "*"
+                "Action": ["lambda:InvokeFunction"],
+                "Resource": "*",
             },
             {
                 "Sid": "BedrockAgentPassRole",
                 "Effect": "Allow",
                 "Action": "iam:PassRole",
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "BedrockAgentControlPlane",
@@ -99,9 +85,9 @@ class TestBedrockAgentDefaultOverprivileged:
                     "bedrock:GetAgent",
                     "bedrock:GetAgentAlias",
                     "bedrock:ListAgents",
-                    "bedrock:ListAgentAliases"
+                    "bedrock:ListAgentAliases",
                 ],
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "BedrockGuardrailManagement",
@@ -110,11 +96,11 @@ class TestBedrockAgentDefaultOverprivileged:
                     "bedrock:CreateGuardrail",
                     "bedrock:UpdateGuardrail",
                     "bedrock:DeleteGuardrail",
-                    "bedrock:ApplyGuardrail"
+                    "bedrock:ApplyGuardrail",
                 ],
-                "Resource": "*"
-            }
-        ]
+                "Resource": "*",
+            },
+        ],
     }
 
     def test_catches_wildcard_resource_on_invoke_model(self):
@@ -178,29 +164,23 @@ class TestBedrockAgentDefaultOverprivileged:
                     "Resource": [
                         "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-v2",
                         "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-v2:1",
-                        "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-instant-v1"
-                    ]
+                        "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-instant-v1",
+                    ],
                 },
                 {
                     "Sid": "AgentActionGroupS3",
                     "Effect": "Allow",
                     "Action": ["s3:GetObject"],
                     "Resource": ["arn:aws:s3:::my-schemas-bucket/api-schema.json"],
-                    "Condition": {
-                        "StringEquals": {
-                            "aws:ResourceAccount": "123456789012"
-                        }
-                    }
+                    "Condition": {"StringEquals": {"aws:ResourceAccount": "123456789012"}},
                 },
                 {
                     "Sid": "AgentKnowledgeBaseQuery",
                     "Effect": "Allow",
                     "Action": ["bedrock:Retrieve", "bedrock:RetrieveAndGenerate"],
-                    "Resource": [
-                        "arn:aws:bedrock:us-east-1:123456789012:knowledge-base/KB12345"
-                    ]
-                }
-            ]
+                    "Resource": ["arn:aws:bedrock:us-east-1:123456789012:knowledge-base/KB12345"],
+                },
+            ],
         }
         findings = scan_policy_document(well_scoped_policy)
         # Should NOT fire critical rules
@@ -217,7 +197,6 @@ class TestBedrockAgentDefaultOverprivileged:
         with open(example_path) as f:
             file_policy = json.load(f)
         assert file_policy == self.OVERPRIVILEGED_POLICY
-
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -249,7 +228,7 @@ class TestSageMakerFullAccessPolicy:
                 "Sid": "SageMakerFullAccess",
                 "Effect": "Allow",
                 "Action": ["sagemaker:*"],
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "SageMakerECRAccess",
@@ -267,9 +246,9 @@ class TestSageMakerFullAccessPolicy:
                     "ecr:PutImage",
                     "ecr:CreateRepository",
                     "ecr:DescribeRepositories",
-                    "ecr:DescribeImages"
+                    "ecr:DescribeImages",
                 ],
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "SageMakerS3FullAccess",
@@ -284,9 +263,9 @@ class TestSageMakerFullAccessPolicy:
                     "s3:GetBucketCors",
                     "s3:PutBucketCors",
                     "s3:GetBucketAcl",
-                    "s3:PutObjectAcl"
+                    "s3:PutObjectAcl",
                 ],
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "SageMakerIAMPassRole",
@@ -299,10 +278,10 @@ class TestSageMakerFullAccessPolicy:
                             "sagemaker.amazonaws.com",
                             "glue.amazonaws.com",
                             "robomaker.amazonaws.com",
-                            "states.amazonaws.com"
+                            "states.amazonaws.com",
                         ]
                     }
-                }
+                },
             },
             {
                 "Sid": "SageMakerVPCAccess",
@@ -316,9 +295,9 @@ class TestSageMakerFullAccessPolicy:
                     "ec2:DescribeVpcs",
                     "ec2:DescribeDhcpOptions",
                     "ec2:DescribeSubnets",
-                    "ec2:DescribeSecurityGroups"
+                    "ec2:DescribeSecurityGroups",
                 ],
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "SageMakerSecretsManagerAccess",
@@ -326,9 +305,9 @@ class TestSageMakerFullAccessPolicy:
                 "Action": [
                     "secretsmanager:GetSecretValue",
                     "secretsmanager:DescribeSecret",
-                    "secretsmanager:ListSecrets"
+                    "secretsmanager:ListSecrets",
                 ],
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "SageMakerKMSAccess",
@@ -337,9 +316,9 @@ class TestSageMakerFullAccessPolicy:
                     "kms:Decrypt",
                     "kms:GenerateDataKey",
                     "kms:CreateGrant",
-                    "kms:DescribeKey"
+                    "kms:DescribeKey",
                 ],
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "SageMakerLogsAccess",
@@ -349,11 +328,11 @@ class TestSageMakerFullAccessPolicy:
                     "logs:CreateLogStream",
                     "logs:PutLogEvents",
                     "logs:GetLogEvents",
-                    "logs:DescribeLogStreams"
+                    "logs:DescribeLogStreams",
                 ],
-                "Resource": "*"
-            }
-        ]
+                "Resource": "*",
+            },
+        ],
     }
 
     def test_catches_sagemaker_wildcard_action(self):
@@ -416,7 +395,6 @@ class TestSageMakerFullAccessPolicy:
         assert file_policy == self.SAGEMAKER_FULL_ACCESS_POLICY
 
 
-
 # ═══════════════════════════════════════════════════════════════════════════════
 # TEST 3: Over-Permissive Lambda Execution Role
 # Source: Common serverless deployment anti-pattern
@@ -447,12 +425,8 @@ class TestLambdaOverPermissiveRole:
             {
                 "Sid": "LambdaBasicExecution",
                 "Effect": "Allow",
-                "Action": [
-                    "logs:CreateLogGroup",
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents"
-                ],
-                "Resource": "arn:aws:logs:*:*:*"
+                "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+                "Resource": "arn:aws:logs:*:*:*",
             },
             {
                 "Sid": "LambdaVPCAccess",
@@ -462,9 +436,9 @@ class TestLambdaOverPermissiveRole:
                     "ec2:DescribeNetworkInterfaces",
                     "ec2:DeleteNetworkInterface",
                     "ec2:AssignPrivateIpAddresses",
-                    "ec2:UnassignPrivateIpAddresses"
+                    "ec2:UnassignPrivateIpAddresses",
                 ],
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "LambdaOverlyBroadDynamoDB",
@@ -477,29 +451,21 @@ class TestLambdaOverPermissiveRole:
                     "dynamodb:Query",
                     "dynamodb:Scan",
                     "dynamodb:BatchGetItem",
-                    "dynamodb:BatchWriteItem"
+                    "dynamodb:BatchWriteItem",
                 ],
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "LambdaOverlyBroadS3",
                 "Effect": "Allow",
-                "Action": [
-                    "s3:GetObject",
-                    "s3:PutObject",
-                    "s3:DeleteObject",
-                    "s3:ListBucket"
-                ],
-                "Resource": "*"
+                "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket"],
+                "Resource": "*",
             },
             {
                 "Sid": "LambdaOverlyBroadSecrets",
                 "Effect": "Allow",
-                "Action": [
-                    "secretsmanager:GetSecretValue",
-                    "secretsmanager:ListSecrets"
-                ],
-                "Resource": "*"
+                "Action": ["secretsmanager:GetSecretValue", "secretsmanager:ListSecrets"],
+                "Resource": "*",
             },
             {
                 "Sid": "LambdaOverlyBroadSQSSNS",
@@ -510,29 +476,23 @@ class TestLambdaOverPermissiveRole:
                     "sqs:DeleteMessage",
                     "sqs:GetQueueAttributes",
                     "sns:Publish",
-                    "sns:Subscribe"
+                    "sns:Subscribe",
                 ],
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "LambdaInvokeOtherFunctions",
                 "Effect": "Allow",
-                "Action": [
-                    "lambda:InvokeFunction",
-                    "lambda:InvokeAsync"
-                ],
-                "Resource": "*"
+                "Action": ["lambda:InvokeFunction", "lambda:InvokeAsync"],
+                "Resource": "*",
             },
             {
                 "Sid": "LambdaKMSDecrypt",
                 "Effect": "Allow",
-                "Action": [
-                    "kms:Decrypt",
-                    "kms:GenerateDataKey"
-                ],
-                "Resource": "*"
-            }
-        ]
+                "Action": ["kms:Decrypt", "kms:GenerateDataKey"],
+                "Resource": "*",
+            },
+        ],
     }
 
     def test_catches_network_egress(self):
@@ -594,7 +554,6 @@ class TestLambdaOverPermissiveRole:
         assert file_policy == self.LAMBDA_OVERPERMISSIVE_POLICY
 
 
-
 # ═══════════════════════════════════════════════════════════════════════════════
 # TEST 4: ECS Task Role for Bedrock Agent Deployment
 # Source: Common ECS Bedrock agent deployment pattern
@@ -631,25 +590,21 @@ class TestECSTaskRoleBedrockAgent:
                     "bedrock:InvokeModelWithResponseStream",
                     "bedrock-agent-runtime:InvokeAgent",
                     "bedrock-agent-runtime:Retrieve",
-                    "bedrock-agent-runtime:RetrieveAndGenerate"
+                    "bedrock-agent-runtime:RetrieveAndGenerate",
                 ],
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "ECSPassRoleUnconstrained",
                 "Effect": "Allow",
                 "Action": "iam:PassRole",
-                "Resource": "arn:aws:iam::111122223333:role/*"
+                "Resource": "arn:aws:iam::111122223333:role/*",
             },
             {
                 "Sid": "ECSTaskExecutionLogs",
                 "Effect": "Allow",
-                "Action": [
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents",
-                    "logs:GetLogEvents"
-                ],
-                "Resource": "arn:aws:logs:us-east-1:111122223333:log-group:/ecs/bedrock-agent:*"
+                "Action": ["logs:CreateLogStream", "logs:PutLogEvents", "logs:GetLogEvents"],
+                "Resource": "arn:aws:logs:us-east-1:111122223333:log-group:/ecs/bedrock-agent:*",
             },
             {
                 "Sid": "ECSSecretsAccess",
@@ -658,25 +613,21 @@ class TestECSTaskRoleBedrockAgent:
                     "secretsmanager:GetSecretValue",
                     "ssm:GetParameter",
                     "ssm:GetParameters",
-                    "ssm:GetParametersByPath"
+                    "ssm:GetParametersByPath",
                 ],
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "ECSS3ModelArtifacts",
                 "Effect": "Allow",
-                "Action": [
-                    "s3:GetObject",
-                    "s3:PutObject",
-                    "s3:ListBucket"
-                ],
-                "Resource": "*"
+                "Action": ["s3:GetObject", "s3:PutObject", "s3:ListBucket"],
+                "Resource": "*",
             },
             {
                 "Sid": "ECSLambdaToolInvoke",
                 "Effect": "Allow",
                 "Action": "lambda:InvokeFunction",
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "ECSDynamoDBState",
@@ -686,9 +637,9 @@ class TestECSTaskRoleBedrockAgent:
                     "dynamodb:PutItem",
                     "dynamodb:UpdateItem",
                     "dynamodb:Query",
-                    "dynamodb:Scan"
+                    "dynamodb:Scan",
                 ],
-                "Resource": "*"
+                "Resource": "*",
             },
             {
                 "Sid": "ECSStepFunctionsOrchestration",
@@ -697,11 +648,11 @@ class TestECSTaskRoleBedrockAgent:
                     "states:StartExecution",
                     "states:StartSyncExecution",
                     "states:DescribeExecution",
-                    "states:StopExecution"
+                    "states:StopExecution",
                 ],
-                "Resource": "*"
-            }
-        ]
+                "Resource": "*",
+            },
+        ],
     }
 
     def test_catches_passrole_without_passed_to_service(self):
@@ -767,18 +718,14 @@ class TestECSTaskRoleBedrockAgent:
                     "Action": ["bedrock:InvokeModel"],
                     "Resource": [
                         "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0"
-                    ]
+                    ],
                 },
                 {
                     "Sid": "PassRoleConstrained",
                     "Effect": "Allow",
                     "Action": "iam:PassRole",
                     "Resource": "arn:aws:iam::111122223333:role/bedrock-agent-service-role",
-                    "Condition": {
-                        "StringEquals": {
-                            "iam:PassedToService": "bedrock.amazonaws.com"
-                        }
-                    }
+                    "Condition": {"StringEquals": {"iam:PassedToService": "bedrock.amazonaws.com"}},
                 },
                 {
                     "Sid": "LambdaToolScoped",
@@ -786,10 +733,10 @@ class TestECSTaskRoleBedrockAgent:
                     "Action": "lambda:InvokeFunction",
                     "Resource": [
                         "arn:aws:lambda:us-east-1:111122223333:function:agent-tool-search",
-                        "arn:aws:lambda:us-east-1:111122223333:function:agent-tool-retrieve"
-                    ]
-                }
-            ]
+                        "arn:aws:lambda:us-east-1:111122223333:function:agent-tool-retrieve",
+                    ],
+                },
+            ],
         }
         findings = scan_policy_document(well_scoped)
         # Should NOT fire AIG004 (PassRole has PassedToService condition)
@@ -804,11 +751,9 @@ class TestECSTaskRoleBedrockAgent:
         assert len(aig005) == 1
         # No OTHER critical findings beyond AIG005 for PassRole
         critical_non_passrole = [
-            f for f in findings
-            if f.severity == "critical" and f.rule_id != "AIG005"
+            f for f in findings if f.severity == "critical" and f.rule_id != "AIG005"
         ]
         assert len(critical_non_passrole) == 0
-
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -845,12 +790,10 @@ class TestCrossAccountTrustPolicyConfusedDeputy:
             {
                 "Sid": "AllowCrossAccountAgentAccess",
                 "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::999888777666:root"
-                },
-                "Action": "sts:AssumeRole"
+                "Principal": {"AWS": "arn:aws:iam::999888777666:root"},
+                "Action": "sts:AssumeRole",
             }
-        ]
+        ],
     }
 
     # Trust policy with wildcard principal — worst case
@@ -861,9 +804,9 @@ class TestCrossAccountTrustPolicyConfusedDeputy:
                 "Sid": "AllowAnyPrincipal",
                 "Effect": "Allow",
                 "Principal": "*",
-                "Action": "sts:AssumeRole"
+                "Action": "sts:AssumeRole",
             }
-        ]
+        ],
     }
 
     # Multi-account trust with partial conditions (has SourceAccount but no ExternalId)
@@ -876,17 +819,13 @@ class TestCrossAccountTrustPolicyConfusedDeputy:
                 "Principal": {
                     "AWS": [
                         "arn:aws:iam::999888777666:role/agent-orchestrator",
-                        "arn:aws:iam::555444333222:role/ml-pipeline"
+                        "arn:aws:iam::555444333222:role/ml-pipeline",
                     ]
                 },
                 "Action": "sts:AssumeRole",
-                "Condition": {
-                    "StringEquals": {
-                        "aws:PrincipalOrgID": "o-abc123def4"
-                    }
-                }
+                "Condition": {"StringEquals": {"aws:PrincipalOrgID": "o-abc123def4"}},
             }
-        ]
+        ],
     }
 
     def test_catches_missing_external_id(self):
@@ -931,9 +870,7 @@ class TestCrossAccountTrustPolicyConfusedDeputy:
                 {
                     "Sid": "AllowPartnerWithExternalId",
                     "Effect": "Allow",
-                    "Principal": {
-                        "AWS": "arn:aws:iam::999888777666:role/agent-orchestrator"
-                    },
+                    "Principal": {"AWS": "arn:aws:iam::999888777666:role/agent-orchestrator"},
                     "Action": "sts:AssumeRole",
                     "Condition": {
                         "StringEquals": {
@@ -941,10 +878,10 @@ class TestCrossAccountTrustPolicyConfusedDeputy:
                         },
                         "ArnLike": {
                             "aws:SourceArn": "arn:aws:ecs:us-east-1:999888777666:task/agent-cluster/*"
-                        }
-                    }
+                        },
+                    },
                 }
-            ]
+            ],
         }
         findings = scan_trust_policy(secure_trust)
         # Should NOT fire TP001 (no wildcard)
@@ -962,20 +899,16 @@ class TestCrossAccountTrustPolicyConfusedDeputy:
                 {
                     "Sid": "AllowBedrockService",
                     "Effect": "Allow",
-                    "Principal": {
-                        "Service": "bedrock.amazonaws.com"
-                    },
+                    "Principal": {"Service": "bedrock.amazonaws.com"},
                     "Action": "sts:AssumeRole",
                     "Condition": {
-                        "StringEquals": {
-                            "aws:SourceAccount": "111122223333"
-                        },
+                        "StringEquals": {"aws:SourceAccount": "111122223333"},
                         "ArnLike": {
                             "aws:SourceArn": "arn:aws:bedrock:us-east-1:111122223333:agent/*"
-                        }
-                    }
+                        },
+                    },
                 }
-            ]
+            ],
         }
         findings = scan_trust_policy(service_trust)
         # Service principals are not cross-account ARNs

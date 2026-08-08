@@ -14,10 +14,11 @@ turning a security scanner into an infrastructure automation tool.
 No external AI service required. Uses rule-based templates with context
 injection. Zero cost, zero network calls, zero API keys.
 """
+
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from .scanner import Finding
@@ -26,6 +27,7 @@ from .scanner import Finding
 @dataclass
 class Remediation:
     """A generated fix for one or more findings on a single resource."""
+
     resource_name: str
     resource_arn: str | None
     findings_addressed: list[str]
@@ -226,33 +228,33 @@ def generate_remediations(
 
         if finding.rule_id == "AIG004":
             # PassRole without constraint
-            hcl = _PASSROLE_FIX.format(
-                role_name=tf_name, target_service=target_service
-            )
+            hcl = _PASSROLE_FIX.format(role_name=tf_name, target_service=target_service)
             policy = {
                 "Version": "2012-10-17",
-                "Statement": [{
-                    "Sid": "PassRoleScopedToService",
-                    "Effect": "Allow",
-                    "Action": "iam:PassRole",
-                    "Resource": f"arn:aws:iam::*:role/{resource_name}-execution",
-                    "Condition": {
-                        "StringEquals": {"iam:PassedToService": target_service}
-                    },
-                }],
+                "Statement": [
+                    {
+                        "Sid": "PassRoleScopedToService",
+                        "Effect": "Allow",
+                        "Action": "iam:PassRole",
+                        "Resource": f"arn:aws:iam::*:role/{resource_name}-execution",
+                        "Condition": {"StringEquals": {"iam:PassedToService": target_service}},
+                    }
+                ],
             }
-            remediations.append(Remediation(
-                resource_name=resource_name,
-                resource_arn=resource_arn,
-                findings_addressed=["AIG004"],
-                terraform_hcl=hcl,
-                cloudformation_yaml=_to_cfn_yaml("PassRoleScoped", policy),
-                fixed_policy_json=policy,
-                explanation=(
-                    f"Scoped iam:PassRole to only pass roles to {target_service}. "
-                    "The agent can no longer pass arbitrary roles to arbitrary services."
-                ),
-            ))
+            remediations.append(
+                Remediation(
+                    resource_name=resource_name,
+                    resource_arn=resource_arn,
+                    findings_addressed=["AIG004"],
+                    terraform_hcl=hcl,
+                    cloudformation_yaml=_to_cfn_yaml("PassRoleScoped", policy),
+                    fixed_policy_json=policy,
+                    explanation=(
+                        f"Scoped iam:PassRole to only pass roles to {target_service}. "
+                        "The agent can no longer pass arbitrary roles to arbitrary services."
+                    ),
+                )
+            )
             addressed.add("AIG004")
 
         elif finding.rule_id == "AIG015":
@@ -260,26 +262,30 @@ def generate_remediations(
             hcl = _BEDROCK_SCOPED_FIX.format(role_name=tf_name, model_id=model_id)
             policy = {
                 "Version": "2012-10-17",
-                "Statement": [{
-                    "Sid": "InvokeSpecificModel",
-                    "Effect": "Allow",
-                    "Action": ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
-                    "Resource": f"arn:aws:bedrock:*::foundation-model/{model_id}",
-                }],
+                "Statement": [
+                    {
+                        "Sid": "InvokeSpecificModel",
+                        "Effect": "Allow",
+                        "Action": ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
+                        "Resource": f"arn:aws:bedrock:*::foundation-model/{model_id}",
+                    }
+                ],
             }
-            remediations.append(Remediation(
-                resource_name=resource_name,
-                resource_arn=resource_arn,
-                findings_addressed=["AIG015"],
-                terraform_hcl=hcl,
-                cloudformation_yaml=_to_cfn_yaml("BedrockInvokeScoped", policy),
-                fixed_policy_json=policy,
-                explanation=(
-                    f"Restricted Bedrock invocation to model {model_id}. "
-                    "Prevents cost overruns from calling expensive models and "
-                    "capability escalation from accessing more powerful models."
-                ),
-            ))
+            remediations.append(
+                Remediation(
+                    resource_name=resource_name,
+                    resource_arn=resource_arn,
+                    findings_addressed=["AIG015"],
+                    terraform_hcl=hcl,
+                    cloudformation_yaml=_to_cfn_yaml("BedrockInvokeScoped", policy),
+                    fixed_policy_json=policy,
+                    explanation=(
+                        f"Restricted Bedrock invocation to model {model_id}. "
+                        "Prevents cost overruns from calling expensive models and "
+                        "capability escalation from accessing more powerful models."
+                    ),
+                )
+            )
             addressed.add("AIG015")
 
         elif finding.rule_id in ("AIG006", "AIG016"):
@@ -287,64 +293,68 @@ def generate_remediations(
             hcl = _LAMBDA_SCOPED_FIX.format(role_name=tf_name, owner_tag=owner_tag)
             policy = {
                 "Version": "2012-10-17",
-                "Statement": [{
-                    "Sid": "InvokeApprovedToolFunctions",
-                    "Effect": "Allow",
-                    "Action": "lambda:InvokeFunction",
-                    "Resource": "arn:aws:lambda:*:*:function:agent-tool-*",
-                    "Condition": {
-                        "StringEquals": {"aws:PrincipalTag/agent-owner": owner_tag}
-                    },
-                }],
+                "Statement": [
+                    {
+                        "Sid": "InvokeApprovedToolFunctions",
+                        "Effect": "Allow",
+                        "Action": "lambda:InvokeFunction",
+                        "Resource": "arn:aws:lambda:*:*:function:agent-tool-*",
+                        "Condition": {"StringEquals": {"aws:PrincipalTag/agent-owner": owner_tag}},
+                    }
+                ],
             }
-            remediations.append(Remediation(
-                resource_name=resource_name,
-                resource_arn=resource_arn,
-                findings_addressed=["AIG006", "AIG016"],
-                terraform_hcl=hcl,
-                cloudformation_yaml=_to_cfn_yaml("LambdaToolsScoped", policy),
-                fixed_policy_json=policy,
-                explanation=(
-                    "Restricted Lambda invocation to functions matching agent-tool-* "
-                    f"naming convention, owned by {owner_tag}. Uses ABAC tags for "
-                    "multi-tenant isolation."
-                ),
-            ))
+            remediations.append(
+                Remediation(
+                    resource_name=resource_name,
+                    resource_arn=resource_arn,
+                    findings_addressed=["AIG006", "AIG016"],
+                    terraform_hcl=hcl,
+                    cloudformation_yaml=_to_cfn_yaml("LambdaToolsScoped", policy),
+                    fixed_policy_json=policy,
+                    explanation=(
+                        "Restricted Lambda invocation to functions matching agent-tool-* "
+                        f"naming convention, owned by {owner_tag}. Uses ABAC tags for "
+                        "multi-tenant isolation."
+                    ),
+                )
+            )
             addressed.add("AIG006")
             addressed.add("AIG016")
 
         elif finding.rule_id == "AIG017":
             # AssumeRole without session tags
-            hcl = _SESSION_TAGS_FIX.format(
-                role_name=tf_name, target_role_arn=target_role_arn
-            )
+            hcl = _SESSION_TAGS_FIX.format(role_name=tf_name, target_role_arn=target_role_arn)
             policy = {
                 "Version": "2012-10-17",
-                "Statement": [{
-                    "Sid": "AssumeWithSessionTags",
-                    "Effect": "Allow",
-                    "Action": "sts:AssumeRole",
-                    "Resource": target_role_arn,
-                    "Condition": {
-                        "StringLike": {"aws:RequestTag/agent-session-id": "*"},
-                        "ForAllValues:StringEquals": {
-                            "sts:TransitiveTagKeys": ["agent-session-id", "tenant"]
+                "Statement": [
+                    {
+                        "Sid": "AssumeWithSessionTags",
+                        "Effect": "Allow",
+                        "Action": "sts:AssumeRole",
+                        "Resource": target_role_arn,
+                        "Condition": {
+                            "StringLike": {"aws:RequestTag/agent-session-id": "*"},
+                            "ForAllValues:StringEquals": {
+                                "sts:TransitiveTagKeys": ["agent-session-id", "tenant"]
+                            },
                         },
-                    },
-                }],
+                    }
+                ],
             }
-            remediations.append(Remediation(
-                resource_name=resource_name,
-                resource_arn=resource_arn,
-                findings_addressed=["AIG017"],
-                terraform_hcl=hcl,
-                cloudformation_yaml=_to_cfn_yaml("AssumeRoleWithTags", policy),
-                fixed_policy_json=policy,
-                explanation=(
-                    "Required session tags (agent-session-id, tenant) for role assumption. "
-                    "Enables tracing which agent session performed downstream actions."
-                ),
-            ))
+            remediations.append(
+                Remediation(
+                    resource_name=resource_name,
+                    resource_arn=resource_arn,
+                    findings_addressed=["AIG017"],
+                    terraform_hcl=hcl,
+                    cloudformation_yaml=_to_cfn_yaml("AssumeRoleWithTags", policy),
+                    fixed_policy_json=policy,
+                    explanation=(
+                        "Required session tags (agent-session-id, tenant) for role assumption. "
+                        "Enables tracing which agent session performed downstream actions."
+                    ),
+                )
+            )
             addressed.add("AIG017")
 
         elif finding.rule_id in ("AIG005", "AIG008", "AIG009", "AIG010", "AIG011"):
@@ -357,9 +367,12 @@ def generate_remediations(
                         "Sid": "AllowCoreAgentActions",
                         "Effect": "Allow",
                         "Action": [
-                            "bedrock:InvokeModel", "lambda:InvokeFunction",
-                            "s3:GetObject", "s3:PutObject",
-                            "logs:PutLogEvents", "logs:CreateLogStream",
+                            "bedrock:InvokeModel",
+                            "lambda:InvokeFunction",
+                            "s3:GetObject",
+                            "s3:PutObject",
+                            "logs:PutLogEvents",
+                            "logs:CreateLogStream",
                         ],
                         "Resource": "*",
                     },
@@ -367,9 +380,12 @@ def generate_remediations(
                         "Sid": "DenyDangerousActions",
                         "Effect": "Deny",
                         "Action": [
-                            "iam:*", "sts:AssumeRole",
-                            "cloudtrail:StopLogging", "guardduty:DeleteDetector",
-                            "bedrock:CreateAgent", "sagemaker:CreateEndpoint",
+                            "iam:*",
+                            "sts:AssumeRole",
+                            "cloudtrail:StopLogging",
+                            "guardduty:DeleteDetector",
+                            "bedrock:CreateAgent",
+                            "sagemaker:CreateEndpoint",
                             "ec2:CreateNetworkInterface",
                         ],
                         "Resource": "*",
@@ -377,24 +393,27 @@ def generate_remediations(
                 ],
             }
             addressed_rules = [
-                r for r in ("AIG005", "AIG008", "AIG009", "AIG010", "AIG011")
+                r
+                for r in ("AIG005", "AIG008", "AIG009", "AIG010", "AIG011")
                 if any(f.rule_id == r for f in findings)
             ]
-            remediations.append(Remediation(
-                resource_name=resource_name,
-                resource_arn=resource_arn,
-                findings_addressed=addressed_rules,
-                terraform_hcl=hcl,
-                cloudformation_yaml=_to_cfn_yaml("AgentBoundary", policy),
-                fixed_policy_json=policy,
-                explanation=(
-                    "Attached a permission boundary that denies all dangerous actions "
-                    "(IAM modification, audit tampering, control-plane, network). "
-                    "The boundary caps effective permissions regardless of what identity "
-                    "policies grant. This is defense-in-depth — even if a policy is "
-                    "misconfigured, the boundary prevents escalation."
-                ),
-            ))
+            remediations.append(
+                Remediation(
+                    resource_name=resource_name,
+                    resource_arn=resource_arn,
+                    findings_addressed=addressed_rules,
+                    terraform_hcl=hcl,
+                    cloudformation_yaml=_to_cfn_yaml("AgentBoundary", policy),
+                    fixed_policy_json=policy,
+                    explanation=(
+                        "Attached a permission boundary that denies all dangerous actions "
+                        "(IAM modification, audit tampering, control-plane, network). "
+                        "The boundary caps effective permissions regardless of what identity "
+                        "policies grant. This is defense-in-depth — even if a policy is "
+                        "misconfigured, the boundary prevents escalation."
+                    ),
+                )
+            )
             for r in addressed_rules:
                 addressed.add(r)
 
@@ -407,32 +426,32 @@ def _to_cfn_yaml(logical_id: str, policy: dict[str, Any]) -> str:
     statements = policy.get("Statement", [])
     lines = [
         f"  {logical_id}Policy:",
-        f"    Type: AWS::IAM::ManagedPolicy",
-        f"    Properties:",
-        f"      PolicyDocument:",
-        f"        Version: '2012-10-17'",
-        f"        Statement:",
+        "    Type: AWS::IAM::ManagedPolicy",
+        "    Properties:",
+        "      PolicyDocument:",
+        "        Version: '2012-10-17'",
+        "        Statement:",
     ]
     for stmt in statements:
         lines.append(f"          - Sid: {stmt.get('Sid', '')}")
         lines.append(f"            Effect: {stmt['Effect']}")
         action = stmt["Action"]
         if isinstance(action, list):
-            lines.append(f"            Action:")
+            lines.append("            Action:")
             for a in action:
                 lines.append(f"              - '{a}'")
         else:
             lines.append(f"            Action: '{action}'")
         resource = stmt["Resource"]
         if isinstance(resource, list):
-            lines.append(f"            Resource:")
+            lines.append("            Resource:")
             for r in resource:
                 lines.append(f"              - '{r}'")
         else:
             lines.append(f"            Resource: '{resource}'")
         if "Condition" in stmt:
-            lines.append(f"            Condition:")
-            lines.append(f"              # See fixed_policy_json for full condition block")
+            lines.append("            Condition:")
+            lines.append("              # See fixed_policy_json for full condition block")
     return "\n".join(lines)
 
 

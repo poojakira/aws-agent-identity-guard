@@ -10,6 +10,7 @@ Run with:
     pip install 'aws-agent-identity-guard[dev]'
     pytest tests/test_live_scanner.py -v
 """
+
 from __future__ import annotations
 
 import json
@@ -26,6 +27,7 @@ from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
 def _session():
     import boto3 as _b3
+
     return _b3.Session(
         region_name="us-east-1",
         aws_access_key_id="testing",
@@ -35,17 +37,21 @@ def _session():
 
 
 def _trust(principal: str | dict) -> str:
-    return json.dumps({
-        "Version": "2012-10-17",
-        "Statement": [{"Effect": "Allow", "Principal": principal, "Action": "sts:AssumeRole"}],
-    })
+    return json.dumps(
+        {
+            "Version": "2012-10-17",
+            "Statement": [{"Effect": "Allow", "Principal": principal, "Action": "sts:AssumeRole"}],
+        }
+    )
 
 
 def _policy(actions: list[str], resources: list[str]) -> str:
-    return json.dumps({
-        "Version": "2012-10-17",
-        "Statement": [{"Effect": "Allow", "Action": actions, "Resource": resources}],
-    })
+    return json.dumps(
+        {
+            "Version": "2012-10-17",
+            "Statement": [{"Effect": "Allow", "Action": actions, "Resource": resources}],
+        }
+    )
 
 
 @mock_aws
@@ -53,8 +59,13 @@ def test_live_scan_wildcard_action_is_critical():
     """Role with Action:* must produce CRITICAL AIG002."""
     sess = _session()
     iam = sess.client("iam")
-    iam.create_role(RoleName="wildcard-role", AssumeRolePolicyDocument=_trust({"Service": "bedrock.amazonaws.com"}))
-    iam.put_role_policy(RoleName="wildcard-role", PolicyName="too-broad", PolicyDocument=_policy(["*"], ["*"]))
+    iam.create_role(
+        RoleName="wildcard-role",
+        AssumeRolePolicyDocument=_trust({"Service": "bedrock.amazonaws.com"}),
+    )
+    iam.put_role_policy(
+        RoleName="wildcard-role", PolicyName="too-broad", PolicyDocument=_policy(["*"], ["*"])
+    )
 
     report = LiveAccountScanner(session=sess).scan_account()
     rule_ids = {f["rule_id"] for f in report.findings}
@@ -76,15 +87,21 @@ def test_live_scan_wildcard_principal_is_critical():
 def test_live_scan_cross_account_missing_external_id():
     """Cross-account trust without ExternalId must produce HIGH AIG-TP002."""
     sess = _session()
-    trust_doc = json.dumps({
-        "Version": "2012-10-17",
-        "Statement": [{
-            "Effect": "Allow",
-            "Principal": {"AWS": "arn:aws:iam::111122223333:root"},
-            "Action": "sts:AssumeRole",
-        }],
-    })
-    sess.client("iam").create_role(RoleName="cross-account-role", AssumeRolePolicyDocument=trust_doc)
+    trust_doc = json.dumps(
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "arn:aws:iam::111122223333:root"},
+                    "Action": "sts:AssumeRole",
+                }
+            ],
+        }
+    )
+    sess.client("iam").create_role(
+        RoleName="cross-account-role", AssumeRolePolicyDocument=trust_doc
+    )
 
     report = LiveAccountScanner(session=sess).scan_account()
     assert "AIG-TP002" in {f["rule_id"] for f in report.findings}
@@ -95,8 +112,15 @@ def test_live_scan_passrole_without_condition():
     """iam:PassRole without iam:PassedToService must produce CRITICAL AIG004."""
     sess = _session()
     iam = sess.client("iam")
-    iam.create_role(RoleName="passrole-role", AssumeRolePolicyDocument=_trust({"Service": "lambda.amazonaws.com"}))
-    iam.put_role_policy(RoleName="passrole-role", PolicyName="passrole", PolicyDocument=_policy(["iam:PassRole"], ["*"]))
+    iam.create_role(
+        RoleName="passrole-role",
+        AssumeRolePolicyDocument=_trust({"Service": "lambda.amazonaws.com"}),
+    )
+    iam.put_role_policy(
+        RoleName="passrole-role",
+        PolicyName="passrole",
+        PolicyDocument=_policy(["iam:PassRole"], ["*"]),
+    )
 
     report = LiveAccountScanner(session=sess).scan_account()
     assert "AIG004" in {f["rule_id"] for f in report.findings}
@@ -107,14 +131,21 @@ def test_live_scan_clean_role_no_high_critical():
     """Well-scoped role with narrow s3:GetObject must produce zero high/critical findings."""
     sess = _session()
     iam = sess.client("iam")
-    iam.create_role(RoleName="clean-role", AssumeRolePolicyDocument=_trust({"Service": "bedrock.amazonaws.com"}))
+    iam.create_role(
+        RoleName="clean-role", AssumeRolePolicyDocument=_trust({"Service": "bedrock.amazonaws.com"})
+    )
     iam.put_role_policy(
-        RoleName="clean-role", PolicyName="read-only",
+        RoleName="clean-role",
+        PolicyName="read-only",
         PolicyDocument=_policy(["s3:GetObject"], ["arn:aws:s3:::my-bucket/agent-data/*"]),
     )
 
     report = LiveAccountScanner(session=sess).scan_account()
-    bad = [f for f in report.findings if f.get("resource_name") == "clean-role" and f["severity"] in ("high", "critical")]
+    bad = [
+        f
+        for f in report.findings
+        if f.get("resource_name") == "clean-role" and f["severity"] in ("high", "critical")
+    ]
     assert bad == [], f"Clean role should have no high/critical findings, got: {bad}"
 
 
@@ -124,7 +155,9 @@ def test_scan_role_by_name_returns_only_target_role():
     sess = _session()
     iam = sess.client("iam")
     iam.create_role(RoleName="target", AssumeRolePolicyDocument=_trust("*"))
-    iam.create_role(RoleName="other", AssumeRolePolicyDocument=_trust({"Service": "lambda.amazonaws.com"}))
+    iam.create_role(
+        RoleName="other", AssumeRolePolicyDocument=_trust({"Service": "lambda.amazonaws.com"})
+    )
 
     findings = LiveAccountScanner(session=sess).scan_role_by_name("target")
     assert any(f["rule_id"] == "AIG-TP001" for f in findings)
@@ -143,10 +176,22 @@ def test_scan_role_by_name_raises_on_missing():
 def test_report_has_required_fields():
     """scan_account() report must contain all required top-level keys."""
     sess = _session()
-    sess.client("iam").create_role(RoleName="any-role", AssumeRolePolicyDocument=_trust({"Service": "lambda.amazonaws.com"}))
+    sess.client("iam").create_role(
+        RoleName="any-role", AssumeRolePolicyDocument=_trust({"Service": "lambda.amazonaws.com"})
+    )
 
     report = LiveAccountScanner(session=sess).scan_account().to_dict()
-    required = {"account_id", "scan_timestamp", "region", "roles_scanned", "users_scanned", "findings", "summary", "roles", "errors"}
+    required = {
+        "account_id",
+        "scan_timestamp",
+        "region",
+        "roles_scanned",
+        "users_scanned",
+        "findings",
+        "summary",
+        "roles",
+        "errors",
+    }
     missing = required - report.keys()
     assert not missing, f"Report missing keys: {missing}"
     assert report["roles_scanned"] >= 1
