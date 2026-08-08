@@ -1,57 +1,14 @@
 # AWS Agent Identity Guard
 
-Static IAM policy linter built specifically for AI agent roles on AWS.
+**Your AI agents are shipping with admin-level IAM. This tool catches it before deploy.**
 
-Catches overly-permissive patterns that are common when teams grant Bedrock, SageMaker, Lambda, SSM, or ECS permissions to autonomous AI agents. Flags privilege escalation paths, blast-radius issues, and missing tenant isolation — then tells you exactly how to fix them.
+83% of enterprises are deploying AI agents. Only 29% have security controls around them. The result: Bedrock agents with `iam:PassRole` to anything. Lambda-based tool executors with `*` resources. MCP servers that can disable their own audit trails.
 
-**Zero runtime dependencies.** Pure Python stdlib for static analysis. Optional `boto3` for live account scanning.
+Traditional IAM linters don't catch this. Parliament and Prowler check general AWS policy hygiene, but they have no concept of agent-specific risks — a Bedrock agent with `bedrock:CreateAgent` can reconfigure its own capabilities. An agent with `cloudtrail:StopLogging` can cover its tracks. An agent with unscoped `sts:AssumeRole` can pivot to any role in the account.
 
-## Why This Exists
+**aws-agent-identity-guard** is a static IAM policy linter purpose-built for AI agent roles. 22 rules. Zero runtime dependencies. Blocks bad deploys in CI. SARIF output for GitHub Advanced Security.
 
-When you deploy a Bedrock agent or an MCP server on Lambda, the default IAM policy is usually too broad. Nobody bothers to scope `iam:PassRole` with `iam:PassedToService`. Nobody restricts which Lambda functions the agent can invoke. Nobody adds session tags for audit trails.
-
-This tool catches those mistakes in CI before they become production incidents.
-
-Parliament and Prowler check 300+ general AWS rules, but they don't understand agent-specific risks: an AI agent with `bedrock:CreateAgent` can reconfigure its own capabilities. An agent with `cloudtrail:StopLogging` can cover its tracks. These are the patterns we catch.
-
-## What It Checks (22 Rules)
-
-### Identity Policy Rules (AIG001–AIG018)
-
-| Rule | Severity | What It Catches |
-|------|----------|-----------------|
-| AIG001 | HIGH | NotAction/NotResource in agent policies |
-| AIG002 | CRITICAL | Wildcard service or full-account actions |
-| AIG003 | HIGH | Resource: '*' (unbounded blast radius) |
-| AIG004 | CRITICAL | iam:PassRole without PassedToService |
-| AIG005 | CRITICAL | Privilege-management actions (iam:*, policy modification) |
-| AIG006 | HIGH | Tool execution (Lambda, SSM, ECS, Bedrock) without resource scoping |
-| AIG007 | MEDIUM | Sensitive data access without ABAC tags |
-| AIG008 | CRITICAL | Bedrock control-plane actions (agent can modify itself) |
-| AIG009 | HIGH | SageMaker control-plane (deploy endpoints, start training) |
-| AIG010 | HIGH | Network egress modification (ENI, security groups) |
-| AIG011 | CRITICAL | Audit trail tampering (CloudTrail, GuardDuty, Config) |
-| AIG012 | MEDIUM | Excessive action breadth (>15 actions per statement) |
-| AIG013 | MEDIUM | Resource: '*' with zero Condition keys |
-| AIG014 | HIGH | S3 write/delete without key-prefix scoping |
-| AIG015 | MEDIUM | Bedrock InvokeModel without model-ID scoping |
-| AIG016 | HIGH | Lambda invoke without function-name scoping |
-| AIG017 | HIGH | sts:AssumeRole without session tag requirements |
-| AIG018 | HIGH | Database full-table access without row-level conditions |
-
-### Trust Policy Rules (AIG-TP001–TP003)
-
-| Rule | Severity | What It Catches |
-|------|----------|-----------------|
-| AIG-TP001 | CRITICAL | Wildcard principal ('*') in trust policy |
-| AIG-TP002 | HIGH | Cross-account trust without sts:ExternalId |
-| AIG-TP003 | HIGH | Cross-account trust without aws:SourceArn |
-
-### Live Scan Rules (AIG-PB001)
-
-| Rule | Severity | What It Catches |
-|------|----------|-----------------|
-| AIG-PB001 | MEDIUM | Role has critical/high findings but no permission boundary |
+No AWS credentials required. No cloud calls. Just feed it your policy JSON.
 
 ## Install
 
@@ -59,67 +16,74 @@ Parliament and Prowler check 300+ general AWS rules, but they don't understand a
 pip install aws-agent-identity-guard
 ```
 
-Or from source:
-
-```bash
-git clone https://github.com/poojakira/aws-agent-identity-guard
-cd aws-agent-identity-guard
-pip install -e .
-```
-
-For live AWS account scanning:
-
-```bash
-pip install 'aws-agent-identity-guard[live]'
-```
+30 seconds from install to first scan.
 
 ## Usage
 
-### Static Analysis (No AWS Credentials Required)
+```bash
+aws-agent-identity-guard deploy/agent-role-policy.json
+```
+
+### Output
+
+```
+CRITICAL AIG002 statement=0: Wildcard service prefix 'bedrock:*' grants full Bedrock control
+  remediation: Replace bedrock:* with specific actions: bedrock:InvokeModel, bedrock:InvokeModelWithResponseStream
+CRITICAL AIG004 statement=0: iam:PassRole without iam:PassedToService condition
+  remediation: Add Condition: {"StringEquals": {"iam:PassedToService": "bedrock.amazonaws.com"}}
+CRITICAL AIG005 statement=0: Policy grants privilege-management action: iam:AttachRolePolicy
+  remediation: Remove iam:AttachRolePolicy — agents must not modify their own permissions
+CRITICAL AIG011 statement=0: Policy grants audit-tampering action: cloudtrail:StopLogging
+  remediation: Remove cloudtrail:StopLogging — no agent should disable its audit trail
+HIGH AIG003 statement=0: Resource '*' with 12 actions creates unbounded blast radius
+  remediation: Scope Resource to specific ARNs for each action
+HIGH AIG006 statement=0: lambda:InvokeFunction without function-name scoping
+  remediation: Restrict Resource to arn:aws:lambda:REGION:ACCOUNT:function:FUNCTION_NAME
+HIGH AIG009 statement=0: SageMaker control-plane action sagemaker:CreateEndpoint in agent role
+  remediation: Remove sagemaker:CreateEndpoint or scope to specific endpoint configs
+HIGH AIG010 statement=0: Network egress modification action ec2:CreateNetworkInterface
+  remediation: Remove ec2:CreateNetworkInterface — agents should not modify network paths
+HIGH AIG014 statement=0: s3:* includes write/delete without key-prefix scoping
+  remediation: Scope to specific bucket and prefix: arn:aws:s3:::bucket/prefix/*
+```
+
+Exit code `1`. Deploy blocked.
+
+### Output Formats
 
 ```bash
-# Human-readable output
-aws-agent-identity-guard deploy/agent-role-policy.json
+# Human-readable (default)
+aws-agent-identity-guard policy.json
 
-# JSON for CI pipelines
-aws-agent-identity-guard deploy/agent-role-policy.json --format json
+# JSON for programmatic consumption
+aws-agent-identity-guard policy.json --format json
 
 # SARIF for GitHub Advanced Security
-aws-agent-identity-guard deploy/agent-role-policy.json --format sarif
+aws-agent-identity-guard policy.json --format sarif --output results.sarif
 ```
 
-### Live AWS Account Scanning
-
-```bash
-# Scan all roles in current account
-aws-agent-identity-guard --live-scan --format json
-
-# Scan a specific agent role
-aws-agent-identity-guard --live-scan --role-name my-bedrock-agent-role
-
-# Output SARIF for GitHub code scanning
-aws-agent-identity-guard --live-scan --format sarif --output scan.sarif
-```
-
-### Exit Codes
-
-| Code | Meaning |
-|------|---------|
-| 0 | No high or critical findings |
-| 1 | At least one high or critical finding |
-| 2 | Invalid input or CLI error |
-
-## CI Integration
-
-Block deploys when agent IAM policies are overly permissive:
+## CI Integration — Block Bad Deploys in 3 Lines
 
 ```yaml
-# .github/workflows/iam-lint.yml
+- run: pip install aws-agent-identity-guard
+- run: aws-agent-identity-guard deploy/agent-role-policy.json --format sarif --output results.sarif
+- uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: results.sarif
+```
+
+Findings appear inline on pull requests via GitHub Code Scanning. Critical or high findings fail the pipeline (exit code 1).
+
+Full workflow example:
+
+```yaml
 name: Agent IAM Lint
 on: [pull_request]
 jobs:
   lint:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -132,39 +96,71 @@ jobs:
           sarif_file: results.sarif
 ```
 
-## Scope and Limitations
+## What It Catches — 22 Rules
 
-This is a **static linter**. It reads policy JSON and flags patterns. It does not:
+| Rule | Severity | Pattern |
+|------|----------|---------|
+| AIG001 | HIGH | NotAction/NotResource in agent policies |
+| AIG002 | CRITICAL | Wildcard service prefix (`bedrock:*`, `s3:*`) |
+| AIG003 | HIGH | `Resource: "*"` — unbounded blast radius |
+| AIG004 | CRITICAL | `iam:PassRole` without `iam:PassedToService` condition |
+| AIG005 | CRITICAL | Privilege-management actions (iam:*, policy modification) |
+| AIG006 | HIGH | Tool execution (Lambda, SSM, ECS, Bedrock) without resource scoping |
+| AIG007 | MEDIUM | Sensitive data access without ABAC tags |
+| AIG008 | CRITICAL | Bedrock control-plane — agent can modify itself |
+| AIG009 | HIGH | SageMaker control-plane in a runtime role |
+| AIG010 | HIGH | Network egress modification (ENI, security groups) |
+| AIG011 | CRITICAL | Audit trail tampering (CloudTrail, GuardDuty, Config) |
+| AIG012 | MEDIUM | Excessive action breadth (>15 actions per statement) |
+| AIG013 | MEDIUM | `Resource: "*"` with zero Condition keys |
+| AIG014 | HIGH | S3 write/delete without key-prefix scoping |
+| AIG015 | MEDIUM | Bedrock InvokeModel without model-ID scoping |
+| AIG016 | HIGH | Lambda invoke without function-name scoping |
+| AIG017 | HIGH | `sts:AssumeRole` without session tag requirements |
+| AIG018 | HIGH | Database full-table access without row-level conditions |
+| AIG-TP001 | CRITICAL | Wildcard principal (`*`) in trust policy |
+| AIG-TP002 | HIGH | Cross-account trust without `sts:ExternalId` |
+| AIG-TP003 | HIGH | Cross-account trust without `aws:SourceArn` |
+| AIG-PB001 | MEDIUM | Role with critical findings but no permission boundary |
 
-- Calculate effective permissions (combining identity policies + resource policies + SCPs + permission boundaries + session policies)
-- Simulate AWS authorization logic at runtime
-- Replace AWS IAM Access Analyzer for effective-permission analysis
+## Live Account Scanning
 
-It catches the most common agent-role mistakes in seconds, without AWS credentials, at zero cost.
-
-## Required IAM Permissions for Live Scanning
-
-```json
-{
-  "Effect": "Allow",
-  "Action": [
-    "iam:ListRoles", "iam:ListUsers", "iam:GetRole", "iam:GetUser",
-    "iam:ListRolePolicies", "iam:ListAttachedRolePolicies",
-    "iam:GetRolePolicy", "iam:GetPolicy", "iam:GetPolicyVersion",
-    "iam:ListUserPolicies", "iam:ListAttachedUserPolicies",
-    "iam:ListUserTags", "sts:GetCallerIdentity"
-  ],
-  "Resource": "*"
-}
-```
-
-## Running Tests
+Scan roles in a running AWS account (requires `boto3`):
 
 ```bash
-pip install -e ".[dev]"
-pytest -v
+pip install 'aws-agent-identity-guard[live]'
+
+# Scan all roles
+aws-agent-identity-guard --live-scan --format json
+
+# Scan a specific agent role
+aws-agent-identity-guard --live-scan --role-name my-bedrock-agent-role
+
+# SARIF output
+aws-agent-identity-guard --live-scan --format sarif --output scan.sarif
 ```
+
+## Why Not Parliament / Prowler / IAM Access Analyzer?
+
+| | aws-agent-identity-guard | Parliament | Prowler | IAM Access Analyzer |
+|---|---|---|---|---|
+| Agent-specific rules | ✓ 22 rules | ✗ | ✗ | ✗ |
+| Bedrock self-modification detection | ✓ | ✗ | ✗ | ✗ |
+| PassRole without PassedToService | ✓ | ✗ | ✗ | Partial |
+| Audit-tampering detection | ✓ | ✗ | ✓ (runtime) | ✗ |
+| Static (no credentials needed) | ✓ | ✓ | ✗ | ✗ |
+| SARIF output | ✓ | ✗ | ✗ | ✗ |
+| Zero dependencies | ✓ | ✗ | ✗ | N/A (AWS service) |
+| Pre-deploy CI gate | ✓ | ✓ | ✗ | ✗ |
+
+## Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | No critical or high findings — safe to deploy |
+| 1 | Critical or high findings — deploy blocked |
+| 2 | Invalid input or CLI error |
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
