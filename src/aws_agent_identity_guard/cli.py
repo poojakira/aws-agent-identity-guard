@@ -7,6 +7,13 @@ from pathlib import Path
 from .scanner import Finding, scan_policy_document
 
 
+def _pkg_version() -> str:
+    """Return the package version (single source of truth in __init__)."""
+    from . import __version__
+
+    return __version__
+
+
 def _load_json(path: Path) -> dict:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -92,7 +99,7 @@ def _build_sarif(policy_path: Path, findings: list[Finding]) -> dict:
                 "tool": {
                     "driver": {
                         "name": "aws-agent-identity-guard",
-                        "version": "0.1.0",
+                        "version": _pkg_version(),
                         "informationUri": _TOOL_URI,
                         "rules": rules,
                     }
