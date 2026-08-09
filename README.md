@@ -6,7 +6,7 @@
 
 Traditional IAM linters don't catch this. Parliament and Prowler check general AWS policy hygiene, but they have no concept of agent-specific risks. A Bedrock agent with `bedrock:CreateAgent` can reconfigure its own capabilities. An agent with `cloudtrail:StopLogging` can cover its tracks. An agent with unscoped `sts:AssumeRole` can pivot to any role in the account.
 
-**aws-agent-identity-guard** is a static IAM policy linter purpose-built for AI agent roles. 22 rules. Zero runtime dependencies. Blocks bad deploys in CI. SARIF output for GitHub Advanced Security.
+**aws-agent-identity-guard** is a static IAM policy linter purpose-built for AI agent roles. 25 rules. Zero runtime dependencies. Blocks bad deploys in CI. SARIF output for GitHub Advanced Security.
 
 No AWS credentials required. No cloud calls. Just feed it your policy JSON.
 
@@ -96,7 +96,7 @@ jobs:
           sarif_file: results.sarif
 ```
 
-## What It Catches: 22 Rules
+## What It Catches: 25 rules
 
 | Rule | Severity | Pattern |
 |------|----------|---------|
@@ -147,7 +147,7 @@ aws-agent-identity-guard --live-scan --format sarif --output scan.sarif
 
 | | aws-agent-identity-guard | Parliament | Prowler | IAM Access Analyzer |
 |---|---|---|---|---|
-| Agent-specific rules | ✓ 22 rules | ✗ | ✗ | ✗ |
+| Agent-specific rules | ✓ 25 rules | ✗ | ✗ | ✗ |
 | Bedrock self-modification detection | ✓ | ✗ | ✗ | ✗ |
 | PassRole without PassedToService | ✓ | ✗ | ✗ | Partial |
 | Audit-tampering detection | ✓ | ✗ | ✓ (runtime) | ✗ |

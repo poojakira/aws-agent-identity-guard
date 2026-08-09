@@ -134,7 +134,7 @@ aws-agent-identity-guard --version
 
 ### Static Mode (Default)
 
-No configuration required. The tool reads a JSON policy file and applies 22 rules locally. Zero network calls.
+No configuration required. The tool reads a JSON policy file and applies 25 rules locally. Zero network calls.
 
 ### Live Mode — Environment Variables
 
