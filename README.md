@@ -4,7 +4,7 @@
 
 83% of enterprises are deploying AI agents. Only 29% have security controls around them. The result: Bedrock agents with `iam:PassRole` to anything. Lambda-based tool executors with `*` resources. MCP servers that can disable their own audit trails.
 
-Traditional IAM linters don't catch this. Parliament and Prowler check general AWS policy hygiene, but they have no concept of agent-specific risks — a Bedrock agent with `bedrock:CreateAgent` can reconfigure its own capabilities. An agent with `cloudtrail:StopLogging` can cover its tracks. An agent with unscoped `sts:AssumeRole` can pivot to any role in the account.
+Traditional IAM linters don't catch this. Parliament and Prowler check general AWS policy hygiene, but they have no concept of agent-specific risks. A Bedrock agent with `bedrock:CreateAgent` can reconfigure its own capabilities. An agent with `cloudtrail:StopLogging` can cover its tracks. An agent with unscoped `sts:AssumeRole` can pivot to any role in the account.
 
 **aws-agent-identity-guard** is a static IAM policy linter purpose-built for AI agent roles. 22 rules. Zero runtime dependencies. Blocks bad deploys in CI. SARIF output for GitHub Advanced Security.
 
@@ -62,7 +62,7 @@ aws-agent-identity-guard policy.json --format json
 aws-agent-identity-guard policy.json --format sarif --output results.sarif
 ```
 
-## CI Integration — Block Bad Deploys in 3 Lines
+## CI Integration: Block Bad Deploys in 3 Lines
 
 ```yaml
 - run: pip install aws-agent-identity-guard
@@ -96,18 +96,18 @@ jobs:
           sarif_file: results.sarif
 ```
 
-## What It Catches — 22 Rules
+## What It Catches: 22 Rules
 
 | Rule | Severity | Pattern |
 |------|----------|---------|
 | AIG001 | HIGH | NotAction/NotResource in agent policies |
 | AIG002 | CRITICAL | Wildcard service prefix (`bedrock:*`, `s3:*`) |
-| AIG003 | HIGH | `Resource: "*"` — unbounded blast radius |
+| AIG003 | HIGH | `Resource: "*"` - unbounded blast radius |
 | AIG004 | CRITICAL | `iam:PassRole` without `iam:PassedToService` condition |
 | AIG005 | CRITICAL | Privilege-management actions (iam:*, policy modification) |
 | AIG006 | HIGH | Tool execution (Lambda, SSM, ECS, Bedrock) without resource scoping |
 | AIG007 | MEDIUM | Sensitive data access without ABAC tags |
-| AIG008 | CRITICAL | Bedrock control-plane — agent can modify itself |
+| AIG008 | CRITICAL | Bedrock control-plane, agent can modify itself |
 | AIG009 | HIGH | SageMaker control-plane in a runtime role |
 | AIG010 | HIGH | Network egress modification (ENI, security groups) |
 | AIG011 | CRITICAL | Audit trail tampering (CloudTrail, GuardDuty, Config) |
@@ -118,8 +118,8 @@ jobs:
 | AIG016 | HIGH | Lambda invoke without function-name scoping |
 | AIG017 | HIGH | `sts:AssumeRole` without session tag requirements |
 | AIG018 | HIGH | Database full-table access without row-level conditions |
-| AIG019 | CRITICAL | **Credential-harvest + lateral-movement combination** — the 2026 OpenAI–Hugging Face breach chain |
-| AIG020 | HIGH | **Credential-harvest + cloud-metadata reach** — the SSRF-to-IMDS credential-theft path |
+| AIG019 | CRITICAL | **Credential-harvest + lateral-movement combination** (the 2026 OpenAI-Hugging Face breach chain) |
+| AIG020 | HIGH | **Credential-harvest + cloud-metadata reach** (the SSRF-to-IMDS credential-theft path) |
 | AIG021 | CRITICAL | **Complete breach chain** (harvest → metadata → lateral) in one identity |
 | AIG-TP001 | CRITICAL | Wildcard principal (`*`) in trust policy |
 | AIG-TP002 | HIGH | Cross-account trust without `sts:ExternalId` |
@@ -160,8 +160,8 @@ aws-agent-identity-guard --live-scan --format sarif --output scan.sarif
 
 | Code | Meaning |
 |------|---------|
-| 0 | No critical or high findings — safe to deploy |
-| 1 | Critical or high findings — deploy blocked |
+| 0 | No critical or high findings, safe to deploy |
+| 1 | Critical or high findings, deploy blocked |
 | 2 | Invalid input or CLI error |
 
 ## License
