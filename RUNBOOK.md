@@ -1,4 +1,4 @@
-# Runbook — AWS Agent Identity Guard v0.2.0
+# Runbook — AWS Agent Identity Guard v0.3.0
 
 **Last updated:** 2026-08-08  
 **Audience:** SREs, DevSecOps, Cloud Security Engineers  
@@ -68,7 +68,7 @@ py -m pip install "aws-agent-identity-guard[live]"
 
 # Verify installation
 aws-agent-identity-guard --version
-# Expected: aws-agent-identity-guard 0.2.0
+# Expected: aws-agent-identity-guard 0.3.0
 ```
 
 **Linux / macOS (bash):**
@@ -81,7 +81,7 @@ pip install "aws-agent-identity-guard[live]"
 
 # Verify installation
 aws-agent-identity-guard --version
-# Expected: aws-agent-identity-guard 0.2.0
+# Expected: aws-agent-identity-guard 0.3.0
 ```
 
 ### Option B: Install from Source (for development or unreleased fixes)
@@ -103,7 +103,7 @@ py -m pip install -e ".[dev]"
 
 # Verify
 aws-agent-identity-guard --version
-# Expected: aws-agent-identity-guard 0.2.0
+# Expected: aws-agent-identity-guard 0.3.0
 ```
 
 **Linux / macOS (bash):**
@@ -123,7 +123,7 @@ pip install -e ".[dev]"
 
 # Verify
 aws-agent-identity-guard --version
-# Expected: aws-agent-identity-guard 0.2.0
+# Expected: aws-agent-identity-guard 0.3.0
 ```
 
 > **Note:** If PowerShell blocks venv activation, run `Set-ExecutionPolicy -Scope Process Bypass` first.
@@ -448,7 +448,7 @@ pipeline {
 | Wrong Python version | Running with Python < 3.10 | Use `py -3.12` (Windows) or `python3.12` (Linux) explicitly |
 | `UnicodeDecodeError` reading policy file | File has non-UTF-8 encoding | Re-save the file as UTF-8. On Windows: `Get-Content policy.json | Set-Content -Encoding UTF8 policy-fixed.json` |
 | SARIF file is empty | Redirect captured stderr too | Use `aws-agent-identity-guard policy.json --format sarif > results.sarif 2>errors.log` |
-| Findings count differs from last run | Rules updated between versions | Pin version in CI: `pip install aws-agent-identity-guard==0.2.0` |
+| Findings count differs from last run | Rules updated between versions | Pin version in CI: `pip install aws-agent-identity-guard==0.3.0` |
 
 ---
 
@@ -506,7 +506,7 @@ aws-agent-identity-guard --version
 Always pin to avoid unexpected rule changes breaking builds:
 
 ```bash
-pip install aws-agent-identity-guard==0.2.0
+pip install aws-agent-identity-guard==0.3.0
 ```
 
 Update pinned version after testing new rules in a non-blocking mode first.
