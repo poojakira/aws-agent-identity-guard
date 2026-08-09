@@ -129,8 +129,18 @@ def _print_live_text(report: dict) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    from . import __version__
+
     parser = argparse.ArgumentParser(
         description="Scan AWS IAM policy JSON for agent identity risks"
+    )
+
+    # --version prints "aws-agent-identity-guard <version>" and exits 0,
+    # matching the RUNBOOK's documented verification step.
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"aws-agent-identity-guard {__version__}",
     )
 
     # Static analysis (existing behaviour)
