@@ -118,6 +118,9 @@ jobs:
 | AIG016 | HIGH | Lambda invoke without function-name scoping |
 | AIG017 | HIGH | `sts:AssumeRole` without session tag requirements |
 | AIG018 | HIGH | Database full-table access without row-level conditions |
+| AIG019 | CRITICAL | **Credential-harvest + lateral-movement combination** — the 2026 OpenAI–Hugging Face breach chain |
+| AIG020 | HIGH | **Credential-harvest + cloud-metadata reach** — the SSRF-to-IMDS credential-theft path |
+| AIG021 | CRITICAL | **Complete breach chain** (harvest → metadata → lateral) in one identity |
 | AIG-TP001 | CRITICAL | Wildcard principal (`*`) in trust policy |
 | AIG-TP002 | HIGH | Cross-account trust without `sts:ExternalId` |
 | AIG-TP003 | HIGH | Cross-account trust without `aws:SourceArn` |
