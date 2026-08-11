@@ -2,9 +2,10 @@
 
 ## Purpose
 
-This document describes how `aws-agent-identity-guard` can be deployed as an automated security
-gate in an AWS-integrated CI/CD pipeline, and how the live scanning mode authenticates to AWS
-without long-lived credentials.
+This document is a reference design for running `aws-agent-identity-guard` as an
+automated security check in an AWS-integrated CI/CD pipeline. The default product
+surface is still a local static linter. Live scanning requires explicit AWS
+configuration by the operator.
 
 ---
 
@@ -56,7 +57,7 @@ without long-lived credentials.
 |---------|--------------|-------|
 | **AWS IAM** | Core subject of the scanner | Read-only enumeration of roles, users, policies |
 | **AWS STS** | Temporary credential issuance | OIDC federation from GitHub Actions; `GetCallerIdentity` to resolve account ID |
-| **CloudWatch Logs** | Evidence retention | Scan event logging in live mode |
+| **CloudWatch Logs** | Evidence retention | Provisioned by Terraform module; log shipping from the CLI is not implemented |
 
 Services **not used** (and why):
 - **S3** — Not needed for a CLI tool; scan artifacts are stored in CI artifact storage.
@@ -70,7 +71,7 @@ Services **not used** (and why):
 ### `aws-agent-identity-guard-{env}-scanner-role`
 
 - **Purpose:** Read-only IAM enumeration
-- **Trust:** GitHub Actions OIDC endpoint (`token.actions.githubusercontent.com`) scoped to this repository and `agent/security-hardening-v1` branch
+- **Trust:** GitHub Actions OIDC endpoint (`token.actions.githubusercontent.com`) scoped to the deploying repository and branch
 - **Permissions:** `iam:ListRoles`, `iam:ListUsers`, `iam:GetRole`, `iam:GetPolicy`, `iam:GetPolicyVersion`, `iam:ListAttachedRolePolicies`, `iam:GetRolePolicy`, `iam:ListUserPolicies`, `iam:ListAttachedUserPolicies`, `iam:ListUserTags`, `sts:GetCallerIdentity`
 - **No write permissions** to IAM or any other service
 - **Confused-deputy protection:** `sts:ExternalId` condition required
@@ -99,7 +100,7 @@ Trust policy for the role (example):
   "Condition": {
     "StringEquals": {
       "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-      "token.actions.githubusercontent.com:sub": "repo:poojakira/aws-agent-identity-guard:ref:refs/heads/agent/security-hardening-v1"
+      "token.actions.githubusercontent.com:sub": "repo:OWNER/REPO:ref:refs/heads/main"
     }
   }
 }
@@ -107,16 +108,12 @@ Trust policy for the role (example):
 
 ---
 
-## Cost Estimate
+## Cost
 
-For a CI pipeline running 20 scans/day against an account with ~100 IAM roles:
-
-| Service | Usage | Estimated Cost |
-|---------|-------|---------------|
-| IAM API calls | ~300 read calls/scan × 20 = 6,000/day | Free (IAM API has no per-call cost) |
-| STS AssumeRole | 20/day | Free |
-| CloudWatch Logs | ~10 KB/scan × 20 = 200 KB/day | < $0.01/month |
-| **Total** | | **< $0.10/month** |
+No measured cost artifact is committed in this repository. Operators should
+estimate AWS charges from their actual scan frequency, IAM role count,
+CloudWatch retention settings, and current AWS pricing before enabling live
+scan evidence retention.
 
 ---
 
@@ -125,8 +122,8 @@ For a CI pipeline running 20 scans/day against an account with ~100 IAM roles:
 See [docs/aws-security-controls.md](aws-security-controls.md) for the full control mapping.
 
 Key controls:
-- No permanent AWS credentials stored anywhere
-- Scanner role has `sts:ExternalId` condition (confused-deputy prevention)
-- GitHub Actions OIDC scoped to this repository and branch
-- All IAM permissions are read-only with no resource wildcards that could be abused
-- Terraform state encrypted in S3 (when deployed) with DynamoDB locking
+- No permanent AWS credentials are required by the reference design.
+- Scanner role has `sts:ExternalId` condition in the Terraform module.
+- GitHub Actions OIDC scoping must be set to the operator's repository and branch.
+- Scanner permissions are intended to be read-only IAM enumeration.
+- Terraform state encryption and locking are operator responsibilities outside this module.

@@ -1,10 +1,8 @@
 """
-Tests for policy-level kill-chain combination rules (AIG019-AIG021).
+Tests for policy-level combination rules (AIG019-AIG021).
 
-Grounded in the 2026 OpenAI-Hugging Face incident (first documented autonomous
-AI cyberattack): the agent harvested credentials, reached cloud metadata, and
-moved laterally. These rules detect the COMBINATION across a whole policy that
-per-statement linters miss.
+These rules detect combinations across a whole policy that per-statement linters
+can miss: credential access, metadata enumeration, and lateral movement.
 """
 
 from aws_agent_identity_guard import scan_policy_document
@@ -12,7 +10,7 @@ from aws_agent_identity_guard import scan_policy_document
 
 class TestKillChainCombinations:
     def test_harvest_plus_lateral_is_aig019_critical(self):
-        """The exact HF-incident chain: read secrets + assume roles."""
+        """Credential read plus assume-role is a high-risk combination."""
         policy = {
             "Statement": [
                 {
@@ -92,9 +90,10 @@ class TestKillChainCombinations:
         combo = [f for f in findings if f.rule_id in ("AIG019", "AIG020", "AIG021")]
         assert combo == [], "lateral alone must not trigger a combination rule"
 
-    def test_wildcard_triggers_all_chains(self):
-        """A '*' policy contains every capability — full chain must fire."""
+    def test_wildcard_action_uses_aig002_not_combination_rules(self):
+        """Wildcard action is already covered by AIG002 and should not inflate combos."""
         policy = {"Statement": [{"Effect": "Allow", "Action": "*", "Resource": "*"}]}
         findings = scan_policy_document(policy)
         rule_ids = {f.rule_id for f in findings}
-        assert "AIG021" in rule_ids
+        assert "AIG002" in rule_ids
+        assert not {"AIG019", "AIG020", "AIG021"} & rule_ids

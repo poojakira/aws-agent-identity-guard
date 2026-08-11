@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-08-08  
 **Audience:** SREs, DevSecOps, Cloud Security Engineers  
-**Severity:** This tool gates deployments. If it's broken, insecure agent roles may reach production.
+**Severity:** If you choose to use this tool as a CI merge gate, failures can affect deployment decisions. Treat findings as review evidence, not proof that a role is safe or unsafe in every environment.
 
 ---
 
@@ -56,7 +56,7 @@ python3 -m pip --version
 
 ## 2. Installation
 
-### Option A: Install from PyPI (Recommended for CI and production use)
+### Option A: Install from PyPI
 
 **Windows (PowerShell):**
 ```powershell

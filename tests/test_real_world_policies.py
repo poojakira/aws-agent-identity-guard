@@ -1,11 +1,11 @@
 """
 tests/test_real_world_policies.py
 ─────────────────────────────────────────────────────────────────────────────
-Real-world IAM policy test cases sourced from AWS documentation and
-known misconfiguration patterns observed in production agent deployments.
+IAM policy regression cases derived from AWS documentation examples and
+agent-role misconfiguration hypotheses.
 
-Each test uses actual policy JSON (not simplified versions) and asserts
-which specific AIG rules should fire. Sources are cited in comments.
+Each test uses policy-shaped JSON and asserts which specific AIG rules should
+fire. Do not treat these fixtures as production incident measurements.
 """
 
 import json
@@ -29,12 +29,12 @@ EXAMPLES_DIR = Path(__file__).parent.parent / "examples" / "real_world"
 
 class TestBedrockAgentDefaultOverprivileged:
     """
-    Real-world pattern: Teams copy the AWS docs example but use Resource: '*'
+    Documentation-derived risky variant: an agent execution role uses Resource: '*'
     and add control-plane actions (CreateAgent, UpdateAgent, etc.) to the
     execution role instead of a separate admin role.
 
     Source: https://docs.aws.amazon.com/bedrock/latest/userguide/agents-permissions.html
-    Pattern: Over-broad agent execution role seen in production deployments
+    Pattern: Over-broad agent execution role fixture
     """
 
     # The overprivileged default that teams commonly deploy
@@ -212,10 +212,10 @@ class TestBedrockAgentDefaultOverprivileged:
 
 class TestSageMakerFullAccessPolicy:
     """
-    Real-world pattern: Teams attach AmazonSageMakerFullAccess to agent roles
-    that only need sagemaker-runtime:InvokeEndpoint. The managed policy grants
-    sagemaker:* (including CreateEndpoint, CreateNotebookInstance) plus broad
-    access to S3, ECR, EC2, Secrets Manager, and KMS.
+    Documentation-derived regression case: AmazonSageMakerFullAccess attached
+    to a role that only needs sagemaker-runtime:InvokeEndpoint. The managed
+    policy grants sagemaker:* plus broad access to S3, ECR, EC2,
+    Secrets Manager, and KMS.
 
     Source: arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
     Reference: https://docs.aws.amazon.com/sagemaker/latest/dg/security-iam-awsmanpol.html
@@ -410,9 +410,10 @@ class TestSageMakerFullAccessPolicy:
 
 class TestLambdaOverPermissiveRole:
     """
-    Real-world pattern: Serverless Framework / SAM template with overly broad
-    IAM permissions. The Lambda function is used as a Bedrock agent action group
-    tool, inheriting all these permissions as the agent's effective capability.
+    Regression case: Serverless Framework / SAM style template with overly
+    broad IAM permissions. The Lambda function is used as a Bedrock agent
+    action group tool, inheriting all these permissions as the agent's
+    effective capability.
 
     Source: Common pattern in SAM/Serverless Framework deployments
     Reference: https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html
@@ -569,12 +570,11 @@ class TestLambdaOverPermissiveRole:
 
 class TestECSTaskRoleBedrockAgent:
     """
-    Real-world pattern: ECS task role for a containerized Bedrock agent.
-    The task needs to invoke Bedrock models and pass a role to the Bedrock
-    service, but the PassRole is unconstrained — the #1 misconfiguration
-    in ECS-based agent deployments.
+    Regression case: ECS task role for a containerized Bedrock agent. The task
+    needs to invoke Bedrock models and pass a role to the Bedrock service, but
+    the PassRole is unconstrained.
 
-    Source: Production ECS Fargate + Bedrock agent deployment pattern
+    Source: ECS task-role and iam:PassRole documentation-derived fixture
     Reference: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html
     Misconfiguration: iam:PassRole without iam:PassedToService condition
     """
@@ -772,9 +772,9 @@ class TestECSTaskRoleBedrockAgent:
 
 class TestCrossAccountTrustPolicyConfusedDeputy:
     """
-    Real-world pattern: Cross-account trust policy for an AI agent orchestration
-    platform. The partner/vendor account is trusted to assume a role in the
-    customer account, but the trust policy is missing:
+    Regression case: Cross-account trust policy for an AI agent orchestration
+    platform. A partner/vendor account is trusted to assume a role in the
+    customer account, and the trust policy is missing:
     1. sts:ExternalId (confused deputy protection)
     2. aws:SourceArn (lateral movement protection)
 

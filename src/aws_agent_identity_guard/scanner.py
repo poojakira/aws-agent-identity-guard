@@ -3,10 +3,10 @@ aws_agent_identity_guard/scanner.py
 ────────────────────────────────────────────────────────────────────────────────
 Static IAM policy linter targeting AI agent roles on AWS.
 
-Catches overly-permissive patterns that are common when teams quickly grant
+Catches overly permissive patterns that can occur when teams grant
 Bedrock, SageMaker, Lambda, SSM, or ECS permissions to autonomous AI agents.
-Each rule maps to a real privilege-escalation or data-exfiltration vector
-observed in production agent deployments.
+Each rule maps to an IAM permission pattern that can increase privilege
+escalation, data exposure, lateral movement, or audit-tampering risk.
 
 Rule categories:
   AIG001-AIG007  Identity policy rules (original set)
@@ -617,17 +617,15 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                 )
 
     # ─── Policy-level kill-chain combinations (AIG019-AIG021) ─────────────────
-    # Per-statement rules miss the DANGEROUS COMBINATIONS that turn a single
-    # compromised agent into a multi-day breach. These are grounded in the
-    # 2026 OpenAI-Hugging Face incident (first documented autonomous AI
-    # cyberattack): the agent harvested cloud/cluster credentials, then moved
-    # laterally by assuming other roles, staying inside for 3 days.
+    # Per-statement rules miss dangerous combinations: a single role may be able
+    # to read credentials, enumerate metadata, and pivot to other identities even
+    # if those permissions are split across separate policy statements.
     findings.extend(_scan_killchain_combinations(document))
 
     return findings
 
 
-# ─── Kill-chain combination patterns (grounded in real Aug-2026 incidents) ────
+# ─── Kill-chain combination patterns ──────────────────────────────────────────
 
 # Actions that let an agent HARVEST credentials/secrets (breach step 1).
 _CREDENTIAL_HARVEST_ACTIONS = (
@@ -656,8 +654,7 @@ _LATERAL_MOVEMENT_ACTIONS = (
     "eks:AccessKubernetesApi",
 )
 
-# Actions that let an agent reach cloud metadata / instance identity, the
-# SSRF-to-IMDS credential-theft path used in the Hugging Face intrusion.
+# Actions that let an agent enumerate cloud metadata / instance identities.
 _METADATA_REACH_ACTIONS = (
     "ec2:DescribeInstances",
     "ec2:DescribeIamInstanceProfileAssociations",
@@ -679,8 +676,9 @@ def _all_allowed_actions(document: dict[str, Any]) -> list[str]:
 def _scan_killchain_combinations(document: dict[str, Any]) -> list[Finding]:
     """Detect action COMBINATIONS across a whole policy that enable a breach chain.
 
-    Grounded in the 2026 OpenAI-Hugging Face incident kill chain:
-    harvest credentials -> reach cloud metadata -> move laterally.
+    The combination model is intentionally conservative: AIG002 already covers
+    '*' and service-level wildcards, so these rules only fire when an explicit
+    action matches one of the combination categories.
     """
     findings: list[Finding] = []
     actions = _all_allowed_actions(document)
@@ -689,7 +687,7 @@ def _scan_killchain_combinations(document: dict[str, Any]) -> list[Finding]:
         hits = []
         for a in actions:
             for p in patterns:
-                if a == "*" or a.endswith(":*") or _matches_any(a, {p}):
+                if _matches_any(a, {p}):
                     hits.append(a)
                     break
         return hits
@@ -698,7 +696,7 @@ def _scan_killchain_combinations(document: dict[str, Any]) -> list[Finding]:
     lateral = _has(_LATERAL_MOVEMENT_ACTIONS)
     metadata = _has(_METADATA_REACH_ACTIONS)
 
-    # AIG019 — the exact combination that turned the HF foothold into a 3-day breach.
+    # AIG019: credential read plus identity/code-execution pivot.
     if harvest and lateral:
         findings.append(
             Finding(
@@ -706,10 +704,8 @@ def _scan_killchain_combinations(document: dict[str, Any]) -> list[Finding]:
                 "critical",
                 "Policy grants BOTH credential-harvesting "
                 f"({', '.join(sorted(set(harvest))[:3])}) AND lateral-movement "
-                f"({', '.join(sorted(set(lateral))[:3])}) actions. This is the exact "
-                "kill chain of the 2026 OpenAI-Hugging Face incident: an autonomous "
-                "agent read credentials then assumed other roles to move laterally, "
-                "staying inside for 3 days. Individually each may look reasonable; "
+                f"({', '.join(sorted(set(lateral))[:3])}) actions. Individually "
+                "each permission may look reasonable; "
                 "together they let one compromised agent pivot across your account.",
                 "Split credential-read and role-assumption into separate roles that "
                 "cannot be held by the same session. If an agent must do both, gate "
@@ -726,8 +722,8 @@ def _scan_killchain_combinations(document: dict[str, Any]) -> list[Finding]:
                 "AIG020",
                 "high",
                 "Policy grants credential-harvesting actions alongside cloud-metadata "
-                "enumeration. This mirrors the SSRF-to-IMDS credential-theft path used "
-                "to escalate the Hugging Face intrusion to node-level access.",
+                "enumeration. This can increase exposure if a compromised workload can "
+                "query instance identity or profile metadata.",
                 "Enforce IMDSv2 (HttpTokens=required) on all instances and remove "
                 "instance-profile enumeration from agent roles. Agents should never "
                 "need to discover other instances' identities.",
@@ -743,8 +739,8 @@ def _scan_killchain_combinations(document: dict[str, Any]) -> list[Finding]:
                 "critical",
                 "Policy enables the COMPLETE breach chain (credential harvest -> "
                 "metadata reach -> lateral movement) in a single agent identity. "
-                "A prompt-injected or escaped agent with this policy can reproduce "
-                "the full 2026 autonomous-agent breach pattern end to end.",
+                "A prompt-injected or escaped agent with this policy has multiple "
+                "independent paths to expand access.",
                 "This role is over-scoped for any single agent. Decompose it by "
                 "capability, apply a permission boundary denying sts:AssumeRole and "
                 "secretsmanager:* together, and require human approval for role chaining.",

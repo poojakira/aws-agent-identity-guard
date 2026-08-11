@@ -205,8 +205,7 @@ def main(argv: list[str] | None = None) -> int:
             from .live_scanner import LiveAccountScanner  # noqa: PLC0415
         except ImportError:
             print(
-                "ERROR: boto3 is not installed. "
-                "Run: pip install 'aws-agent-identity-guard[live]'",
+                "ERROR: boto3 is not installed. Run: pip install 'aws-agent-identity-guard[live]'",
                 flush=True,
             )
             return 2
