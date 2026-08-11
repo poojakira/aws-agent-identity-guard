@@ -1,12 +1,16 @@
 # AWS Agent Identity Guard
 
-**Your AI agents are shipping with admin-level IAM. This tool catches it before deploy.**
+Static IAM policy checks for AWS roles used by AI agents and tool executors.
 
-83% of enterprises are deploying AI agents. Only 29% have security controls around them. The result: Bedrock agents with `iam:PassRole` to anything. Lambda-based tool executors with `*` resources. MCP servers that can disable their own audit trails.
+AI agents and tool executors can turn overbroad cloud permissions into real actions: invoking Lambda functions, assuming roles, changing Bedrock/SageMaker control-plane resources, reading secrets, or disabling audit trails. `aws-agent-identity-guard` checks IAM policy JSON for these agent-specific risk patterns before deployment.
 
-Traditional IAM linters don't catch this. Parliament and Prowler check general AWS policy hygiene, but they have no concept of agent-specific risks. A Bedrock agent with `bedrock:CreateAgent` can reconfigure its own capabilities. An agent with `cloudtrail:StopLogging` can cover its tracks. An agent with unscoped `sts:AssumeRole` can pivot to any role in the account.
+This tool is a static linter. It does not call AWS in default mode, does not prove an agent is safe, and does not replace IAM Access Analyzer, Prowler, Parliament, CloudTrail, Security Hub, or threat modeling. Its narrow job is to produce reviewable findings for policies that grant risky permissions to autonomous or semi-autonomous workloads.
 
-**aws-agent-identity-guard** is a static IAM policy linter purpose-built for AI agent roles. 25 rules. Zero runtime dependencies. Blocks bad deploys in CI. SARIF output for GitHub Advanced Security.
+Current implemented surface:
+- 25 deterministic rules for identity policies, trust policies, and permission-boundary presence.
+- Text, JSON, and SARIF output.
+- Zero runtime dependencies for static local-file scanning.
+- Optional live account scan mode when installed with `boto3`.
 
 No AWS credentials required. No cloud calls. Just feed it your policy JSON.
 
@@ -15,8 +19,6 @@ No AWS credentials required. No cloud calls. Just feed it your policy JSON.
 ```bash
 pip install aws-agent-identity-guard
 ```
-
-30 seconds from install to first scan.
 
 ## Usage
 
@@ -47,7 +49,7 @@ HIGH AIG014 statement=0: s3:* includes write/delete without key-prefix scoping
   remediation: Scope to specific bucket and prefix: arn:aws:s3:::bucket/prefix/*
 ```
 
-Exit code `1`. Deploy blocked.
+Exit code `1` means at least one high or critical finding was detected. Whether that blocks deployment is controlled by your CI policy.
 
 ### Output Formats
 
@@ -62,7 +64,7 @@ aws-agent-identity-guard policy.json --format json
 aws-agent-identity-guard policy.json --format sarif --output results.sarif
 ```
 
-## CI Integration: Block Bad Deploys in 3 Lines
+## CI Integration
 
 ```yaml
 - run: pip install aws-agent-identity-guard
@@ -72,7 +74,7 @@ aws-agent-identity-guard policy.json --format sarif --output results.sarif
     sarif_file: results.sarif
 ```
 
-Findings appear inline on pull requests via GitHub Code Scanning. Critical or high findings fail the pipeline (exit code 1).
+Findings can appear inline on pull requests through GitHub Code Scanning. Critical or high findings return exit code `1`, so a workflow can use the result as a merge gate.
 
 Full workflow example:
 
@@ -118,9 +120,9 @@ jobs:
 | AIG016 | HIGH | Lambda invoke without function-name scoping |
 | AIG017 | HIGH | `sts:AssumeRole` without session tag requirements |
 | AIG018 | HIGH | Database full-table access without row-level conditions |
-| AIG019 | CRITICAL | **Credential-harvest + lateral-movement combination** (the 2026 OpenAI-Hugging Face breach chain) |
-| AIG020 | HIGH | **Credential-harvest + cloud-metadata reach** (the SSRF-to-IMDS credential-theft path) |
-| AIG021 | CRITICAL | **Complete breach chain** (harvest → metadata → lateral) in one identity |
+| AIG019 | CRITICAL | Credential-harvest plus lateral-movement permission combination |
+| AIG020 | HIGH | Credential-harvest plus cloud-metadata reachability pattern |
+| AIG021 | CRITICAL | Combined credential-harvest, metadata, and lateral-movement chain in one identity |
 | AIG-TP001 | CRITICAL | Wildcard principal (`*`) in trust policy |
 | AIG-TP002 | HIGH | Cross-account trust without `sts:ExternalId` |
 | AIG-TP003 | HIGH | Cross-account trust without `aws:SourceArn` |
@@ -143,26 +145,33 @@ aws-agent-identity-guard --live-scan --role-name my-bedrock-agent-role
 aws-agent-identity-guard --live-scan --format sarif --output scan.sarif
 ```
 
-## Why Not Parliament / Prowler / IAM Access Analyzer?
+## Relationship to Other IAM Tools
+
+Use this alongside mature AWS security tools. It is intentionally narrower than account-wide posture products and focuses on pre-deploy policy review for agent roles.
 
 | | aws-agent-identity-guard | Parliament | Prowler | IAM Access Analyzer |
 |---|---|---|---|---|
-| Agent-specific rules | ✓ 25 rules | ✗ | ✗ | ✗ |
-| Bedrock self-modification detection | ✓ | ✗ | ✗ | ✗ |
-| PassRole without PassedToService | ✓ | ✗ | ✗ | Partial |
-| Audit-tampering detection | ✓ | ✗ | ✓ (runtime) | ✗ |
-| Static (no credentials needed) | ✓ | ✓ | ✗ | ✗ |
-| SARIF output | ✓ | ✗ | ✗ | ✗ |
-| Zero dependencies | ✓ | ✗ | ✗ | N/A (AWS service) |
-| Pre-deploy CI gate | ✓ | ✓ | ✗ | ✗ |
+| Main role | Agent-role static linter | General IAM linting | Account posture assessment | AWS policy analysis service |
+| Default data path | Local policy JSON | Local policy JSON | AWS account/API scan | AWS service APIs |
+| Agent-specific rules | Implemented in this repo | Out of scope for this audit | Out of scope for this audit | Out of scope for this audit |
+| SARIF output | Implemented in this repo | Tool/version dependent | Workflow dependent | Export/integration dependent |
+| Account-wide cloud context | No | No | Yes | Yes |
 
 ## Exit Codes
 
 | Code | Meaning |
 |------|---------|
-| 0 | No critical or high findings, safe to deploy |
-| 1 | Critical or high findings, deploy blocked |
+| 0 | No critical or high findings found by these rules |
+| 1 | Critical or high findings found |
 | 2 | Invalid input or CLI error |
+
+## Local Test Note
+
+Some developer workstations load unrelated pytest plugins globally. To run this project's tests in an isolated way:
+
+```bash
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests -q
+```
 
 ## License
 
