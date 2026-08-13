@@ -111,6 +111,11 @@ class AccountScanReport:
     summary: dict[str, int]
     roles: list[dict[str, Any]] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
+    # Completeness fields — NEVER omit these from reports.
+    # scan_complete=False means the scan was truncated and findings may be incomplete.
+    scan_complete: bool = True
+    roles_discovered: int | None = None  # total discovered before cap; None if unknown
+    completeness_reason: str | None = None  # human-readable explanation if incomplete
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -287,25 +292,44 @@ class LiveAccountScanner:
 
     # ── Role and user enumeration ──────────────────────────────────────────────
 
-    def _enumerate_roles(self) -> list[RoleSummary]:
-        """List all IAM roles (or just the filtered one)."""
+    def _enumerate_roles(self) -> tuple[list[RoleSummary], bool, int]:
+        """List all IAM roles (or just the filtered one).
+
+        Returns
+        -------
+        tuple of (roles, was_truncated, total_discovered)
+            was_truncated is True when the max_roles cap was hit.
+            total_discovered is the count before truncation (may equal max_roles
+            if pagination was cut short — treat as lower bound).
+        """
         roles: list[RoleSummary] = []
+        was_truncated = False
+        total_discovered = 0
         try:
             if self._role_name_filter:
                 resp = self._iam.get_role(RoleName=self._role_name_filter)
                 role_list = [resp["Role"]]
+                total_discovered = 1
             else:
                 paginator = self._iam.get_paginator("list_roles")
                 role_list = []
                 for page in paginator.paginate():
                     role_list.extend(page.get("Roles", []))
                     if len(role_list) >= self._max_roles:
-                        logger.warning("Role cap (%d) reached — truncating.", self._max_roles)
+                        total_discovered = len(role_list)
+                        was_truncated = True
+                        logger.warning(
+                            "Role cap (%d) reached — truncating scan. "
+                            "Report will be marked incomplete.",
+                            self._max_roles,
+                        )
                         role_list = role_list[: self._max_roles]
                         break
+                if not was_truncated:
+                    total_discovered = len(role_list)
         except botocore.exceptions.ClientError as exc:
             logger.error("Could not enumerate roles: %s", exc)
-            return roles
+            return roles, False, 0
 
         for role_data in role_list:
             role_name = role_data["RoleName"]
@@ -436,8 +460,14 @@ class LiveAccountScanner:
 
         logger.info("Scanning account %s (region=%s)", account_id, self._region)
 
-        # Scan roles
-        roles = self._enumerate_roles()
+        # Scan roles — capture completeness metadata
+        roles, roles_truncated, roles_discovered = self._enumerate_roles()
+        scan_complete = not roles_truncated
+        completeness_reason = (
+            f"Role scan truncated at {self._max_roles} (discovered at least {roles_discovered}). "
+            "Findings may be incomplete — increase max_roles or filter by role name."
+            if roles_truncated else None
+        )
         for role in roles:
             findings = self._scan_role(role)
             all_findings.extend(findings)
@@ -487,6 +517,9 @@ class LiveAccountScanner:
             summary=severity_counts,
             roles=role_rows,
             errors=errors,
+            scan_complete=scan_complete,
+            roles_discovered=roles_discovered,
+            completeness_reason=completeness_reason,
         )
 
     def scan_role_by_name(self, role_name: str) -> list[dict[str, Any]]:

@@ -198,6 +198,129 @@ def _count_actions(actions: list[str]) -> int:
     return len([a for a in actions if a != "*" and not a.endswith(":*")])
 
 
+def _condition_has_key(condition: dict[str, Any], target_key: str) -> bool:
+    """Structurally check whether a condition block contains a specific condition key.
+
+    Replaces ``str(condition)`` substring matching, which is ambiguous because:
+    - Case variants (iam:passedtoservice vs iam:PassedToService) are missed
+    - Substring matches on longer key names cause false-negatives
+      (e.g. "iam:PassedToServiceAccount" contains "iam:PassedToService")
+
+    IAM condition key names are case-insensitive per AWS documentation.
+
+    Parameters
+    ----------
+    condition:
+        The Condition block dict from a policy statement, e.g.
+        {"StringEquals": {"iam:PassedToService": "bedrock.amazonaws.com"}}
+    target_key:
+        The condition key to look for, e.g. "iam:PassedToService".
+        Matched case-insensitively.
+
+    Returns
+    -------
+    bool
+        True if the exact condition key (case-insensitive) appears in any
+        operator's key map. Returns False if condition is empty or malformed.
+    """
+    if not condition or not isinstance(condition, dict):
+        return False
+    target_lower = target_key.lower()
+    # Determine if this is a tag-namespace prefix lookup.
+    # AWS tag condition keys use the form "aws:PrincipalTag/key-name".
+    # When the caller checks for "aws:PrincipalTag" we must match both
+    # the exact key AND any "aws:PrincipalTag/<suffix>" variant.
+    is_tag_prefix = target_lower.endswith("tag")
+    for _operator, key_value_map in condition.items():
+        if not isinstance(key_value_map, dict):
+            continue
+        for condition_key in key_value_map:
+            ck_lower = condition_key.lower()
+            # Exact case-insensitive match
+            if ck_lower == target_lower:
+                return True
+            # Tag-prefix match: aws:PrincipalTag/tenant matches aws:PrincipalTag
+            if is_tag_prefix and ck_lower.startswith(target_lower + "/"):
+                return True
+    return False
+
+
+def _condition_has_key_any(condition: dict[str, Any], *target_keys: str) -> bool:
+    """Return True if the condition block contains ANY of the given keys."""
+    return any(_condition_has_key(condition, k) for k in target_keys)
+
+
+# Set of known dangerous IAM actions used for wildcard expansion checks.
+# When a policy action pattern like "iam:*Role*" or "s3:Get*" matches one
+# of these, we treat it as granting that dangerous capability.
+_DANGEROUS_ACTIONS_FOR_WILDCARD_CHECK: frozenset[str] = frozenset(
+    s.lower()
+    for s in (
+        # Privilege escalation
+        "iam:CreateRole",
+        "iam:PutRolePolicy",
+        "iam:AttachRolePolicy",
+        "iam:CreatePolicy",
+        "iam:CreatePolicyVersion",
+        "iam:SetDefaultPolicyVersion",
+        "iam:PassRole",
+        "iam:DeleteRolePolicy",
+        "iam:DetachRolePolicy",
+        "iam:UpdateAssumeRolePolicy",
+        "iam:PutUserPolicy",
+        "iam:AttachUserPolicy",
+        "iam:AddUserToGroup",
+        # Sensitive data
+        "secretsmanager:GetSecretValue",
+        "kms:Decrypt",
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "s3:GetObject",
+        # Tool execution
+        "lambda:InvokeFunction",
+        "bedrock:InvokeModel",
+        "bedrock-agent:InvokeAgent",
+        "bedrock-agent-runtime:InvokeAgent",
+        "sts:AssumeRole",
+        # Control plane
+        "bedrock:CreateAgent",
+        "bedrock:UpdateAgent",
+        "sagemaker:CreateTrainingJob",
+        # Anti-forensics
+        "cloudtrail:StopLogging",
+        "cloudtrail:DeleteTrail",
+        "guardduty:DeleteDetector",
+    )
+)
+
+
+def _action_pattern_covers_dangerous(action_pattern: str) -> str | None:
+    """Check whether a wildcard action pattern covers at least one dangerous action.
+
+    Only called when the action itself contains a wildcard ('*' or '?') and
+    is NOT already caught by the simple AIG002 check (exact '*' or 'svc:*').
+
+    Returns the first matching dangerous action string for use in the finding
+    message, or None if no dangerous action is covered.
+
+    Examples
+    --------
+    >>> _action_pattern_covers_dangerous("iam:*Role*")
+    'iam:PassRole'
+    >>> _action_pattern_covers_dangerous("s3:Get*")
+    's3:GetObject'
+    >>> _action_pattern_covers_dangerous("ec2:Describe*")
+    None  # read-only, not in dangerous set
+    """
+    if "*" not in action_pattern and "?" not in action_pattern:
+        return None
+    pattern_lower = action_pattern.lower()
+    for dangerous in _DANGEROUS_ACTIONS_FOR_WILDCARD_CHECK:
+        if fnmatchcase(dangerous, pattern_lower):
+            return dangerous
+    return None
+
+
 def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
     """Scan an IAM identity policy for agent-specific security risks.
 
@@ -229,7 +352,9 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
         actions = _as_list(statement.get("Action") or statement.get("NotAction"))
         resources = _as_list(statement.get("Resource") or statement.get("NotResource"))
         condition = statement.get("Condition", {})
-        condition_str = str(condition)
+        # NOTE: condition_str = str(condition) has been removed.
+        # Use _condition_has_key() / _condition_has_key_any() for structural,
+        # case-insensitive, exact-key lookups instead of substring matching.
 
         # ─── AIG001: NotAction/NotResource in agent policies ─────────────────
         if has_not_action or has_not_resource:
@@ -247,6 +372,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
             )
 
         # ─── AIG002: Wildcard actions ────────────────────────────────────────
+        # Check 1: broad wildcards — '*' or 'service:*'
         if any(a == "*" or a.endswith(":*") for a in actions):
             findings.append(
                 Finding(
@@ -261,6 +387,29 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                     index,
                 )
             )
+        # Check 2: partial wildcards that expand to dangerous actions
+        # e.g. "iam:*Role*" covers iam:PassRole; "s3:Get*" covers s3:GetObject
+        else:
+            for action_pat in actions:
+                if "*" not in action_pat and "?" not in action_pat:
+                    continue
+                matched = _action_pattern_covers_dangerous(action_pat)
+                if matched:
+                    findings.append(
+                        Finding(
+                            "AIG002",
+                            "high",
+                            f"Agent policy action pattern '{action_pat}' expands to "
+                            f"dangerous action '{matched}' via wildcard. "
+                            "Partial wildcards are often overlooked but can grant "
+                            "significant privilege (e.g. 'iam:*Role*' includes PassRole).",
+                            f"Replace '{action_pat}' with an explicit list of only the "
+                            "specific actions this agent requires. Never use wildcards "
+                            "for privilege-sensitive IAM services.",
+                            index,
+                        )
+                    )
+                    break  # one finding per statement is sufficient
 
         # ─── AIG003: Wildcard resources ──────────────────────────────────────
         if any(r == "*" for r in resources):
@@ -280,7 +429,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
         # ─── AIG004: PassRole without PassedToService ────────────────────────
         if (
             any(_matches_any(a, {"iam:PassRole", "iam:passrole"}) for a in actions)
-            and "iam:PassedToService" not in condition_str
+            and not _condition_has_key(condition, "iam:PassedToService")
         ):
             findings.append(
                 Finding(
@@ -349,8 +498,8 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
             # AIG007: Sensitive data access without principal tags
             if (
                 _matches_any(action, SENSITIVE_DATA_PATTERNS)
-                and "aws:PrincipalTag" not in condition_str
-                and "aws:ResourceTag" not in condition_str
+                and not _condition_has_key(condition, "aws:PrincipalTag")
+                and not _condition_has_key(condition, "aws:ResourceTag")
                 and action_lower not in seen_sensitive
             ):
                 seen_sensitive.add(action_lower)
@@ -575,8 +724,8 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
         # ─── AIG017: STS AssumeRole without session tags ─────────────────────
         if (
             any(_matches_any(a, {"sts:AssumeRole"}) for a in actions)
-            and "aws:RequestTag" not in condition_str
-            and "sts:TransitiveTagKeys" not in condition_str
+            and not _condition_has_key(condition, "aws:RequestTag")
+            and not _condition_has_key(condition, "sts:TransitiveTagKeys")
         ):
             findings.append(
                 Finding(
@@ -597,9 +746,9 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
         db_scan_actions = {"dynamodb:scan", "dynamodb:query", "rds-data:executestatement"}
         if any(a.lower() in db_scan_actions for a in actions):
             has_condition_limit = (
-                "dynamodb:LeadingKeys" in condition_str
-                or "dynamodb:Attributes" in condition_str
-                or "aws:PrincipalTag" in condition_str
+                _condition_has_key(condition, "dynamodb:LeadingKeys")
+                or _condition_has_key(condition, "dynamodb:Attributes")
+                or _condition_has_key(condition, "aws:PrincipalTag")
             )
             if not has_condition_limit and any(r == "*" for r in resources):
                 findings.append(
@@ -805,10 +954,8 @@ def scan_trust_policy(document: dict[str, Any]) -> list[Finding]:
         # Identify cross-account principals for TP002/TP003
         cross_account_arns = [p for p in principals_flat if p.startswith("arn:aws:iam::")]
         if cross_account_arns:
-            condition_str = str(condition)
-
             # AIG-TP002: Missing ExternalId
-            if "sts:ExternalId" not in condition_str:
+            if not _condition_has_key(condition, "sts:ExternalId"):
                 findings.append(
                     Finding(
                         "AIG-TP002",
@@ -822,8 +969,8 @@ def scan_trust_policy(document: dict[str, Any]) -> list[Finding]:
                     )
                 )
 
-            # AIG-TP003: Missing SourceArn
-            if "aws:SourceArn" not in condition_str and "aws:sourceArn" not in condition_str:
+            # AIG-TP003: Missing SourceArn (aws:SourceArn, case-insensitive structural check)
+            if not _condition_has_key(condition, "aws:SourceArn"):
                 findings.append(
                     Finding(
                         "AIG-TP003",
