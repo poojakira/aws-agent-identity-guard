@@ -24,14 +24,19 @@ def _load_json(path: Path) -> dict:
     return data
 
 
-def _print_text(findings: list[Finding]) -> None:
+def _format_text(findings: list[Finding]) -> str:
     if not findings:
-        print("PASS: no high-risk agent IAM findings")
-        return
+        return "PASS: no high-risk agent IAM findings"
+    lines: list[str] = []
     for finding in findings:
         loc = f" statement={finding.statement_index}" if finding.statement_index is not None else ""
-        print(f"{finding.severity.upper()} {finding.rule_id}{loc}: {finding.message}")
-        print(f"  remediation: {finding.remediation}")
+        lines.append(f"{finding.severity.upper()} {finding.rule_id}{loc}: {finding.message}")
+        lines.append(f"  remediation: {finding.remediation}")
+    return "\n".join(lines)
+
+
+def _print_text(findings: list[Finding]) -> None:
+    print(_format_text(findings))
 
 
 # SARIF severity mapping: SARIF uses "error" / "warning" / "note"
@@ -267,11 +272,18 @@ def main(argv: list[str] | None = None) -> int:
 
     findings = scan_policy_document(_load_json(args.policy))
     if args.format == "json":
-        print(json.dumps({"findings": [f.to_dict() for f in findings]}, indent=2))
+        output_text = json.dumps({"findings": [f.to_dict() for f in findings]}, indent=2)
     elif args.format == "sarif":
-        print(json.dumps(_build_sarif(args.policy, findings), indent=2))
+        output_text = json.dumps(_build_sarif(args.policy, findings), indent=2)
     else:
-        _print_text(findings)
+        output_text = _format_text(findings)
+
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(output_text, encoding="utf-8")
+        print(f"Written to {args.output}")
+    else:
+        print(output_text)
 
     # ── Remediation output ────────────────────────────────────────────────────
     if getattr(args, "remediate", False) and findings:
