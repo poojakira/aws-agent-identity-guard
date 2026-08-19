@@ -21,11 +21,11 @@ Static analyzer that catches over-permissioned IAM policies on AI agent roles be
 
 ## Why I Built This
 
-AI agents on AWS get IAM roles provisioned by infrastructure teams that don't think adversarially about what an agent can do with `iam:PassRole` and no condition keys. I kept seeing Bedrock and SageMaker agent roles with `s3:*` and `sts:AssumeRole` scoped to `*` — not because anyone wanted that, but because nobody caught it before deployment.
+AI agents on AWS get IAM roles provisioned by infrastructure teams that don't think adversarially about what an agent can do with `iam:PassRole` and no condition keys. I kept seeing Bedrock and SageMaker agent roles with `s3:*` and `sts:AssumeRole` scoped to `*`  -  not because anyone wanted that, but because nobody caught it before deployment.
 
 Manual review during security design reviews doesn't scale when you're deploying dozens of agent roles per quarter. I wanted something that runs in CI, catches the patterns that matter for agent-specific threats (credential chaining, lateral movement to other ML services, audit-trail tampering), and blocks the merge automatically if the policy is dangerous.
 
-Zero dependencies means it runs anywhere Python runs — no Docker, no AWS credentials, no network access required. Hand it a policy JSON file and it tells you what's wrong.
+Zero dependencies means it runs anywhere Python runs  -  no Docker, no AWS credentials, no network access required. Hand it a policy JSON file and it tells you what's wrong.
 
 See [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md) for why 25 rules, why pure Python, and what I chose not to build.
 
@@ -38,7 +38,7 @@ IAM Policy JSON (local file or boto3 fetch)
 ┌─────────────────────────────────────────────────────┐
 │              POLICY PARSER                           │
 │  • Statement normalization                          │
-│  • Wildcard expansion (s3:* → all s3 actions)       │
+│  • Wildcard expansion (s3:* -> all s3 actions)       │
 │  • Condition key extraction                         │
 │  • Resource ARN parsing                             │
 └───────────────────────┬─────────────────────────────┘
@@ -85,29 +85,30 @@ IAM Policy JSON (local file or boto3 fetch)
                         ▼
 ┌─────────────────────────────────────────────────────┐
 │           EXIT CODE LOGIC                           │
-│  • Critical or High finding → exit 1               │
-│  • Medium or lower only → exit 0                   │
+│  • Critical or High finding -> exit 1               │
+│  • Medium or lower only -> exit 0                   │
 │  • --fail-on flag overrides threshold              │
 └─────────────────────────────────────────────────────┘
 ```
 
 ## What It Detects
 
-- **Wildcard service prefixes** — `s3:*`, `iam:*`, `bedrock:*`, etc.
-- **iam:PassRole without conditions** — the most common privilege escalation path for agent roles
-- **Privilege-management actions** — `iam:CreatePolicyVersion`, `iam:AttachRolePolicy`, `iam:PutRolePolicy`
-- **Audit-trail tampering** — `cloudtrail:DeleteTrail`, `cloudtrail:StopLogging`, `cloudtrail:UpdateTrail`
-- **Credential-harvest chains** — `sts:AssumeRole` targeting `*` or cross-account without `ExternalId`; combined with `secretsmanager:GetSecretValue` on broad resources
-- **Cross-account trust without ExternalId** — the confused-deputy pattern
-- **Lateral movement** — `lambda:InvokeFunction` on `*`, `sagemaker:CreateNotebookInstance`, `bedrock:InvokeModel` with no resource constraint
-- **Missing condition keys** — policies missing `aws:SourceVpc`, `aws:PrincipalOrgId`, or MFA conditions
+- **Wildcard service prefixes**  -  `s3:*`, `iam:*`, `bedrock:*`, etc.
+- **iam:PassRole without conditions**  -  the most common privilege escalation path for agent roles
+- **Privilege-management actions**  -  `iam:CreatePolicyVersion`, `iam:AttachRolePolicy`, `iam:PutRolePolicy`
+- **Audit-trail tampering**  -  `cloudtrail:DeleteTrail`, `cloudtrail:StopLogging`, `cloudtrail:UpdateTrail`
+- **Credential-harvest chains**  -  `sts:AssumeRole` targeting `*` or cross-account without `ExternalId`; combined with `secretsmanager:GetSecretValue` on broad resources
+- **Cross-account trust without ExternalId**  -  the confused-deputy pattern
+- **Lateral movement**  -  `lambda:InvokeFunction` on `*`, `sagemaker:CreateNotebookInstance`, `bedrock:InvokeModel` with no resource constraint
+- **Missing condition keys**  -  policies missing `aws:SourceVpc`, `aws:PrincipalOrgId`, or MFA conditions
 
 ## Quick Start
 
 ```bash
-pip install aws-agent-identity-guard
+pip install -e .
 
-agent-guard scan policy.json
+# Scan a local policy file
+py -m aws_agent_identity_guard policy.json
 ```
 
 ```
@@ -121,10 +122,10 @@ Exit code: 1
 
 ```bash
 # SARIF output for GitHub Code Scanning
-agent-guard scan policy.json --format sarif --output findings.sarif
+py -m aws_agent_identity_guard policy.json --format sarif --output findings.sarif
 
-# Live mode — pull policies from AWS account
-agent-guard scan --live --role-name my-agent-role --format sarif
+# Live mode  -  pull policies from AWS account
+py -m aws_agent_identity_guard --live-scan --role-name my-agent-role --format sarif
 ```
 
 ## Sample Output
