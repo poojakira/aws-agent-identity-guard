@@ -23,35 +23,31 @@ pip install -e ".[aws]"
 
 ```bash
 # Single file
-identity-guard scan policy.json
+aws-agent-identity-guard policy.json
 
-# Directory of policies
-identity-guard scan ./policies/ --recursive
+# With SARIF output
+aws-agent-identity-guard policy.json --format sarif --output findings.sarif
 
 # With severity threshold (fail on HIGH+)
-identity-guard scan policy.json --min-severity high --exit-code
+aws-agent-identity-guard policy.json --fail-on high
 ```
 
 ## Scan Live AWS Account
 
 ```bash
-# Scan all IAM policies in account
-identity-guard scan-live --profile prod-account
-
 # Specific role
-identity-guard scan-live --role-name agent-execution-role
+aws-agent-identity-guard --live-scan --role-name agent-execution-role
 
 # Specific region
-identity-guard scan-live --region us-west-2
+aws-agent-identity-guard --live-scan --role-name my-agent --region us-west-2 --format json
 ```
 
 ## Output Formats
 
 ```bash
-identity-guard scan policy.json                          # table (default)
-identity-guard scan policy.json --format json > out.json # JSON
-identity-guard scan policy.json --format sarif > out.sarif # SARIF
-identity-guard scan policy.json --format csv             # CSV
+aws-agent-identity-guard policy.json                        # text (default)
+aws-agent-identity-guard policy.json --format json          # JSON
+aws-agent-identity-guard policy.json --format sarif         # SARIF 2.1
 ```
 
 ## CI Integration
@@ -61,7 +57,7 @@ identity-guard scan policy.json --format csv             # CSV
 - name: Scan IAM Policies
   run: |
     pip install aws-agent-identity-guard
-    identity-guard scan ./iam-policies/ --recursive --format sarif --exit-code > results.sarif
+    aws-agent-identity-guard iam/agent-role-policy.json --format sarif --output results.sarif
 - name: Upload SARIF
   uses: github/codeql-action/upload-sarif@v3
   with:
