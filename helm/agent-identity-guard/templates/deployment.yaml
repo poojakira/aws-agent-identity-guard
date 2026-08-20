@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "agent-identity-guard.fullname" . }}
+  labels:
+    {{- include "agent-identity-guard.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "agent-identity-guard.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "agent-identity-guard.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "agent-identity-guard.serviceAccountName" . }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          env:
+            - name: GUARD_ENVIRONMENT
+              value: {{ .Values.config.environment }}
+            - name: GUARD_FAIL_MODE
+              value: {{ .Values.config.failMode }}
+            - name: GUARD_LOG_LEVEL
+              value: {{ .Values.config.logLevel }}
+            - name: GUARD_AUTH_ENABLED
+              value: {{ .Values.config.authEnabled | quote }}
+            - name: GUARD_RATE_LIMIT
+              value: {{ .Values.config.rateLimitPerSecond | quote }}
+            {{- if .Values.redis.enabled }}
+            - name: REDIS_URL
+              value: "redis://{{ .Values.redis.host }}:{{ .Values.redis.port }}/0"
+            {{- end }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]

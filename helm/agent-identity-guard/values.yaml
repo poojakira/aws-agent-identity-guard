@@ -1,0 +1,75 @@
+replicaCount: 3
+
+image:
+  repository: ghcr.io/poojakira/aws-agent-identity-guard
+  tag: '1.0.0'
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+  metricsPort: 9090
+
+resources:
+  limits:
+    cpu: '1'
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilization: 70
+  targetMemoryUtilization: 80
+
+config:
+  environment: production
+  failMode: closed
+  logLevel: info
+  authEnabled: true
+  rateLimitPerSecond: 1000
+
+redis:
+  enabled: true
+  host: redis
+  port: 6379
+
+livenessProbe:
+  httpGet:
+    path: /v1/health
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+
+readinessProbe:
+  httpGet:
+    path: /v1/health/ready
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+
+serviceAccount:
+  create: true
+  annotations:
+    eks.amazonaws.com/role-arn: ''
+
+ingress:
+  enabled: false
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internal
+  hosts:
+    - host: agent-guard.internal
+      paths:
+        - path: /v1
+          pathType: Prefix
+
+monitoring:
+  serviceMonitor:
+    enabled: true
+    interval: 30s

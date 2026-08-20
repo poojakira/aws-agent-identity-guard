@@ -1,0 +1,284 @@
+{
+  "policies": [
+    {
+      "policy_id": "policy-deny-wildcard-secrets",
+      "name": "Deny Wildcard Secrets Access",
+      "description": "Blocks any agent from using wildcard resource on secrets manager in production",
+      "version": "1.0",
+      "priority": 100,
+      "enabled": true,
+      "rules": [
+        {
+          "id": "rule-001",
+          "rule_type": "deny",
+          "action_pattern": "secretsmanager:*",
+          "resource_pattern": "*",
+          "severity": "CRITICAL",
+          "message": "Wildcard secrets access is never permitted for agents",
+          "conditions": {
+            "environment": ["production", "staging"]
+          }
+        }
+      ]
+    },
+    {
+      "policy_id": "policy-require-approval-passrole",
+      "name": "Require Approval for PassRole",
+      "description": "PassRole in production requires human approval to prevent privilege escalation",
+      "version": "1.0",
+      "priority": 90,
+      "enabled": true,
+      "rules": [
+        {
+          "id": "rule-002",
+          "rule_type": "require_approval",
+          "action_pattern": "iam:PassRole",
+          "resource_pattern": "*",
+          "severity": "HIGH",
+          "message": "iam:PassRole requires human approval in production environments",
+          "conditions": {
+            "environment": ["production"]
+          }
+        }
+      ]
+    },
+    {
+      "policy_id": "policy-deny-iam-wildcard",
+      "name": "Deny IAM Wildcard Actions",
+      "description": "No agent should have iam:* - always scope to specific actions",
+      "version": "1.0",
+      "priority": 95,
+      "enabled": true,
+      "rules": [
+        {
+          "id": "rule-003",
+          "rule_type": "deny",
+          "action_pattern": "iam:*",
+          "resource_pattern": "*",
+          "severity": "CRITICAL",
+          "message": "IAM wildcard actions create unlimited privilege escalation risk"
+        },
+        {
+          "id": "rule-004",
+          "rule_type": "deny",
+          "action_pattern": "iam:Create*",
+          "resource_pattern": "*",
+          "severity": "HIGH",
+          "message": "IAM resource creation by agents must be explicitly scoped",
+          "conditions": {
+            "agent_type": ["BEDROCK_AGENT", "LAMBDA"]
+          }
+        }
+      ]
+    },
+    {
+      "policy_id": "policy-deny-cross-account",
+      "name": "Deny Unrestricted Cross-Account AssumeRole",
+      "description": "Cross-account access must target specific role ARNs, not wildcards",
+      "version": "1.0",
+      "priority": 85,
+      "enabled": true,
+      "rules": [
+        {
+          "id": "rule-005",
+          "rule_type": "deny",
+          "action_pattern": "sts:AssumeRole",
+          "resource_pattern": "arn:aws:iam::*:role/*",
+          "severity": "HIGH",
+          "message": "Cross-account AssumeRole with wildcard account is prohibited"
+        }
+      ]
+    },
+    {
+      "policy_id": "policy-warn-broad-s3",
+      "name": "Warn on Broad S3 Access",
+      "description": "Flag s3:* or s3 actions on resource * for review",
+      "version": "1.0",
+      "priority": 50,
+      "enabled": true,
+      "rules": [
+        {
+          "id": "rule-006",
+          "rule_type": "warn",
+          "action_pattern": "s3:*",
+          "resource_pattern": "*",
+          "severity": "MEDIUM",
+          "message": "Broad S3 access detected - consider scoping to specific buckets"
+        },
+        {
+          "id": "rule-007",
+          "rule_type": "warn",
+          "action_pattern": "s3:Delete*",
+          "resource_pattern": "*",
+          "severity": "HIGH",
+          "message": "S3 delete operations should be restricted to specific prefixes"
+        }
+      ]
+    },
+    {
+      "policy_id": "policy-audit-iam-writes",
+      "name": "Audit IAM Write Operations",
+      "description": "All IAM mutations are recorded for compliance audit",
+      "version": "1.0",
+      "priority": 30,
+      "enabled": true,
+      "rules": [
+        {
+          "id": "rule-008",
+          "rule_type": "audit",
+          "action_pattern": "iam:Put*",
+          "resource_pattern": "*",
+          "severity": "MEDIUM",
+          "message": "IAM write operation audited"
+        },
+        {
+          "id": "rule-009",
+          "rule_type": "audit",
+          "action_pattern": "iam:Attach*",
+          "resource_pattern": "*",
+          "severity": "MEDIUM",
+          "message": "IAM policy attachment audited"
+        },
+        {
+          "id": "rule-010",
+          "rule_type": "audit",
+          "action_pattern": "iam:Detach*",
+          "resource_pattern": "*",
+          "severity": "LOW",
+          "message": "IAM policy detachment audited"
+        }
+      ]
+    },
+    {
+      "policy_id": "policy-deny-cloudtrail-disable",
+      "name": "Deny CloudTrail Tampering",
+      "description": "Agents must never be able to disable CloudTrail logging",
+      "version": "1.0",
+      "priority": 100,
+      "enabled": true,
+      "rules": [
+        {
+          "id": "rule-011",
+          "rule_type": "deny",
+          "action_pattern": "cloudtrail:StopLogging",
+          "resource_pattern": "*",
+          "severity": "CRITICAL",
+          "message": "Disabling CloudTrail is absolutely prohibited for all agents"
+        },
+        {
+          "id": "rule-012",
+          "rule_type": "deny",
+          "action_pattern": "cloudtrail:DeleteTrail",
+          "resource_pattern": "*",
+          "severity": "CRITICAL",
+          "message": "Deleting CloudTrail trails is absolutely prohibited for all agents"
+        }
+      ]
+    },
+    {
+      "policy_id": "policy-require-approval-kms-delete",
+      "name": "Require Approval for KMS Key Deletion",
+      "description": "KMS key scheduling for deletion requires human approval",
+      "version": "1.0",
+      "priority": 80,
+      "enabled": true,
+      "rules": [
+        {
+          "id": "rule-013",
+          "rule_type": "require_approval",
+          "action_pattern": "kms:ScheduleKeyDeletion",
+          "resource_pattern": "*",
+          "severity": "CRITICAL",
+          "message": "KMS key deletion scheduling requires human approval"
+        },
+        {
+          "id": "rule-014",
+          "rule_type": "require_approval",
+          "action_pattern": "kms:DisableKey",
+          "resource_pattern": "*",
+          "severity": "HIGH",
+          "message": "KMS key disabling requires human approval"
+        }
+      ]
+    },
+    {
+      "policy_id": "policy-allow-readonly-dynamo",
+      "name": "Allow Read-Only DynamoDB",
+      "description": "Permit scoped DynamoDB read operations for chatbot agents",
+      "version": "1.0",
+      "priority": 40,
+      "enabled": true,
+      "rules": [
+        {
+          "id": "rule-015",
+          "rule_type": "allow",
+          "action_pattern": "dynamodb:GetItem",
+          "resource_pattern": "arn:aws:dynamodb:*:*:table/Orders",
+          "severity": "INFORMATIONAL",
+          "message": "Read access to Orders table is permitted",
+          "conditions": {
+            "agent_type": ["BEDROCK_AGENT"]
+          }
+        },
+        {
+          "id": "rule-016",
+          "rule_type": "allow",
+          "action_pattern": "dynamodb:Query",
+          "resource_pattern": "arn:aws:dynamodb:*:*:table/Orders",
+          "severity": "INFORMATIONAL",
+          "message": "Query access to Orders table is permitted",
+          "conditions": {
+            "agent_type": ["BEDROCK_AGENT"]
+          }
+        }
+      ]
+    },
+    {
+      "policy_id": "policy-deny-data-exfiltration",
+      "name": "Deny Data Exfiltration Patterns",
+      "description": "Block actions commonly used in data exfiltration chains",
+      "version": "1.0",
+      "priority": 95,
+      "enabled": true,
+      "rules": [
+        {
+          "id": "rule-017",
+          "rule_type": "deny",
+          "action_pattern": "s3:PutBucketPolicy",
+          "resource_pattern": "*",
+          "severity": "CRITICAL",
+          "message": "Agents cannot modify bucket policies (data exfiltration risk)"
+        },
+        {
+          "id": "rule-018",
+          "rule_type": "deny",
+          "action_pattern": "s3:PutBucketAcl",
+          "resource_pattern": "*",
+          "severity": "CRITICAL",
+          "message": "Agents cannot modify bucket ACLs (public exposure risk)"
+        },
+        {
+          "id": "rule-019",
+          "rule_type": "deny",
+          "action_pattern": "ec2:CreateSnapshot",
+          "resource_pattern": "*",
+          "severity": "HIGH",
+          "message": "Unscoped snapshot creation may enable data exfiltration via snapshot sharing"
+        }
+      ]
+    }
+  ],
+  "_metadata": {
+    "version": "1.0.0",
+    "description": "Benchmark security policies for AWS Agent Identity Guard testing",
+    "total_policies": 10,
+    "total_rules": 19,
+    "coverage": {
+      "deny_rules": 10,
+      "require_approval_rules": 4,
+      "allow_rules": 2,
+      "warn_rules": 2,
+      "audit_rules": 3
+    }
+  }
+}

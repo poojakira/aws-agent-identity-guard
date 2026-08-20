@@ -1,0 +1,307 @@
+{
+  "transactions": [
+    {
+      "transaction_id": "txn-001",
+      "description": "Invoice agent attempts to read all secrets (CRITICAL - should DENY)",
+      "agent_id": "agent-bench-001",
+      "agent_name": "invoice-processing-agent",
+      "principal": "scheduled-job@acme.corp",
+      "tool": "secrets-reader",
+      "action": "secretsmanager:GetSecretValue",
+      "resource": "*",
+      "data_classification": "SECRET",
+      "environment": "production",
+      "context": {
+        "invocation_source": "scheduled",
+        "session_duration_minutes": 5
+      },
+      "risk_context": {
+        "recent_actions_count": 45,
+        "anomaly_detected": false
+      },
+      "expected_decision": "DENY",
+      "expected_reasons": ["Wildcard secrets access is never permitted for agents"],
+      "severity": "CRITICAL"
+    },
+    {
+      "transaction_id": "txn-002",
+      "description": "Invoice agent attempts iam:PassRole (HIGH - should STEP_UP)",
+      "agent_id": "agent-bench-001",
+      "agent_name": "invoice-processing-agent",
+      "principal": "finance-admin@acme.corp",
+      "tool": "role-manager",
+      "action": "iam:PassRole",
+      "resource": "arn:aws:iam::123456789012:role/GlueServiceRole",
+      "data_classification": "CONFIDENTIAL",
+      "environment": "production",
+      "context": {
+        "invocation_source": "human",
+        "justification": "Need to configure new Glue job"
+      },
+      "risk_context": {
+        "recent_actions_count": 12,
+        "anomaly_detected": false
+      },
+      "expected_decision": "STEP_UP",
+      "expected_reasons": ["iam:PassRole requires human approval in production environments"],
+      "severity": "HIGH"
+    },
+    {
+      "transaction_id": "txn-003",
+      "description": "Chatbot reads order status (LOW - should ALLOW)",
+      "agent_id": "agent-bench-004",
+      "agent_name": "customer-support-chatbot",
+      "principal": "customer-session-9a8b7c",
+      "tool": "order-lookup",
+      "action": "dynamodb:GetItem",
+      "resource": "arn:aws:dynamodb:us-east-1:123456789012:table/Orders",
+      "data_classification": "INTERNAL",
+      "environment": "production",
+      "context": {
+        "invocation_source": "customer_chat",
+        "session_id": "sess-abc123",
+        "attributes_requested": ["orderId", "status", "trackingNumber"]
+      },
+      "risk_context": {
+        "recent_actions_count": 3,
+        "anomaly_detected": false
+      },
+      "expected_decision": "ALLOW",
+      "expected_reasons": ["Read access to Orders table is permitted"],
+      "severity": "INFORMATIONAL"
+    },
+    {
+      "transaction_id": "txn-004",
+      "description": "Data pipeline attempts cross-account role assumption (MEDIUM - context-dependent)",
+      "agent_id": "agent-bench-003",
+      "agent_name": "data-pipeline-orchestrator",
+      "principal": "airflow-scheduler@acme.corp",
+      "tool": "cross-account-connector",
+      "action": "sts:AssumeRole",
+      "resource": "arn:aws:iam::987654321098:role/DataLakeIngestion",
+      "data_classification": "CONFIDENTIAL",
+      "environment": "staging",
+      "context": {
+        "invocation_source": "scheduled",
+        "pipeline_name": "daily-etl-load",
+        "target_account": "987654321098"
+      },
+      "risk_context": {
+        "recent_actions_count": 200,
+        "anomaly_detected": false
+      },
+      "expected_decision": "DENY",
+      "expected_reasons": ["Cross-account AssumeRole with wildcard account is prohibited"],
+      "severity": "HIGH"
+    },
+    {
+      "transaction_id": "txn-005",
+      "description": "Security scanner performs IAM read operation (LOW - should ALLOW)",
+      "agent_id": "agent-bench-005",
+      "agent_name": "security-scanner-agent",
+      "principal": "security-automation@acme.corp",
+      "tool": "iam-analyzer",
+      "action": "iam:ListRoles",
+      "resource": "*",
+      "data_classification": "INTERNAL",
+      "environment": "production",
+      "context": {
+        "invocation_source": "scheduled",
+        "scan_type": "full_inventory"
+      },
+      "risk_context": {
+        "recent_actions_count": 500,
+        "anomaly_detected": false
+      },
+      "expected_decision": "ALLOW",
+      "expected_reasons": ["IAM read operations permitted for security tools"],
+      "severity": "LOW"
+    },
+    {
+      "transaction_id": "txn-006",
+      "description": "Invoice agent attempts to disable CloudTrail (CRITICAL - should DENY)",
+      "agent_id": "agent-bench-001",
+      "agent_name": "invoice-processing-agent",
+      "principal": "unknown-session",
+      "tool": "admin-console",
+      "action": "cloudtrail:StopLogging",
+      "resource": "arn:aws:cloudtrail:us-east-1:123456789012:trail/main-audit-trail",
+      "data_classification": "SECRET",
+      "environment": "production",
+      "context": {
+        "invocation_source": "api_call",
+        "session_duration_minutes": 120
+      },
+      "risk_context": {
+        "recent_actions_count": 1500,
+        "anomaly_detected": true
+      },
+      "expected_decision": "DENY",
+      "expected_reasons": ["Disabling CloudTrail is absolutely prohibited for all agents"],
+      "severity": "CRITICAL"
+    },
+    {
+      "transaction_id": "txn-007",
+      "description": "Log agent writes to designated SIEM bucket (LOW - should ALLOW)",
+      "agent_id": "agent-bench-002",
+      "agent_name": "log-aggregation-agent",
+      "principal": "log-forwarder@acme.corp",
+      "tool": "s3-writer",
+      "action": "s3:PutObject",
+      "resource": "arn:aws:s3:::acme-siem-intake/logs/2024/12/01/batch-001.json.gz",
+      "data_classification": "INTERNAL",
+      "environment": "production",
+      "context": {
+        "invocation_source": "event_trigger",
+        "batch_size": 1024,
+        "compression": "gzip"
+      },
+      "risk_context": {
+        "recent_actions_count": 50000,
+        "anomaly_detected": false
+      },
+      "expected_decision": "ALLOW",
+      "expected_reasons": ["Scoped S3 write to designated SIEM bucket"],
+      "severity": "INFORMATIONAL"
+    },
+    {
+      "transaction_id": "txn-008",
+      "description": "Invoice agent attempts KMS key deletion scheduling (CRITICAL - should DENY/STEP_UP)",
+      "agent_id": "agent-bench-001",
+      "agent_name": "invoice-processing-agent",
+      "principal": "finance-admin@acme.corp",
+      "tool": "key-manager",
+      "action": "kms:ScheduleKeyDeletion",
+      "resource": "arn:aws:kms:us-east-1:123456789012:key/mrk-12345",
+      "data_classification": "SECRET",
+      "environment": "production",
+      "context": {
+        "invocation_source": "human",
+        "justification": "Rotating encryption keys"
+      },
+      "risk_context": {
+        "recent_actions_count": 2,
+        "anomaly_detected": false
+      },
+      "expected_decision": "STEP_UP",
+      "expected_reasons": ["KMS key deletion scheduling requires human approval"],
+      "severity": "CRITICAL"
+    },
+    {
+      "transaction_id": "txn-009",
+      "description": "Data pipeline agent modifies bucket policy (CRITICAL - should DENY)",
+      "agent_id": "agent-bench-003",
+      "agent_name": "data-pipeline-orchestrator",
+      "principal": "airflow-scheduler@acme.corp",
+      "tool": "bucket-config",
+      "action": "s3:PutBucketPolicy",
+      "resource": "arn:aws:s3:::acme-data-lake-staging",
+      "data_classification": "CONFIDENTIAL",
+      "environment": "staging",
+      "context": {
+        "invocation_source": "scheduled",
+        "pipeline_name": "bucket-setup"
+      },
+      "risk_context": {
+        "recent_actions_count": 15,
+        "anomaly_detected": true
+      },
+      "expected_decision": "DENY",
+      "expected_reasons": ["Agents cannot modify bucket policies (data exfiltration risk)"],
+      "severity": "CRITICAL"
+    },
+    {
+      "transaction_id": "txn-010",
+      "description": "Chatbot invokes Bedrock model (LOW - should ALLOW)",
+      "agent_id": "agent-bench-004",
+      "agent_name": "customer-support-chatbot",
+      "principal": "customer-session-def456",
+      "tool": "llm-inference",
+      "action": "bedrock:InvokeModel",
+      "resource": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0",
+      "data_classification": "INTERNAL",
+      "environment": "production",
+      "context": {
+        "invocation_source": "customer_chat",
+        "session_id": "sess-def456",
+        "prompt_tokens": 150,
+        "max_tokens": 500
+      },
+      "risk_context": {
+        "recent_actions_count": 10,
+        "anomaly_detected": false
+      },
+      "expected_decision": "ALLOW",
+      "expected_reasons": ["Bedrock model invocation permitted for chatbot agents"],
+      "severity": "INFORMATIONAL"
+    },
+    {
+      "transaction_id": "txn-011",
+      "description": "Invoice agent creates IAM role (CRITICAL - should DENY)",
+      "agent_id": "agent-bench-001",
+      "agent_name": "invoice-processing-agent",
+      "principal": "compromised-session@unknown",
+      "tool": "iam-admin",
+      "action": "iam:CreateRole",
+      "resource": "*",
+      "data_classification": "SECRET",
+      "environment": "production",
+      "context": {
+        "invocation_source": "api_call",
+        "session_duration_minutes": 300,
+        "source_ip": "198.51.100.42"
+      },
+      "risk_context": {
+        "recent_actions_count": 2000,
+        "anomaly_detected": true
+      },
+      "expected_decision": "DENY",
+      "expected_reasons": ["IAM wildcard actions create unlimited privilege escalation risk"],
+      "severity": "CRITICAL"
+    },
+    {
+      "transaction_id": "txn-012",
+      "description": "Security scanner assumes cross-account audit role (MEDIUM - specific ARN)",
+      "agent_id": "agent-bench-005",
+      "agent_name": "security-scanner-agent",
+      "principal": "security-automation@acme.corp",
+      "tool": "cross-account-scanner",
+      "action": "sts:AssumeRole",
+      "resource": "arn:aws:iam::111222333444:role/OrganizationSecurityAudit",
+      "data_classification": "CONFIDENTIAL",
+      "environment": "production",
+      "context": {
+        "invocation_source": "scheduled",
+        "target_account": "111222333444",
+        "scan_scope": "iam_inventory"
+      },
+      "risk_context": {
+        "recent_actions_count": 100,
+        "anomaly_detected": false
+      },
+      "expected_decision": "DENY",
+      "expected_reasons": ["Cross-account AssumeRole with wildcard account is prohibited"],
+      "severity": "HIGH"
+    }
+  ],
+  "_metadata": {
+    "version": "1.0.0",
+    "description": "Benchmark authorization transactions for end-to-end policy testing",
+    "total_transactions": 12,
+    "expected_outcomes": {
+      "DENY": 7,
+      "ALLOW": 4,
+      "STEP_UP": 2
+    },
+    "coverage": {
+      "agents_covered": 5,
+      "services_covered": ["s3", "iam", "sts", "secretsmanager", "kms", "cloudtrail", "dynamodb", "bedrock"],
+      "severity_distribution": {
+        "CRITICAL": 5,
+        "HIGH": 3,
+        "LOW": 2,
+        "INFORMATIONAL": 2
+      }
+    }
+  }
+}

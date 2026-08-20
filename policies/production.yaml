@@ -1,0 +1,132 @@
+version: '1.0'
+metadata:
+  name: production-strict-policy
+  description: Production environment strict security policy - inherits and extends default baseline
+  author: security-team
+  extends: default-security-baseline
+  environment: production
+
+rules:
+  # --- Inherited defaults enforced at critical level ---
+
+  - id: PROD-DENY-IAM-WRITE
+    deny:
+      action: 'iam:Create*'
+      resource: '*'
+    severity: critical
+    message: 'Agents must not create IAM entities in production'
+
+  - id: PROD-DENY-IAM-ATTACH
+    deny:
+      action: 'iam:Attach*'
+      resource: '*'
+    severity: critical
+    message: 'Agents must not attach policies in production'
+
+  - id: PROD-DENY-IAM-PUT-POLICY
+    deny:
+      action: 'iam:PutRolePolicy'
+      resource: '*'
+    severity: critical
+    message: 'Inline policy injection is forbidden in production'
+
+  - id: PROD-DENY-STS-FEDERATION
+    deny:
+      action: 'sts:GetFederationToken'
+      resource: '*'
+    severity: critical
+    message: 'Federation token generation is forbidden for agents in production'
+
+  - id: PROD-DENY-EC2-TERMINATE
+    deny:
+      action: 'ec2:TerminateInstances'
+      resource: '*'
+    severity: critical
+    message: 'Agents must not terminate EC2 instances in production'
+
+  - id: PROD-DENY-RDS-DELETE
+    deny:
+      action: 'rds:DeleteDBInstance'
+      resource: '*'
+    severity: critical
+    message: 'Agents must not delete RDS instances in production'
+
+  - id: PROD-DENY-LAMBDA-DELETE
+    deny:
+      action: 'lambda:DeleteFunction'
+      resource: '*'
+    severity: critical
+    message: 'Agents must not delete Lambda functions in production'
+
+  - id: PROD-DENY-S3-DELETE-BUCKET
+    deny:
+      action: 's3:DeleteBucket'
+      resource: '*'
+    severity: critical
+    message: 'Agents must not delete S3 buckets in production'
+
+  - id: PROD-DENY-DYNAMODB-DELETE
+    deny:
+      action: 'dynamodb:DeleteTable'
+      resource: '*'
+    severity: critical
+    message: 'Agents must not delete DynamoDB tables in production'
+
+  - id: PROD-DENY-CLOUDFORMATION-DELETE
+    deny:
+      action: 'cloudformation:DeleteStack'
+      resource: '*'
+    severity: critical
+    message: 'Agents must not delete CloudFormation stacks in production'
+
+  - id: PROD-REQUIRE-APPROVAL-ALL-WRITES
+    require_approval:
+      action: '*'
+      resource: '*'
+      conditions:
+        effect: Allow
+        action_category: write
+    severity: high
+    message: 'All write actions in production require human approval'
+
+  - id: PROD-DENY-VPC-MODIFY
+    deny:
+      action: 'ec2:ModifyVpcAttribute'
+      resource: '*'
+    severity: critical
+    message: 'Agents must not modify VPC attributes in production'
+
+  - id: PROD-DENY-SECURITY-GROUP-INGRESS
+    deny:
+      action: 'ec2:AuthorizeSecurityGroupIngress'
+      resource: '*'
+      conditions:
+        cidr: '0.0.0.0/0'
+    severity: critical
+    message: 'Agents must not open security groups to the internet in production'
+
+  - id: PROD-DENY-SECRETS-DELETE
+    deny:
+      action: 'secretsmanager:DeleteSecret'
+      resource: '*'
+    severity: critical
+    message: 'Agents must not delete secrets in production'
+
+  - id: PROD-AUDIT-ALL-API-CALLS
+    audit:
+      action: '*'
+      resource: '*'
+    severity: medium
+    message: 'All agent API calls in production are audited'
+
+  - id: PROD-MAX-SESSION-DURATION
+    constraint:
+      max_session_duration_seconds: 900
+    severity: high
+    message: 'Agent sessions in production must not exceed 15 minutes'
+
+  - id: PROD-REQUIRE-MFA-CONTEXT
+    constraint:
+      require_mfa_context: true
+    severity: high
+    message: 'Production actions require MFA context in the calling chain'

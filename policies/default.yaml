@@ -1,0 +1,78 @@
+version: '1.0'
+metadata:
+  name: default-security-baseline
+  description: Default security baseline for all agents
+  author: security-team
+
+rules:
+  - id: DENY-IAM-WILDCARD
+    deny:
+      action: 'iam:*'
+      resource: '*'
+    severity: critical
+    message: 'Wildcard IAM access is never acceptable for agents'
+
+  - id: DENY-SECRET-WILDCARD
+    deny:
+      action: 'secretsmanager:GetSecretValue'
+      resource: '*'
+    severity: critical
+    message: 'Agents must not have wildcard access to secrets'
+
+  - id: REQUIRE-APPROVAL-PASSROLE
+    require_approval:
+      action: 'iam:PassRole'
+      environment: production
+    severity: high
+    message: 'PassRole in production requires human approval'
+
+  - id: DENY-CLOUDTRAIL-DELETE
+    deny:
+      action: 'cloudtrail:DeleteTrail'
+      resource: '*'
+    severity: critical
+    message: 'Agents must never delete audit trails'
+
+  - id: DENY-CLOUDTRAIL-STOP
+    deny:
+      action: 'cloudtrail:StopLogging'
+      resource: '*'
+    severity: critical
+    message: 'Agents must never stop audit logging'
+
+  - id: WARN-CROSS-ACCOUNT
+    warn:
+      action: 'sts:AssumeRole'
+      resource_pattern: 'arn:aws:iam::(?!SELF_ACCOUNT).*'
+    severity: high
+    message: 'Cross-account role assumption detected'
+
+  - id: DENY-KMS-ALL
+    deny:
+      action: 'kms:*'
+      resource: '*'
+    severity: high
+    message: 'Wildcard KMS access risks key material exposure'
+
+  - id: AUDIT-DATA-ACCESS
+    audit:
+      action: 's3:GetObject'
+      data_classification: [CONFIDENTIAL, SECRET, REGULATED]
+    severity: medium
+    message: 'Audit all access to classified data'
+
+  - id: REQUIRE-APPROVAL-ADMIN
+    require_approval:
+      action: '*'
+      resource: '*'
+      conditions:
+        risk_score_above: 80
+    severity: critical
+    message: 'High-risk actions require approval'
+
+  - id: DENY-PUBLIC-S3
+    deny:
+      action: 's3:PutBucketPolicy'
+      resource: '*'
+    severity: high
+    message: 'Agents must not modify bucket policies'

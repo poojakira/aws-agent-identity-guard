@@ -1,0 +1,18 @@
+apiVersion: v2
+name: agent-identity-guard
+description: AWS Agent Identity Guard - AI Agent Security Platform
+type: application
+version: 1.0.0
+appVersion: '1.0.0'
+keywords:
+  - security
+  - aws
+  - iam
+  - ai-agents
+  - bedrock
+maintainers:
+  - name: Pooja Kiran
+    url: https://github.com/poojakira
+home: https://github.com/poojakira/aws-agent-identity-guard
+sources:
+  - https://github.com/poojakira/aws-agent-identity-guard

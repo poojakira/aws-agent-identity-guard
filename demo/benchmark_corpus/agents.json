@@ -1,0 +1,314 @@
+[
+  {
+    "agent_id": "agent-bench-001",
+    "name": "invoice-processing-agent",
+    "owner": "finance-team@acme.corp",
+    "environment": "production",
+    "purpose": "Process invoices and generate financial reports",
+    "workload_type": "BEDROCK_AGENT",
+    "iam_role_arn": "arn:aws:iam::123456789012:role/InvoiceAgent-OverPermissive",
+    "trust_policy": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {"Service": "bedrock.amazonaws.com"},
+          "Action": "sts:AssumeRole"
+        }
+      ]
+    },
+    "identity_policies": [
+      {
+        "PolicyName": "OverlyBroadAccess",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {"Effect": "Allow", "Action": "s3:*", "Resource": "*"},
+            {"Effect": "Allow", "Action": "iam:*", "Resource": "*"},
+            {"Effect": "Allow", "Action": "sts:*", "Resource": "*"},
+            {"Effect": "Allow", "Action": "kms:*", "Resource": "*"},
+            {"Effect": "Allow", "Action": "secretsmanager:*", "Resource": "*"}
+          ]
+        }
+      }
+    ],
+    "permission_boundaries": [],
+    "data_classification": "SECRET",
+    "tags": {"team": "finance", "compliance": "SOX", "risk-tier": "critical"},
+    "created_at": "2024-06-15T10:30:00Z",
+    "last_activity": "2024-12-01T14:22:00Z",
+    "status": "ACTIVE",
+    "_benchmark_metadata": {
+      "expected_risk_level": "CRITICAL",
+      "expected_risk_range": [0.85, 1.0],
+      "expected_attack_paths_min": 3,
+      "description": "Maximum risk: full admin with wildcard on all sensitive services in production"
+    }
+  },
+  {
+    "agent_id": "agent-bench-002",
+    "name": "log-aggregation-agent",
+    "owner": "platform-eng@acme.corp",
+    "environment": "production",
+    "purpose": "Aggregate and forward CloudWatch logs to SIEM",
+    "workload_type": "LAMBDA",
+    "iam_role_arn": "arn:aws:iam::123456789012:role/LogAggregator-Moderate",
+    "trust_policy": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {"Service": "lambda.amazonaws.com"},
+          "Action": "sts:AssumeRole"
+        }
+      ]
+    },
+    "identity_policies": [
+      {
+        "PolicyName": "LogAccessPolicy",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:GetLogEvents",
+                "logs:FilterLogEvents",
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams"
+              ],
+              "Resource": "arn:aws:logs:us-east-1:123456789012:log-group:*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": "s3:PutObject",
+              "Resource": "arn:aws:s3:::acme-siem-intake/*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": "sts:AssumeRole",
+              "Resource": "arn:aws:iam::987654321098:role/SIEMIngestion"
+            }
+          ]
+        }
+      }
+    ],
+    "permission_boundaries": ["arn:aws:iam::123456789012:policy/LambdaBoundary"],
+    "data_classification": "INTERNAL",
+    "tags": {"team": "platform", "cost-center": "CC-1100"},
+    "created_at": "2024-03-10T08:00:00Z",
+    "last_activity": "2024-12-01T11:45:00Z",
+    "status": "ACTIVE",
+    "_benchmark_metadata": {
+      "expected_risk_level": "MEDIUM",
+      "expected_risk_range": [0.3, 0.6],
+      "expected_attack_paths_min": 1,
+      "description": "Moderate risk: cross-account AssumeRole but scoped resources with boundary"
+    }
+  },
+  {
+    "agent_id": "agent-bench-003",
+    "name": "data-pipeline-orchestrator",
+    "owner": "data-eng@acme.corp",
+    "environment": "staging",
+    "purpose": "Orchestrate ETL pipelines and manage Glue jobs",
+    "workload_type": "ECS",
+    "iam_role_arn": "arn:aws:iam::123456789012:role/DataPipelineOrchestrator",
+    "trust_policy": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {"Service": "ecs-tasks.amazonaws.com"},
+          "Action": "sts:AssumeRole"
+        }
+      ]
+    },
+    "identity_policies": [
+      {
+        "PolicyName": "GlueAndS3Access",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "glue:*",
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": "s3:*",
+              "Resource": [
+                "arn:aws:s3:::acme-data-lake-staging",
+                "arn:aws:s3:::acme-data-lake-staging/*"
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": "iam:PassRole",
+              "Resource": "arn:aws:iam::123456789012:role/GlueServiceRole"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "lakeformation:GetDataAccess",
+                "lakeformation:GrantPermissions"
+              ],
+              "Resource": "*"
+            }
+          ]
+        }
+      }
+    ],
+    "permission_boundaries": [],
+    "data_classification": "CONFIDENTIAL",
+    "tags": {"team": "data-engineering", "pipeline": "etl-main"},
+    "created_at": "2024-08-22T16:00:00Z",
+    "last_activity": "2024-11-30T22:15:00Z",
+    "status": "ACTIVE",
+    "_benchmark_metadata": {
+      "expected_risk_level": "HIGH",
+      "expected_risk_range": [0.6, 0.85],
+      "expected_attack_paths_min": 2,
+      "description": "High risk: glue:* wildcard with PassRole and LakeFormation grant in staging"
+    }
+  },
+  {
+    "agent_id": "agent-bench-004",
+    "name": "customer-support-chatbot",
+    "owner": "cx-team@acme.corp",
+    "environment": "production",
+    "purpose": "Handle customer inquiries and look up order status",
+    "workload_type": "BEDROCK_AGENT",
+    "iam_role_arn": "arn:aws:iam::123456789012:role/CxChatbot-WellScoped",
+    "trust_policy": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {"Service": "bedrock.amazonaws.com"},
+          "Action": "sts:AssumeRole",
+          "Condition": {
+            "StringEquals": {"aws:SourceAccount": "123456789012"}
+          }
+        }
+      ]
+    },
+    "identity_policies": [
+      {
+        "PolicyName": "ScopedReadOnly",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Query"
+              ],
+              "Resource": "arn:aws:dynamodb:us-east-1:123456789012:table/Orders",
+              "Condition": {
+                "ForAllValues:StringEquals": {
+                  "dynamodb:Attributes": ["orderId", "status", "trackingNumber", "estimatedDelivery"]
+                }
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": "bedrock:InvokeModel",
+              "Resource": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-sonnet*"
+            }
+          ]
+        }
+      }
+    ],
+    "permission_boundaries": ["arn:aws:iam::123456789012:policy/BedrockAgentBoundary"],
+    "data_classification": "INTERNAL",
+    "tags": {"team": "customer-experience", "pii-access": "none"},
+    "created_at": "2024-09-01T09:00:00Z",
+    "last_activity": "2024-12-01T16:30:00Z",
+    "status": "ACTIVE",
+    "_benchmark_metadata": {
+      "expected_risk_level": "LOW",
+      "expected_risk_range": [0.05, 0.3],
+      "expected_attack_paths_min": 0,
+      "description": "Low risk: well-scoped read-only DynamoDB with attribute conditions and boundary"
+    }
+  },
+  {
+    "agent_id": "agent-bench-005",
+    "name": "security-scanner-agent",
+    "owner": "security@acme.corp",
+    "environment": "production",
+    "purpose": "Scan IAM configurations and report findings to Security Hub",
+    "workload_type": "LAMBDA",
+    "iam_role_arn": "arn:aws:iam::123456789012:role/SecurityScanner-ReadWrite",
+    "trust_policy": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {"Service": "lambda.amazonaws.com"},
+          "Action": "sts:AssumeRole"
+        }
+      ]
+    },
+    "identity_policies": [
+      {
+        "PolicyName": "SecurityScanPolicy",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "iam:ListRoles",
+                "iam:ListPolicies",
+                "iam:GetRole",
+                "iam:GetPolicy",
+                "iam:GetRolePolicy",
+                "iam:ListRolePolicies",
+                "iam:ListAttachedRolePolicies",
+                "iam:SimulatePrincipalPolicy"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "securityhub:BatchImportFindings",
+                "securityhub:GetFindings"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "access-analyzer:ListAnalyzers",
+                "access-analyzer:ListFindings"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": "sts:AssumeRole",
+              "Resource": "arn:aws:iam::*:role/OrganizationSecurityAudit"
+            }
+          ]
+        }
+      }
+    ],
+    "permission_boundaries": ["arn:aws:iam::123456789012:policy/SecurityToolsBoundary"],
+    "data_classification": "CONFIDENTIAL",
+    "tags": {"team": "security", "automated": "true", "scan-schedule": "hourly"},
+    "created_at": "2024-04-01T12:00:00Z",
+    "last_activity": "2024-12-01T15:00:00Z",
+    "status": "ACTIVE",
+    "_benchmark_metadata": {
+      "expected_risk_level": "MEDIUM",
+      "expected_risk_range": [0.35, 0.65],
+      "expected_attack_paths_min": 1,
+      "description": "Medium risk: IAM read + cross-account AssumeRole wildcard, but has boundary and read-only IAM"
+    }
+  }
+]
