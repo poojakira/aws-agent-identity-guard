@@ -18,11 +18,9 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
-from pathlib import Path
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock, patch
 
 import pytest
-
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # __main__.py coverage (lines 3-7)
@@ -67,10 +65,12 @@ class TestMainModule:
         """Importing __main__ module covers lines 3-7."""
         from unittest.mock import patch as mock_patch
 
-        with mock_patch("aws_agent_identity_guard.cli.main", return_value=0) as mock_main:
+        with mock_patch("aws_agent_identity_guard.cli.main", return_value=0):
             with pytest.raises(SystemExit) as exc_info:
                 import importlib
+
                 import aws_agent_identity_guard.__main__
+
                 importlib.reload(aws_agent_identity_guard.__main__)
             assert exc_info.value.code == 0
 
@@ -185,10 +185,12 @@ class TestCli:
 
         policy = tmp_path / "p.json"
         policy.write_text(
-            json.dumps({"Statement": [{"Effect": "Allow", "Action": "iam:PassRole", "Resource": "*"}]}),
+            json.dumps(
+                {"Statement": [{"Effect": "Allow", "Action": "iam:PassRole", "Resource": "*"}]}
+            ),
             encoding="utf-8",
         )
-        rc = main([str(policy), "--format", "sarif"])
+        main([str(policy), "--format", "sarif"])
         captured = capsys.readouterr()
         sarif = json.loads(captured.out)
         assert sarif["version"] == "2.1.0"
@@ -200,13 +202,17 @@ class TestCli:
 
         policy = tmp_path / "agent_role_policy.json"
         policy.write_text(
-            json.dumps({
-                "Statement": [{
-                    "Effect": "Allow",
-                    "Action": "iam:PassRole",
-                    "Resource": "*",
-                }]
-            }),
+            json.dumps(
+                {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": "iam:PassRole",
+                            "Resource": "*",
+                        }
+                    ]
+                }
+            ),
             encoding="utf-8",
         )
         rc = main([str(policy), "--remediate"])
@@ -221,13 +227,17 @@ class TestCli:
 
         policy = tmp_path / "clean_policy.json"
         policy.write_text(
-            json.dumps({
-                "Statement": [{
-                    "Effect": "Allow",
-                    "Action": "s3:GetObject",
-                    "Resource": "arn:aws:s3:::bucket/prefix/*",
-                }]
-            }),
+            json.dumps(
+                {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": "s3:GetObject",
+                            "Resource": "arn:aws:s3:::bucket/prefix/*",
+                        }
+                    ]
+                }
+            ),
             encoding="utf-8",
         )
         rc = main([str(policy), "--remediate"])
@@ -237,11 +247,9 @@ class TestCli:
 
     def test_live_scan_no_boto3(self, capsys):
         """--live-scan without boto3 installed shows error."""
-        from aws_agent_identity_guard.cli import main
-
         # Simulate ImportError when trying to import live_scanner
-        import importlib
-        import aws_agent_identity_guard.cli as cli_mod
+
+        from aws_agent_identity_guard.cli import main
 
         # Remove live_scanner from sys.modules if it's there, and make the import fail
         with patch.dict("sys.modules", {"aws_agent_identity_guard.live_scanner": None}):
@@ -278,15 +286,18 @@ class TestCli:
             # Patch the import inside main
             import aws_agent_identity_guard.cli as cli_module
 
-            with patch.object(cli_module, "__import__", create=True):
-                # We need to simulate the import inside main() succeeding
-                # Do this by patching at the module level where it's imported
-                with patch.dict("sys.modules", {
-                    "aws_agent_identity_guard.live_scanner": MagicMock(
-                        LiveAccountScanner=mock_scanner_class
-                    )
-                }):
-                    rc = main(["--live-scan", "--format", "json"])
+            with (
+                patch.object(cli_module, "__import__", create=True),
+                patch.dict(
+                    "sys.modules",
+                    {
+                        "aws_agent_identity_guard.live_scanner": MagicMock(
+                            LiveAccountScanner=mock_scanner_class
+                        )
+                    },
+                ),
+            ):
+                rc = main(["--live-scan", "--format", "json"])
 
         assert rc == 0
         captured = capsys.readouterr()
@@ -323,11 +334,14 @@ class TestCli:
         mock_scanner_class = MagicMock()
         mock_scanner_class.return_value.scan_account.return_value = mock_report
 
-        with patch.dict("sys.modules", {
-            "aws_agent_identity_guard.live_scanner": MagicMock(
-                LiveAccountScanner=mock_scanner_class
-            )
-        }):
+        with patch.dict(
+            "sys.modules",
+            {
+                "aws_agent_identity_guard.live_scanner": MagicMock(
+                    LiveAccountScanner=mock_scanner_class
+                )
+            },
+        ):
             rc = main(["--live-scan", "--format", "text"])
 
         assert rc == 1  # has critical findings
@@ -355,11 +369,14 @@ class TestCli:
         mock_scanner_class = MagicMock()
         mock_scanner_class.return_value.scan_account.return_value = mock_report
 
-        with patch.dict("sys.modules", {
-            "aws_agent_identity_guard.live_scanner": MagicMock(
-                LiveAccountScanner=mock_scanner_class
-            )
-        }):
+        with patch.dict(
+            "sys.modules",
+            {
+                "aws_agent_identity_guard.live_scanner": MagicMock(
+                    LiveAccountScanner=mock_scanner_class
+                )
+            },
+        ):
             rc = main(["--live-scan", "--format", "text"])
 
         assert rc == 0
@@ -394,11 +411,14 @@ class TestCli:
         mock_scanner_class = MagicMock()
         mock_scanner_class.return_value.scan_account.return_value = mock_report
 
-        with patch.dict("sys.modules", {
-            "aws_agent_identity_guard.live_scanner": MagicMock(
-                LiveAccountScanner=mock_scanner_class
-            )
-        }):
+        with patch.dict(
+            "sys.modules",
+            {
+                "aws_agent_identity_guard.live_scanner": MagicMock(
+                    LiveAccountScanner=mock_scanner_class
+                )
+            },
+        ):
             rc = main(["--live-scan", "--format", "sarif"])
 
         assert rc == 1
@@ -427,11 +447,14 @@ class TestCli:
         mock_scanner_class.return_value.scan_account.return_value = mock_report
 
         out = tmp_path / "report.json"
-        with patch.dict("sys.modules", {
-            "aws_agent_identity_guard.live_scanner": MagicMock(
-                LiveAccountScanner=mock_scanner_class
-            )
-        }):
+        with patch.dict(
+            "sys.modules",
+            {
+                "aws_agent_identity_guard.live_scanner": MagicMock(
+                    LiveAccountScanner=mock_scanner_class
+                )
+            },
+        ):
             rc = main(["--live-scan", "--format", "json", "--output", str(out)])
 
         assert rc == 0
@@ -444,11 +467,14 @@ class TestCli:
         mock_scanner_class = MagicMock()
         mock_scanner_class.return_value.scan_account.side_effect = RuntimeError("No creds")
 
-        with patch.dict("sys.modules", {
-            "aws_agent_identity_guard.live_scanner": MagicMock(
-                LiveAccountScanner=mock_scanner_class
-            )
-        }):
+        with patch.dict(
+            "sys.modules",
+            {
+                "aws_agent_identity_guard.live_scanner": MagicMock(
+                    LiveAccountScanner=mock_scanner_class
+                )
+            },
+        ):
             rc = main(["--live-scan"])
 
         assert rc == 2
@@ -462,11 +488,14 @@ class TestCli:
         mock_scanner_class = MagicMock()
         mock_scanner_class.return_value.scan_account.side_effect = ValueError("bad config")
 
-        with patch.dict("sys.modules", {
-            "aws_agent_identity_guard.live_scanner": MagicMock(
-                LiveAccountScanner=mock_scanner_class
-            )
-        }):
+        with patch.dict(
+            "sys.modules",
+            {
+                "aws_agent_identity_guard.live_scanner": MagicMock(
+                    LiveAccountScanner=mock_scanner_class
+                )
+            },
+        ):
             rc = main(["--live-scan"])
 
         assert rc == 2
@@ -493,12 +522,25 @@ class TestCli:
         mock_scanner_class = MagicMock()
         mock_scanner_class.return_value.scan_account.return_value = mock_report
 
-        with patch.dict("sys.modules", {
-            "aws_agent_identity_guard.live_scanner": MagicMock(
-                LiveAccountScanner=mock_scanner_class
+        with patch.dict(
+            "sys.modules",
+            {
+                "aws_agent_identity_guard.live_scanner": MagicMock(
+                    LiveAccountScanner=mock_scanner_class
+                )
+            },
+        ):
+            rc = main(
+                [
+                    "--live-scan",
+                    "--role-name",
+                    "my-agent",
+                    "--region",
+                    "eu-west-1",
+                    "--format",
+                    "json",
+                ]
             )
-        }):
-            rc = main(["--live-scan", "--role-name", "my-agent", "--region", "eu-west-1", "--format", "json"])
 
         assert rc == 0
         mock_scanner_class.assert_called_once_with(region="eu-west-1", role_name_filter="my-agent")
@@ -587,7 +629,10 @@ class TestRemediate:
         findings = [self._make_finding("AIG017", "high")]
         ctx = {"target_role_arn": "arn:aws:iam::111122223333:role/downstream"}
         result = generate_remediations(
-            findings, resource_name="chain-agent", resource_arn="arn:aws:iam::999:role/chain-agent", context=ctx
+            findings,
+            resource_name="chain-agent",
+            resource_arn="arn:aws:iam::999:role/chain-agent",
+            context=ctx,
         )
 
         assert len(result) == 1
@@ -767,21 +812,28 @@ class TestLiveScannerAdditional:
         )
 
     def _trust(self, principal):
-        return json.dumps({
-            "Version": "2012-10-17",
-            "Statement": [{"Effect": "Allow", "Principal": principal, "Action": "sts:AssumeRole"}],
-        })
+        return json.dumps(
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {"Effect": "Allow", "Principal": principal, "Action": "sts:AssumeRole"}
+                ],
+            }
+        )
 
     def _policy_doc(self, actions, resources):
-        return json.dumps({
-            "Version": "2012-10-17",
-            "Statement": [{"Effect": "Allow", "Action": actions, "Resource": resources}],
-        })
+        return json.dumps(
+            {
+                "Version": "2012-10-17",
+                "Statement": [{"Effect": "Allow", "Action": actions, "Resource": resources}],
+            }
+        )
 
     @pytest.mark.usefixtures("_skip_if_no_moto")
     def test_user_policy_scanning(self):
         """Live scanner detects findings in IAM user policies."""
         from moto import mock_aws
+
         from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
@@ -797,9 +849,7 @@ class TestLiveScannerAdditional:
             )
 
             report = LiveAccountScanner(session=sess).scan_account()
-            user_findings = [
-                f for f in report.findings if f.get("resource_name") == "agent-user"
-            ]
+            user_findings = [f for f in report.findings if f.get("resource_name") == "agent-user"]
             assert len(user_findings) > 0
             assert report.users_scanned >= 1
 
@@ -807,6 +857,7 @@ class TestLiveScannerAdditional:
     def test_managed_policy_scanning(self):
         """Live scanner fetches and scans managed policies attached to roles."""
         from moto import mock_aws
+
         from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
@@ -828,9 +879,7 @@ class TestLiveScannerAdditional:
             iam.attach_role_policy(RoleName="managed-role", PolicyArn=policy_arn)
 
             report = LiveAccountScanner(session=sess).scan_account()
-            role_findings = [
-                f for f in report.findings if f.get("resource_name") == "managed-role"
-            ]
+            role_findings = [f for f in report.findings if f.get("resource_name") == "managed-role"]
             # Should find AIG004 (PassRole without condition)
             assert any(f["rule_id"] == "AIG004" for f in role_findings)
 
@@ -838,6 +887,7 @@ class TestLiveScannerAdditional:
     def test_permission_boundary_note(self):
         """Role with high findings and no boundary gets AIG-PB001."""
         from moto import mock_aws
+
         from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
@@ -856,16 +906,21 @@ class TestLiveScannerAdditional:
 
             report = LiveAccountScanner(session=sess).scan_account()
             pb_findings = [
-                f for f in report.findings
+                f
+                for f in report.findings
                 if f.get("rule_id") == "AIG-PB001" and f.get("resource_name") == "no-boundary-role"
             ]
             assert len(pb_findings) == 1
-            assert "permission boundary" in pb_findings[0]["message"].lower() or "permission boundary" in pb_findings[0]["remediation"].lower()
+            assert (
+                "permission boundary" in pb_findings[0]["message"].lower()
+                or "permission boundary" in pb_findings[0]["remediation"].lower()
+            )
 
     @pytest.mark.usefixtures("_skip_if_no_moto")
     def test_role_name_filter(self):
         """--role-name filter scans only the specified role."""
         from moto import mock_aws
+
         from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
@@ -881,9 +936,7 @@ class TestLiveScannerAdditional:
                 AssumeRolePolicyDocument=self._trust({"Service": "lambda.amazonaws.com"}),
             )
 
-            report = LiveAccountScanner(
-                session=sess, role_name_filter="target-role"
-            ).scan_account()
+            report = LiveAccountScanner(session=sess, role_name_filter="target-role").scan_account()
 
             # Only target-role should be in findings
             assert report.roles_scanned == 1
@@ -895,6 +948,7 @@ class TestLiveScannerAdditional:
     def test_user_with_managed_policy(self):
         """User with attached managed policy is scanned."""
         from moto import mock_aws
+
         from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
@@ -913,15 +967,14 @@ class TestLiveScannerAdditional:
             iam.attach_user_policy(UserName="risky-user", PolicyArn=policy_arn)
 
             report = LiveAccountScanner(session=sess).scan_account()
-            user_findings = [
-                f for f in report.findings if f.get("resource_name") == "risky-user"
-            ]
+            user_findings = [f for f in report.findings if f.get("resource_name") == "risky-user"]
             assert any(f["rule_id"] == "AIG005" for f in user_findings)
 
     @pytest.mark.usefixtures("_skip_if_no_moto")
     def test_role_with_tags_and_last_used(self):
         """Scanner includes role metadata in report."""
         from moto import mock_aws
+
         from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
@@ -950,6 +1003,7 @@ class TestLiveScannerAdditional:
     def test_account_id_detection(self):
         """Scanner correctly detects the account ID."""
         from moto import mock_aws
+
         from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
@@ -969,6 +1023,7 @@ class TestLiveScannerAdditional:
     def test_scan_account_empty(self):
         """Scanning empty account (no roles/users) returns clean report."""
         from moto import mock_aws
+
         from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
@@ -1006,11 +1061,13 @@ class TestScannerEdgeCases:
         from aws_agent_identity_guard.scanner import scan_policy_document
 
         doc = {
-            "Statement": [{
-                "Effect": "Allow",
-                "NotAction": "s3:*",
-                "NotResource": "arn:aws:s3:::protected-bucket",
-            }]
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "NotAction": "s3:*",
+                    "NotResource": "arn:aws:s3:::protected-bucket",
+                }
+            ]
         }
         findings = scan_policy_document(doc)
         assert any(f.rule_id == "AIG001" for f in findings)
@@ -1020,11 +1077,13 @@ class TestScannerEdgeCases:
         from aws_agent_identity_guard.scanner import scan_policy_document
 
         doc = {
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "s3:PutObject",
-                "Resource": "arn:aws:s3:::my-bucket/*",
-            }]
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": "s3:PutObject",
+                    "Resource": "arn:aws:s3:::my-bucket/*",
+                }
+            ]
         }
         findings = scan_policy_document(doc)
         assert any(f.rule_id == "AIG014" for f in findings)
@@ -1034,11 +1093,13 @@ class TestScannerEdgeCases:
         from aws_agent_identity_guard.scanner import scan_policy_document
 
         doc = {
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "s3:PutObject",
-                "Resource": "arn:aws:s3:::my-bucket/agent-workspace/data/*",
-            }]
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": "s3:PutObject",
+                    "Resource": "arn:aws:s3:::my-bucket/agent-workspace/data/*",
+                }
+            ]
         }
         findings = scan_policy_document(doc)
         assert not any(f.rule_id == "AIG014" for f in findings)
@@ -1048,11 +1109,13 @@ class TestScannerEdgeCases:
         from aws_agent_identity_guard.scanner import scan_policy_document
 
         doc = {
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "dynamodb:Scan",
-                "Resource": "*",
-            }]
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": "dynamodb:Scan",
+                    "Resource": "*",
+                }
+            ]
         }
         findings = scan_policy_document(doc)
         assert any(f.rule_id == "AIG018" for f in findings)
@@ -1062,11 +1125,16 @@ class TestScannerEdgeCases:
         from aws_agent_identity_guard.scanner import scan_policy_document
 
         doc = {
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "bedrock:InvokeModel",
-                "Resource": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku*",
-            }]
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": "bedrock:InvokeModel",
+                    "Resource": (
+                        "arn:aws:bedrock:us-east-1::foundation-model"
+                        "/anthropic.claude-3-haiku*"
+                    ),
+                }
+            ]
         }
         findings = scan_policy_document(doc)
         assert not any(f.rule_id == "AIG015" for f in findings)
@@ -1090,11 +1158,13 @@ class TestScannerEdgeCases:
         from aws_agent_identity_guard.scanner import scan_policy_document
 
         doc = {
-            "Statement": [{
-                "Effect": "Deny",
-                "Action": "*",
-                "Resource": "*",
-            }]
+            "Statement": [
+                {
+                    "Effect": "Deny",
+                    "Action": "*",
+                    "Resource": "*",
+                }
+            ]
         }
         findings = scan_policy_document(doc)
         assert findings == []
@@ -1112,11 +1182,13 @@ class TestScannerEdgeCases:
 
         actions = [f"s3:Action{i}" for i in range(20)]
         doc = {
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": actions,
-                "Resource": "arn:aws:s3:::bucket/*",
-            }]
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": actions,
+                    "Resource": "arn:aws:s3:::bucket/*",
+                }
+            ]
         }
         findings = scan_policy_document(doc)
         assert any(f.rule_id == "AIG012" for f in findings)
@@ -1126,11 +1198,13 @@ class TestScannerEdgeCases:
         from aws_agent_identity_guard.scanner import scan_policy_document
 
         doc = {
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "lambda:InvokeFunction",
-                "Resource": "arn:aws:lambda:us-east-1:123456789012:function:my-tool-func",
-            }]
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": "lambda:InvokeFunction",
+                    "Resource": "arn:aws:lambda:us-east-1:123456789012:function:my-tool-func",
+                }
+            ]
         }
         findings = scan_policy_document(doc)
         assert not any(f.rule_id == "AIG016" for f in findings)
@@ -1140,15 +1214,19 @@ class TestScannerEdgeCases:
         from aws_agent_identity_guard.scanner import scan_policy_document
 
         doc = {
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "sts:AssumeRole",
-                "Resource": "arn:aws:iam::123456789012:role/target",
-                "Condition": {
-                    "StringLike": {"aws:RequestTag/agent-session-id": "*"},
-                    "ForAllValues:StringEquals": {"sts:TransitiveTagKeys": ["agent-session-id"]},
-                },
-            }]
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": "sts:AssumeRole",
+                    "Resource": "arn:aws:iam::123456789012:role/target",
+                    "Condition": {
+                        "StringLike": {"aws:RequestTag/agent-session-id": "*"},
+                        "ForAllValues:StringEquals": {
+                            "sts:TransitiveTagKeys": ["agent-session-id"]
+                        },
+                    },
+                }
+            ]
         }
         findings = scan_policy_document(doc)
         assert not any(f.rule_id == "AIG017" for f in findings)
@@ -1158,11 +1236,13 @@ class TestScannerEdgeCases:
         from aws_agent_identity_guard.scanner import scan_trust_policy
 
         doc = {
-            "Statement": [{
-                "Effect": "Allow",
-                "Principal": {"AWS": "arn:aws:iam::111122223333:root"},
-                "Action": "sts:AssumeRole",
-            }]
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "arn:aws:iam::111122223333:root"},
+                    "Action": "sts:AssumeRole",
+                }
+            ]
         }
         findings = scan_trust_policy(doc)
         # Should flag cross-account without ExternalId
@@ -1173,11 +1253,13 @@ class TestScannerEdgeCases:
         from aws_agent_identity_guard.scanner import scan_trust_policy
 
         doc = {
-            "Statement": [{
-                "Effect": "Allow",
-                "Principal": {"Service": "bedrock.amazonaws.com"},
-                "Action": "sts:AssumeRole",
-            }]
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {"Service": "bedrock.amazonaws.com"},
+                    "Action": "sts:AssumeRole",
+                }
+            ]
         }
         findings = scan_trust_policy(doc)
         assert not any(f.rule_id == "AIG-TP002" for f in findings)
@@ -1188,11 +1270,13 @@ class TestScannerEdgeCases:
         from aws_agent_identity_guard.scanner import scan_policy_document
 
         doc = {
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "s3:DeleteObject",
-                "Resource": "arn:aws:s3:::mybucket",
-            }]
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": "s3:DeleteObject",
+                    "Resource": "arn:aws:s3:::mybucket",
+                }
+            ]
         }
         findings = scan_policy_document(doc)
         assert any(f.rule_id == "AIG014" for f in findings)
@@ -1213,6 +1297,7 @@ class TestLiveScannerErrorPaths:
 
     def _session(self):
         import boto3 as _b3
+
         return _b3.Session(
             region_name="us-east-1",
             aws_access_key_id="testing",
@@ -1222,9 +1307,10 @@ class TestLiveScannerErrorPaths:
 
     def test_get_account_id_failure(self):
         """When STS fails, account_id returns 'unknown'."""
-        from moto import mock_aws
-        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
         import botocore.exceptions
+        from moto import mock_aws
+
+        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
             sess = self._session()
@@ -1232,11 +1318,9 @@ class TestLiveScannerErrorPaths:
 
             # Mock the STS client to fail
             scanner._sts = MagicMock()
-            scanner._sts.get_caller_identity.side_effect = (
-                botocore.exceptions.ClientError(
-                    {"Error": {"Code": "AccessDenied", "Message": "forbidden"}},
-                    "GetCallerIdentity",
-                )
+            scanner._sts.get_caller_identity.side_effect = botocore.exceptions.ClientError(
+                {"Error": {"Code": "AccessDenied", "Message": "forbidden"}},
+                "GetCallerIdentity",
             )
 
             account_id = scanner._get_account_id()
@@ -1244,9 +1328,10 @@ class TestLiveScannerErrorPaths:
 
     def test_get_managed_policy_failure(self):
         """When get_policy fails, returns None."""
-        from moto import mock_aws
-        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
         import botocore.exceptions
+        from moto import mock_aws
+
+        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
             sess = self._session()
@@ -1254,11 +1339,9 @@ class TestLiveScannerErrorPaths:
 
             # Mock to fail
             scanner._iam = MagicMock()
-            scanner._iam.get_policy.side_effect = (
-                botocore.exceptions.ClientError(
-                    {"Error": {"Code": "NoSuchEntity", "Message": "not found"}},
-                    "GetPolicy",
-                )
+            scanner._iam.get_policy.side_effect = botocore.exceptions.ClientError(
+                {"Error": {"Code": "NoSuchEntity", "Message": "not found"}},
+                "GetPolicy",
             )
 
             result = scanner._get_managed_policy_document("arn:aws:iam::123:policy/missing")
@@ -1266,9 +1349,10 @@ class TestLiveScannerErrorPaths:
 
     def test_collect_role_policies_inline_failure(self):
         """When list_role_policies fails, returns empty list gracefully."""
-        from moto import mock_aws
-        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
         import botocore.exceptions
+        from moto import mock_aws
+
+        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
             sess = self._session()
@@ -1284,14 +1368,17 @@ class TestLiveScannerErrorPaths:
             mock_iam.get_paginator.return_value = mock_paginator
             scanner._iam = mock_iam
 
-            policies = scanner._collect_role_policies("test-role", "arn:aws:iam::123:role/test-role")
+            policies = scanner._collect_role_policies(
+                "test-role", "arn:aws:iam::123:role/test-role"
+            )
             assert policies == []
 
     def test_collect_user_policies_inline_failure(self):
         """When list_user_policies fails, returns empty list gracefully."""
-        from moto import mock_aws
-        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
         import botocore.exceptions
+        from moto import mock_aws
+
+        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
             sess = self._session()
@@ -1306,14 +1393,17 @@ class TestLiveScannerErrorPaths:
             mock_iam.get_paginator.return_value = mock_paginator
             scanner._iam = mock_iam
 
-            policies = scanner._collect_user_policies("test-user", "arn:aws:iam::123:user/test-user")
+            policies = scanner._collect_user_policies(
+                "test-user", "arn:aws:iam::123:user/test-user"
+            )
             assert policies == []
 
     def test_enumerate_roles_failure(self):
         """When list_roles fails, returns empty list."""
-        from moto import mock_aws
-        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
         import botocore.exceptions
+        from moto import mock_aws
+
+        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
             sess = self._session()
@@ -1333,9 +1423,10 @@ class TestLiveScannerErrorPaths:
 
     def test_enumerate_users_failure(self):
         """When list_users fails, returns empty list."""
-        from moto import mock_aws
-        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
         import botocore.exceptions
+        from moto import mock_aws
+
+        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
             sess = self._session()
@@ -1356,6 +1447,7 @@ class TestLiveScannerErrorPaths:
     def test_enumerate_roles_max_cap(self):
         """When max_roles is reached, scanning truncates."""
         from moto import mock_aws
+
         from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
@@ -1366,10 +1458,18 @@ class TestLiveScannerErrorPaths:
             for i in range(3):
                 iam.create_role(
                     RoleName=f"role-{i}",
-                    AssumeRolePolicyDocument=json.dumps({
-                        "Version": "2012-10-17",
-                        "Statement": [{"Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}],
-                    }),
+                    AssumeRolePolicyDocument=json.dumps(
+                        {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Principal": {"Service": "lambda.amazonaws.com"},
+                                    "Action": "sts:AssumeRole",
+                                }
+                            ],
+                        }
+                    ),
                 )
 
             scanner = LiveAccountScanner(session=sess, max_roles=2)
@@ -1378,9 +1478,10 @@ class TestLiveScannerErrorPaths:
 
     def test_get_role_policy_individual_failure(self):
         """When get_role_policy fails for one policy, others still collected."""
-        from moto import mock_aws
-        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
         import botocore.exceptions
+        from moto import mock_aws
+
+        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
             sess = self._session()
@@ -1391,9 +1492,7 @@ class TestLiveScannerErrorPaths:
 
             # For inline: paginator returns policy names
             inline_paginator = MagicMock()
-            inline_paginator.paginate.return_value = [
-                {"PolicyNames": ["policy-ok", "policy-fail"]}
-            ]
+            inline_paginator.paginate.return_value = [{"PolicyNames": ["policy-ok", "policy-fail"]}]
 
             # For attached: paginator returns empty
             attached_paginator = MagicMock()
@@ -1415,21 +1514,30 @@ class TestLiveScannerErrorPaths:
                         {"Error": {"Code": "NoSuchEntity", "Message": "nope"}},
                         "GetRolePolicy",
                     )
-                return {"PolicyDocument": {"Statement": [{"Effect": "Allow", "Action": "s3:GetObject", "Resource": "*"}]}}
+                return {
+                    "PolicyDocument": {
+                        "Statement": [
+                            {"Effect": "Allow", "Action": "s3:GetObject", "Resource": "*"}
+                        ]
+                    }
+                }
 
             mock_iam.get_role_policy.side_effect = get_role_policy_side_effect
             scanner._iam = mock_iam
 
-            policies = scanner._collect_role_policies("test-role", "arn:aws:iam::123:role/test-role")
+            policies = scanner._collect_role_policies(
+                "test-role", "arn:aws:iam::123:role/test-role"
+            )
             # One should succeed
             assert len(policies) == 1
             assert policies[0].policy_name == "policy-ok"
 
     def test_get_user_policy_individual_failure(self):
         """When get_user_policy fails for one policy, others still collected."""
-        from moto import mock_aws
-        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
         import botocore.exceptions
+        from moto import mock_aws
+
+        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
             sess = self._session()
@@ -1458,20 +1566,29 @@ class TestLiveScannerErrorPaths:
                         {"Error": {"Code": "NoSuchEntity", "Message": "nope"}},
                         "GetUserPolicy",
                     )
-                return {"PolicyDocument": {"Statement": [{"Effect": "Allow", "Action": "s3:GetObject", "Resource": "*"}]}}
+                return {
+                    "PolicyDocument": {
+                        "Statement": [
+                            {"Effect": "Allow", "Action": "s3:GetObject", "Resource": "*"}
+                        ]
+                    }
+                }
 
             mock_iam.get_user_policy.side_effect = get_user_policy_side_effect
             scanner._iam = mock_iam
 
-            policies = scanner._collect_user_policies("test-user", "arn:aws:iam::123:user/test-user")
+            policies = scanner._collect_user_policies(
+                "test-user", "arn:aws:iam::123:user/test-user"
+            )
             assert len(policies) == 1
             assert policies[0].policy_name == "user-policy-ok"
 
     def test_collect_role_attached_policies_failure(self):
         """When list_attached_role_policies fails, inline policies still returned."""
-        from moto import mock_aws
-        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
         import botocore.exceptions
+        from moto import mock_aws
+
+        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
             sess = self._session()
@@ -1488,8 +1605,6 @@ class TestLiveScannerErrorPaths:
                 "ListAttachedRolePolicies",
             )
 
-            call_idx = [0]
-
             def get_paginator(name):
                 if name == "list_role_policies":
                     return inline_paginator
@@ -1503,9 +1618,10 @@ class TestLiveScannerErrorPaths:
 
     def test_collect_user_attached_policies_failure(self):
         """When list_attached_user_policies fails, inline policies still returned."""
-        from moto import mock_aws
-        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
         import botocore.exceptions
+        from moto import mock_aws
+
+        from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
             sess = self._session()
@@ -1548,12 +1664,14 @@ class TestRemediateEdgeCases:
 
         policy = {
             "Version": "2012-10-17",
-            "Statement": [{
-                "Sid": "Multi",
-                "Effect": "Allow",
-                "Action": "s3:GetObject",
-                "Resource": ["arn:aws:s3:::bucket1/*", "arn:aws:s3:::bucket2/*"],
-            }],
+            "Statement": [
+                {
+                    "Sid": "Multi",
+                    "Effect": "Allow",
+                    "Action": "s3:GetObject",
+                    "Resource": ["arn:aws:s3:::bucket1/*", "arn:aws:s3:::bucket2/*"],
+                }
+            ],
         }
         result = _to_cfn_yaml("TestPolicy", policy)
         assert "Resource:" in result
@@ -1566,12 +1684,14 @@ class TestRemediateEdgeCases:
 
         policy = {
             "Version": "2012-10-17",
-            "Statement": [{
-                "Sid": "Simple",
-                "Effect": "Allow",
-                "Action": ["s3:GetObject", "s3:PutObject"],
-                "Resource": "*",
-            }],
+            "Statement": [
+                {
+                    "Sid": "Simple",
+                    "Effect": "Allow",
+                    "Action": ["s3:GetObject", "s3:PutObject"],
+                    "Resource": "*",
+                }
+            ],
         }
         result = _to_cfn_yaml("SimplePolicy", policy)
         assert "Condition" not in result
