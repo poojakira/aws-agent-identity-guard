@@ -1130,8 +1130,7 @@ class TestScannerEdgeCases:
                     "Effect": "Allow",
                     "Action": "bedrock:InvokeModel",
                     "Resource": (
-                        "arn:aws:bedrock:us-east-1::foundation-model"
-                        "/anthropic.claude-3-haiku*"
+                        "arn:aws:bedrock:us-east-1::foundation-model" "/anthropic.claude-3-haiku*"
                     ),
                 }
             ]
