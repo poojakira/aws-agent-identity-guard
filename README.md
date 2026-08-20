@@ -1,6 +1,6 @@
 # AWS Agent Identity Guard
 
-Static IAM policy analyzer that catches over-permissioned AI agent roles before they reach production. 25 deterministic rules, zero runtime dependencies, exits non-zero on critical findings so your CI pipeline blocks the merge.
+Static IAM policy analyzer that catches over-permissioned AI agent roles before they reach production. 24 deterministic rules, zero runtime dependencies, exits non-zero on critical findings so your CI pipeline blocks the merge.
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -12,7 +12,7 @@ Static IAM policy analyzer that catches over-permissioned AI agent roles before 
 
 | Metric | Value |
 |--------|-------|
-| Detection rules | 25 deterministic |
+| Detection rules | 24 deterministic |
 | Runtime dependencies | 0 (pure Python) |
 | Workloads covered | Bedrock, SageMaker, Lambda |
 | Output formats | Text, JSON, SARIF 2.1 |
@@ -39,7 +39,7 @@ IAM Policy JSON (local file or boto3 fetch)
 └───────────────────────┬─────────────────────────────┘
                         ▼
 ┌─────────────────────────────────────────────────────┐
-│           RULE ENGINE (25 rules)                    │
+│           RULE ENGINE (24 rules)                    │
 │                                                     │
 │  Category 1: Wildcard Abuse (5 rules)               │
 │  Category 2: Privilege Escalation (4 rules)         │
