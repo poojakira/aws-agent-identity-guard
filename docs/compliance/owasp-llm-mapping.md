@@ -16,7 +16,7 @@ This document maps AWS Agent Identity Guard capabilities to the [OWASP Top 10 fo
 |--------|---------------|---------|
 | Prevention | ○ Not covered | Guard does not inspect or filter prompts |
 | Impact Mitigation | ● **Strong** | Runtime authorization evaluates every agent action regardless of how the LLM decided to take it. Even if prompt injection succeeds at the reasoning level, the authorization layer blocks unauthorized AWS API calls |
-| Detection | ● **Strong** | Behavior analyzer detects when an agent suddenly performs actions outside its learned baseline — a strong signal of prompt injection |
+| Detection | ● **Strong** | Behavior analyzer detects when an agent suddenly performs actions outside its learned baseline  -  a strong signal of prompt injection |
 
 **Guard-Specific Mitigation:**
 - Policy engine denies actions not in agent's allowed set
@@ -115,7 +115,7 @@ This document maps AWS Agent Identity Guard capabilities to the [OWASP Top 10 fo
 
 | Aspect | Guard Coverage | Details |
 |--------|---------------|---------|
-| Prevention | ● **Strong** | This is Guard's primary use case — ensuring AI agent tools (AWS API calls) operate with least privilege |
+| Prevention | ● **Strong** | This is Guard's primary use case  -  ensuring AI agent tools (AWS API calls) operate with least privilege |
 | Detection | ● **Strong** | Intent alignment detects tools operating outside declared capabilities |
 
 **Guard-Specific Mitigation:**
@@ -156,11 +156,11 @@ This document maps AWS Agent Identity Guard capabilities to the [OWASP Top 10 fo
 
 | Aspect | Guard Coverage | Details |
 |--------|---------------|---------|
-| Prevention | ● Strong | Every agent decision to act is independently verified by authorization service — not reliant on LLM's self-assessment |
+| Prevention | ● Strong | Every agent decision to act is independently verified by authorization service  -  not reliant on LLM's self-assessment |
 | Detection | ◐ Partial | Anomaly detection identifies when LLM actions diverge from expected patterns |
 
 **Guard-Specific Mitigation:**
-- Authorization is independent of agent's reasoning — provides external verification
+- Authorization is independent of agent's reasoning  -  provides external verification
 - Step-up approval creates human verification checkpoint
 - Multi-dimensional risk scoring provides independent risk assessment
 - Behavior analysis detects when agent's actions don't match expected patterns
@@ -210,7 +210,7 @@ This document maps AWS Agent Identity Guard capabilities to the [OWASP Top 10 fo
 
 ## Key Insight
 
-Agent Identity Guard provides the strongest coverage for **LLM07 (Insecure Plugin/Tool Design)** and **LLM08 (Excessive Agency)** — these are the OWASP risks most directly addressable at the IAM/infrastructure layer. For application-layer risks like prompt injection (LLM01) and training data poisoning (LLM03), Guard provides **impact mitigation** rather than root-cause prevention. The defense-in-depth principle ensures that even if an application-layer attack succeeds, the infrastructure-layer controls limit the damage.
+Agent Identity Guard provides the strongest coverage for **LLM07 (Insecure Plugin/Tool Design)** and **LLM08 (Excessive Agency)**  -  these are the OWASP risks most directly addressable at the IAM/infrastructure layer. For application-layer risks like prompt injection (LLM01) and training data poisoning (LLM03), Guard provides **impact mitigation** rather than root-cause prevention. The defense-in-depth principle ensures that even if an application-layer attack succeeds, the infrastructure-layer controls limit the damage.
 
 ---
 

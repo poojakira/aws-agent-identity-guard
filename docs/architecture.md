@@ -87,12 +87,12 @@ The core static analysis engine. Applies 24 deterministic rules to IAM policy JS
 
 | Category | Rules | Description |
 |----------|-------|-------------|
-| Wildcard Abuse | AIG001–AIG005 | Full-service wildcards on sensitive services |
-| Privilege Escalation | AIG006–AIG009 | PassRole, CreatePolicyVersion, AttachRolePolicy |
-| Credential Harvest | AIG010–AIG013 | Cross-account AssumeRole, GetSecretValue |
-| Audit-Trail Tampering | AIG014–AIG016 | CloudTrail deletion/modification |
-| Lateral Movement | AIG017–AIG021 | Lambda invoke, SageMaker notebooks, Bedrock scope |
-| Missing Conditions | AIG022–AIG025 | Missing SourceVpc, PrincipalOrgId, MFA |
+| Wildcard Abuse | AIG001-AIG005 | Full-service wildcards on sensitive services |
+| Privilege Escalation | AIG006-AIG009 | PassRole, CreatePolicyVersion, AttachRolePolicy |
+| Credential Harvest | AIG010-AIG013 | Cross-account AssumeRole, GetSecretValue |
+| Audit-Trail Tampering | AIG014-AIG016 | CloudTrail deletion/modification |
+| Lateral Movement | AIG017-AIG021 | Lambda invoke, SageMaker notebooks, Bedrock scope |
+| Missing Conditions | AIG022-AIG025 | Missing SourceVpc, PrincipalOrgId, MFA |
 
 ### 2. Live Scanner (`live_scanner.py`)
 
@@ -135,7 +135,7 @@ Compares declared agent capabilities (YAML manifest) against effective permissio
 - **DANGEROUS_UNRELATED**: High-risk permissions unrelated to stated purpose
 - **MISSING_PERMISSIONS**: Actions in manifest but not in effective permissions
 
-Produces an alignment score (0–100) with category breakdowns.
+Produces an alignment score (0-100) with category breakdowns.
 
 ### 7. Capability Inventory (`capability_inventory.py`)
 
@@ -248,9 +248,9 @@ Developer commits IAM policy JSON
           ▼
 ┌─────────────────────┐     ┌──────────────────┐
 │  Scanner            │────▶│  Output Formatter │
-│  • Parse policy     │     │  • Text           │
-│  • Normalize        │     │  • JSON           │
-│  • Apply 24 rules   │     │  • SARIF 2.1      │
+│  * Parse policy     │     │  * Text           │
+│  * Normalize        │     │  * JSON           │
+│  * Apply 24 rules   │     │  * SARIF 2.1      │
 └─────────────────────┘     └────────┬─────────┘
                                      │
                                      ▼
@@ -269,9 +269,9 @@ Agent Action Request
          ▼
 ┌─────────────────────────────────────────────────────┐
 │  API Server / SDK Middleware                         │
-│  • Authenticate (API key)                           │
-│  • Rate limit (token bucket)                        │
-│  • Parse request                                    │
+│  * Authenticate (API key)                           │
+│  * Rate limit (token bucket)                        │
+│  * Parse request                                    │
 └───────────────────────┬─────────────────────────────┘
                         │
                         ▼

@@ -4,13 +4,13 @@
 
 This document maps AWS Agent Identity Guard capabilities to the [NIST AI Risk Management Framework](https://www.nist.gov/artificial-intelligence/ai-risk-management-framework) (AI RMF 1.0, January 2023). The AI RMF provides organizations with a framework for managing risks from AI systems across their lifecycle.
 
-Agent Identity Guard specifically addresses risks arising from AI agents operating with AWS IAM permissions — focusing on the **security, accountability, and controllability** dimensions of trustworthy AI.
+Agent Identity Guard specifically addresses risks arising from AI agents operating with AWS IAM permissions  -  focusing on the **security, accountability, and controllability** dimensions of trustworthy AI.
 
 ---
 
 ## AI RMF Core Functions
 
-### GOVERN — Establishing AI Risk Management Culture
+### GOVERN  -  Establishing AI Risk Management Culture
 
 | Subcategory | AI RMF Requirement | Guard Capability | Coverage |
 |-------------|-------------------|-----------------|----------|
@@ -23,7 +23,7 @@ Agent Identity Guard specifically addresses risks arising from AI agents operati
 | GOVERN 4.1 | Organizational practices are reviewed | Policy versioning and testing enable regular policy review cycles | ◐ |
 | GOVERN 4.2 | Feedback mechanisms are in place | Audit trail enables post-incident review; behavior reports for analysis | ● |
 
-### MAP — Contextualizing AI Risks
+### MAP  -  Contextualizing AI Risks
 
 | Subcategory | AI RMF Requirement | Guard Capability | Coverage |
 |-------------|-------------------|-----------------|----------|
@@ -36,7 +36,7 @@ Agent Identity Guard specifically addresses risks arising from AI agents operati
 | MAP 3.4 | Impacts from AI risks are assessed | Blast radius analysis quantifies potential damage; severity classification | ● |
 | MAP 5.1 | AI actors throughout lifecycle are identified | Agent registry with lifecycle tracking (ACTIVE → DECOMMISSIONED) | ● |
 
-### MEASURE — Analyzing and Assessing AI Risks
+### MEASURE  -  Analyzing and Assessing AI Risks
 
 | Subcategory | AI RMF Requirement | Guard Capability | Coverage |
 |-------------|-------------------|-----------------|----------|
@@ -51,7 +51,7 @@ Agent Identity Guard specifically addresses risks arising from AI agents operati
 | MEASURE 3.2 | Risk metrics are collected and reported | Risk scores, finding counts, denial rates, anomaly counts aggregated | ● |
 | MEASURE 4.1 | Measurement approaches address identified risks | Per-category detection rates (precision/recall) for each threat type | ● |
 
-### MANAGE — Prioritizing and Acting on AI Risks
+### MANAGE  -  Prioritizing and Acting on AI Risks
 
 | Subcategory | AI RMF Requirement | Guard Capability | Coverage |
 |-------------|-------------------|-----------------|----------|

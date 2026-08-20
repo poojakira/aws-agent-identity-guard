@@ -8,7 +8,7 @@ Takes scanner findings and produces ready-to-apply IaC fixes:
 - CloudFormation YAML snippets
 - Raw IAM policy JSON (fixed version)
 
-This bridges the gap between "we found a problem" and "here's the fix" —
+This bridges the gap between "we found a problem" and "here's the fix"  - 
 turning a security scanner into an infrastructure automation tool.
 
 No external AI service required. Uses rule-based templates with context
@@ -359,7 +359,7 @@ def generate_remediations(
             addressed.add("AIG017")
 
         elif finding.rule_id in ("AIG005", "AIG008", "AIG009", "AIG010", "AIG011"):
-            # Dangerous actions — suggest permission boundary
+            # Dangerous actions  -  suggest permission boundary
             hcl = _DENY_BOUNDARY.format(role_name=tf_name)
             policy = {
                 "Version": "2012-10-17",
@@ -410,7 +410,7 @@ def generate_remediations(
                         "Attached a permission boundary that denies all dangerous actions "
                         "(IAM modification, audit tampering, control-plane, network). "
                         "The boundary caps effective permissions regardless of what identity "
-                        "policies grant. This is defense-in-depth — even if a policy is "
+                        "policies grant. This is defense-in-depth  -  even if a policy is "
                         "misconfigured, the boundary prevents escalation."
                     ),
                 )

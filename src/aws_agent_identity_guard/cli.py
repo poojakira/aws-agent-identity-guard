@@ -48,7 +48,7 @@ _SARIF_LEVEL: dict[str, str] = {
     "info": "note",
 }
 
-# Stable URI for the tool rules — points at the repo
+# Stable URI for the tool rules  -  points at the repo
 _TOOL_URI = "https://github.com/poojakira/aws-agent-identity-guard"
 
 
@@ -226,7 +226,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         except Exception as exc:  # noqa: BLE001
             # Boto3 ClientError, NoCredentialsError, etc.
-            # Surface the real error — do not swallow it
+            # Surface the real error  -  do not swallow it
             print(f"ERROR during live scan: {type(exc).__name__}: {exc}")
             return 2
 

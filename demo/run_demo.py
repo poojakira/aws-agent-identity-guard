@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""AWS Agent Identity Guard — Golden End-to-End Demo.
+"""AWS Agent Identity Guard  -  Golden End-to-End Demo.
 
 Demonstrates the full lifecycle of AI agent identity security:
   Deploy → Discover → Analyze → Score → Block → Enforce → Audit → Report
@@ -447,7 +447,7 @@ def step_5_risk_score(agent: Agent) -> dict[str, Any]:
         level_color = Colors.GREEN
         level_label = "LOW"
 
-    info("Risk Dimensions (0.0 – 1.0):")
+    info("Risk Dimensions (0.0 - 1.0):")
     result_box("  Privilege Score      ", f"{max(score.privilege_score, max_perm_score):.3f}")
     result_box("  Sensitivity          ", f"{score.sensitivity_score:.3f}")
     result_box("  Blast Radius         ", f"{max(score.blast_radius, avg_perm_score):.3f}")
@@ -465,7 +465,7 @@ def step_5_risk_score(agent: Agent) -> dict[str, Any]:
     info("")
 
     if composite >= 0.7:
-        danger("Agent exceeds risk threshold — deployment should be BLOCKED")
+        danger("Agent exceeds risk threshold  -  deployment should be BLOCKED")
     step_footer()
 
     return {
@@ -485,7 +485,7 @@ def step_5_risk_score(agent: Agent) -> dict[str, Any]:
 
 def step_6_ci_gate(risk_data: dict[str, Any]) -> dict[str, Any]:
     """Step 6: CI/CD gate blocks deployment."""
-    step_header(6, "CI/CD Gate — Block Deployment")
+    step_header(6, "CI/CD Gate  -  Block Deployment")
 
     threshold = 0.7
     composite = risk_data["composite_score"]
@@ -500,10 +500,10 @@ def step_6_ci_gate(risk_data: dict[str, Any]) -> dict[str, Any]:
         danger(f"{Colors.BG_RED}{Colors.WHITE} ██ DEPLOYMENT BLOCKED ██ {Colors.RESET}")
         info("")
         info("Reasons:")
-        info(f"  • Composite risk score {composite:.3f} exceeds threshold {threshold}")
-        info("  • Wildcard IAM permissions detected (iam:*, s3:*, sts:*)")
-        info("  • No permission boundaries configured")
-        info("  • SECRET data classification without scoped access")
+        info(f"  * Composite risk score {composite:.3f} exceeds threshold {threshold}")
+        info("  * Wildcard IAM permissions detected (iam:*, s3:*, sts:*)")
+        info("  * No permission boundaries configured")
+        info("  * SECRET data classification without scoped access")
         info("")
         info(f"{Colors.CYAN}Recommendation:{Colors.RESET} Apply least-privilege policies before re-deploy")
     else:
@@ -534,7 +534,7 @@ def step_7_runtime_request(agent: Agent) -> dict[str, Any]:
 
 def step_8_authorization_decision(agent: Agent) -> dict[str, Any]:
     """Step 8: Authorization service renders DENY/STEP-UP decision."""
-    step_header(8, "Authorization Decision — DENY / STEP-UP")
+    step_header(8, "Authorization Decision  -  DENY / STEP-UP")
 
     # Use the PolicyEngine to make a decision
     policy_engine = PolicyEngine(strict_mode=True)
@@ -574,17 +574,17 @@ def step_8_authorization_decision(agent: Agent) -> dict[str, Any]:
     if decision.reasons:
         info("  Reasons:")
         for reason in decision.reasons[:5]:
-            info(f"    • {reason}")
+            info(f"    * {reason}")
     if decision.warnings:
         info("  Warnings:")
         for w in decision.warnings[:3]:
-            info(f"    • {w}")
+            info(f"    * {w}")
 
     info("")
     if display_effect in ("DENY", "STEP_UP"):
-        success("Runtime guardrail ENFORCED — sensitive action blocked")
+        success("Runtime guardrail ENFORCED  -  sensitive action blocked")
     else:
-        warning("Action was allowed — consider tightening policies")
+        warning("Action was allowed  -  consider tightening policies")
 
     step_footer()
     return {"decision": display_effect, "reasons": decision.reasons[:5]}
@@ -592,7 +592,7 @@ def step_8_authorization_decision(agent: Agent) -> dict[str, Any]:
 
 def step_9_audit(agent: Agent, decision_data: dict[str, Any]) -> dict[str, Any]:
     """Step 9: Record audit event."""
-    step_header(9, "Audit Event — Tamper-Evident Trail")
+    step_header(9, "Audit Event  -  Tamper-Evident Trail")
 
     audit = AuditTrail()
     correlation_id = str(uuid.uuid4())
@@ -767,9 +767,9 @@ def main() -> None:
     """Execute the golden end-to-end demo."""
     start_time = time.perf_counter()
 
-    banner("AWS Agent Identity Guard — End-to-End Demo")
+    banner("AWS Agent Identity Guard  -  End-to-End Demo")
     print(f"  {Colors.DIM}Demonstrating the complete agent identity security lifecycle{Colors.RESET}")
-    print(f"  {Colors.DIM}No AWS credentials required — all analysis runs locally{Colors.RESET}")
+    print(f"  {Colors.DIM}No AWS credentials required  -  all analysis runs locally{Colors.RESET}")
     print()
 
     # Create the vulnerable agent

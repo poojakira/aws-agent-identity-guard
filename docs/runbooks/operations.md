@@ -23,14 +23,14 @@ This runbook covers day-to-day operational procedures for maintaining AWS Agent 
 
 | Metric | Normal Range | Alert Threshold | Action |
 |--------|-------------|-----------------|--------|
-| `guard_requests_total` (rate) | 100–10,000 req/s | < 10 req/s or > 50,000 req/s | Investigate traffic change |
+| `guard_requests_total` (rate) | 100-10,000 req/s | < 10 req/s or > 50,000 req/s | Investigate traffic change |
 | `guard_request_duration_seconds` (p99) | < 15 ms | > 25 ms | Check Redis, scale up |
-| `guard_requests_denied` (rate) | 1–5% of total | > 20% of total | Policy misconfiguration or attack |
+| `guard_requests_denied` (rate) | 1-5% of total | > 20% of total | Policy misconfiguration or attack |
 | `guard_cache_hit_ratio` | > 70% | < 50% | Cache cold/Redis issue |
 | `guard_errors_total` (rate) | < 0.1% | > 1% | Service degradation |
 | Pod restarts | 0 | > 2 in 1 hour | OOM or crash loop |
-| CPU utilization | 30–60% | > 85% sustained | Scale up |
-| Memory utilization | 40–70% | > 90% | Memory leak or under-provisioned |
+| CPU utilization | 30-60% | > 85% sustained | Scale up |
+| Memory utilization | 40-70% | > 90% | Memory leak or under-provisioned |
 
 ### Health Check Commands
 
@@ -395,7 +395,7 @@ aws elasticache describe-cache-clusters --show-cache-node-info
 1. Check network policy / security group rules
 2. Verify Redis service DNS resolves correctly
 3. Check Redis authentication (if AUTH enabled)
-4. Service operates without Redis (no cache, slower) — not a hard dependency
+4. Service operates without Redis (no cache, slower)  -  not a hard dependency
 
 ### Scanner CI Gate Failures
 

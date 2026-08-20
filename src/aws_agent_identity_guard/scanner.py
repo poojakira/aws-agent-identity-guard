@@ -121,7 +121,7 @@ NETWORK_EGRESS_PATTERNS = (
     "ecs:UpdateService",
 )
 
-# Actions that allow log/trail tampering — an agent covering its tracks
+# Actions that allow log/trail tampering  -  an agent covering its tracks
 ANTI_FORENSICS_PATTERNS = (
     "cloudtrail:StopLogging",
     "cloudtrail:DeleteTrail",
@@ -169,7 +169,7 @@ def _matches_any(action: str, patterns: set[str] | tuple[str, ...]) -> bool:
     Uses exact match for literal strings (like 'iam:CreateRole') and
     fnmatch for patterns containing wildcards (like 'bedrock:Invoke*').
     The intent is to match the policy ACTION value against our known-bad
-    patterns — NOT to expand wildcards in the action itself.
+    patterns  -  NOT to expand wildcards in the action itself.
     """
     action_lower = action.lower()
     for pattern in patterns:
@@ -237,7 +237,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                 Finding(
                     "AIG001",
                     "high",
-                    "Agent policy uses NotAction or NotResource — these grant everything "
+                    "Agent policy uses NotAction or NotResource  -  these grant everything "
                     "EXCEPT what's listed, which is almost always broader than intended "
                     "for an autonomous workload.",
                     "Replace negative policy matching with explicit allow lists. "
@@ -317,7 +317,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                         "critical",
                         f"Agent has privilege-management action '{action}'. "
                         "This lets the agent modify IAM policies, create roles, "
-                        "or assume other identities — classic escalation path.",
+                        "or assume other identities  -  classic escalation path.",
                         "Separate agent runtime roles from IAM administration. "
                         "Agent runtime identities should NEVER have iam:* or "
                         "policy-modification permissions.",
@@ -338,7 +338,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                         "high",
                         f"Tool execution action '{action}' targets Resource: '*'. "
                         "The agent can invoke ANY function, endpoint, or task "
-                        "in the account — not just its intended tools.",
+                        "in the account  -  not just its intended tools.",
                         "Restrict to specific ARNs: the Lambda functions, ECS tasks, "
                         "or Bedrock agents this tool is allowed to call. "
                         "Use resource tags for dynamic scoping.",
@@ -370,7 +370,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
 
             # ─── NEW RULES: AIG008-AIG018 ─────────────────────────────────────
 
-            # AIG008: Bedrock control plane — agent can modify itself
+            # AIG008: Bedrock control plane  -  agent can modify itself
             if _matches_any(action, BEDROCK_CONTROL_PLANE) and action_lower not in seen_bedrock_cp:
                 seen_bedrock_cp.add(action_lower)
                 findings.append(
@@ -379,7 +379,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                         "critical",
                         f"Agent has Bedrock control-plane action '{action}'. "
                         "This lets the agent create or modify agents, knowledge bases, "
-                        "or guardrails — it can reconfigure its own capabilities "
+                        "or guardrails  -  it can reconfigure its own capabilities "
                         "or disable safety guardrails.",
                         "Agent runtime roles should only have bedrock:InvokeModel "
                         "and bedrock-agent-runtime:* (data plane). Move control-plane "
@@ -388,7 +388,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                     )
                 )
 
-            # AIG009: SageMaker control plane — agent can deploy models
+            # AIG009: SageMaker control plane  -  agent can deploy models
             if (
                 _matches_any(action, SAGEMAKER_CONTROL_PLANE)
                 and action_lower not in seen_sagemaker_cp
@@ -408,7 +408,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                     )
                 )
 
-            # AIG010: Network egress — agent can create network paths
+            # AIG010: Network egress  -  agent can create network paths
             if _matches_any(action, NETWORK_EGRESS_PATTERNS) and action_lower not in seen_egress:
                 seen_egress.add(action_lower)
                 findings.append(
@@ -426,7 +426,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                     )
                 )
 
-            # AIG011: Anti-forensics — agent can tamper with audit trails
+            # AIG011: Anti-forensics  -  agent can tamper with audit trails
             if (
                 _matches_any(action, ANTI_FORENSICS_PATTERNS)
                 and action_lower not in seen_anti_forensics
@@ -438,7 +438,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                         "critical",
                         f"Agent has audit-tampering action '{action}'. "
                         "A compromised agent could disable CloudTrail, delete logs, "
-                        "or stop GuardDuty — hiding its malicious activity from "
+                        "or stop GuardDuty  -  hiding its malicious activity from "
                         "detection and incident response.",
                         "No agent runtime identity should ever have logging/monitoring "
                         "modification permissions. These belong to a break-glass admin "
@@ -457,7 +457,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                     "AIG012",
                     "medium",
                     f"Statement grants {action_count} distinct actions. "
-                    "Agent policies should follow single-responsibility — each "
+                    "Agent policies should follow single-responsibility  -  each "
                     "statement should map to one tool capability. Broad statements "
                     "suggest a human-role policy was copied for an agent.",
                     "Split into multiple statements, one per tool/capability. "
@@ -563,7 +563,7 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                         "AIG016",
                         "high",
                         "Lambda invoke without function-name resource scoping. "
-                        "The agent can invoke ANY Lambda in the account — including "
+                        "The agent can invoke ANY Lambda in the account  -  including "
                         "admin utilities, data pipelines, or credential-rotation functions.",
                         "Scope to the specific tool functions: "
                         "arn:aws:lambda:REGION:ACCOUNT:function:agent-tool-* "
@@ -715,7 +715,7 @@ def _scan_killchain_combinations(document: dict[str, Any]) -> list[Finding]:
             )
         )
 
-    # AIG020 — credential harvest + cloud-metadata reach = IMDS credential theft path.
+    # AIG020  -  credential harvest + cloud-metadata reach = IMDS credential theft path.
     if harvest and metadata:
         findings.append(
             Finding(
@@ -731,7 +731,7 @@ def _scan_killchain_combinations(document: dict[str, Any]) -> list[Finding]:
             )
         )
 
-    # AIG021 — full chain present: harvest + metadata + lateral. Highest urgency.
+    # AIG021  -  full chain present: harvest + metadata + lateral. Highest urgency.
     if harvest and metadata and lateral:
         findings.append(
             Finding(
@@ -756,7 +756,7 @@ def scan_trust_policy(document: dict[str, Any]) -> list[Finding]:
 
     Rules
     -----
-    AIG-TP001  CRITICAL  Wildcard principal — any AWS identity can assume this role.
+    AIG-TP001  CRITICAL  Wildcard principal  -  any AWS identity can assume this role.
     AIG-TP002  HIGH      Cross-account trust without sts:ExternalId (confused-deputy).
     AIG-TP003  HIGH      Cross-account trust without aws:SourceArn (lateral-movement).
     """
@@ -789,8 +789,8 @@ def scan_trust_policy(document: dict[str, Any]) -> list[Finding]:
                     "AIG-TP001",
                     "critical",
                     "Trust policy grants AssumeRole to wildcard principal '*'. "
-                    "Any AWS identity — or unauthenticated caller via "
-                    "cognito-identity — can assume this agent role.",
+                    "Any AWS identity  -  or unauthenticated caller via "
+                    "cognito-identity  -  can assume this agent role.",
                     "Replace '*' with the specific service principal "
                     "(e.g., bedrock.amazonaws.com) or account ARN that "
                     "legitimately invokes this agent.",

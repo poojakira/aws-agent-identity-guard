@@ -77,7 +77,7 @@ def _utcnow() -> datetime:
 class ApprovalConditions:
     """Scoping conditions that define what an approval authorizes.
 
-    An approval is never a blanket bypass — it is scoped to a specific
+    An approval is never a blanket bypass  -  it is scoped to a specific
     action on a specific resource, optionally with additional constraints.
     """
 
@@ -999,7 +999,7 @@ class ApproverRegistry:
 class EscalationHandler:
     """Handles escalation when approval requests are not actioned in time.
 
-    Pluggable notification mechanism — override `notify` for custom
+    Pluggable notification mechanism  -  override `notify` for custom
     integrations (SNS, PagerDuty, Slack, etc.).
     """
 
@@ -1369,7 +1369,7 @@ class ApprovalService:
     def check_approval(self, request_id: str) -> ApprovalStatus:
         """Check the current status of an approval request.
 
-        Also handles lazy expiration — if the request is found to be
+        Also handles lazy expiration  -  if the request is found to be
         expired, updates its status.
 
         Args:

@@ -104,7 +104,7 @@ Authorize an agent action against the policy pipeline.
 | `context` | object | No | Additional key-value context for policy evaluation |
 | `correlation_id` | string | No | Client-provided trace ID |
 
-**Response (200 OK — Allowed):**
+**Response (200 OK  -  Allowed):**
 
 ```json
 {
@@ -120,7 +120,7 @@ Authorize an agent action against the policy pipeline.
 }
 ```
 
-**Response (200 OK — Denied):**
+**Response (200 OK  -  Denied):**
 
 ```json
 {
@@ -139,7 +139,7 @@ Authorize an agent action against the policy pipeline.
 }
 ```
 
-**Response (200 OK — Step-Up Required):**
+**Response (200 OK  -  Step-Up Required):**
 
 ```json
 {
@@ -466,7 +466,7 @@ List pending approvals.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `status` | string | `PENDING` | Filter by status |
-| `agent_id` | string | — | Filter by agent |
+| `agent_id` | string |  -  | Filter by agent |
 | `limit` | int | 50 | Max results |
 
 **Response (200 OK):**
@@ -553,7 +553,7 @@ Deny a pending request.
 
 Prometheus-compatible metrics endpoint.
 
-**Response (200 OK — text/plain):**
+**Response (200 OK  -  text/plain):**
 
 ```
 # HELP guard_requests_total Total authorization requests processed
@@ -601,7 +601,7 @@ Liveness probe.
 
 #### GET /v1/health/ready
 
-Readiness probe — confirms dependencies are available and policies are loaded.
+Readiness probe  -  confirms dependencies are available and policies are loaded.
 
 **Response (200 OK):**
 

@@ -34,11 +34,11 @@ class AuthorizationError(AgentGuardError):
     """Raised when an authorization request is explicitly denied or malformed."""
 
 
-class ConnectionError(AgentGuardError):  # noqa: A001 — intentional shadow of builtin
+class ConnectionError(AgentGuardError):  # noqa: A001  -  intentional shadow of builtin
     """Raised when the SDK cannot reach the Agent Identity Guard service."""
 
 
-class TimeoutError(AgentGuardError):  # noqa: A001 — intentional shadow of builtin
+class TimeoutError(AgentGuardError):  # noqa: A001  -  intentional shadow of builtin
     """Raised when a request exceeds the configured timeout."""
 
 
@@ -55,7 +55,7 @@ class Decision:
         allowed: Whether the action is permitted.
         denied: Whether the action is explicitly denied.
         step_up_required: Whether additional authentication/approval is needed.
-        risk_score: Numeric risk score (0–100).
+        risk_score: Numeric risk score (0-100).
         reasons: List of human-readable reasons for the decision.
         explanation: Detailed explanation of the decision logic.
         correlation_id: Unique identifier for tracing this decision.
@@ -95,7 +95,7 @@ class RiskScore:
 
     Attributes:
         agent_id: The agent evaluated.
-        score: Numeric risk score (0–100).
+        score: Numeric risk score (0-100).
         factors: Contributing risk factors.
     """
 

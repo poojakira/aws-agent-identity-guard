@@ -5,9 +5,9 @@
 This document maps AWS Agent Identity Guard capabilities to NIST Special Publication 800-53 Rev. 5 security controls. The mapping identifies which controls the tool directly implements, supports, or contributes evidence toward.
 
 **Legend:**
-- ● Direct Implementation — Guard directly satisfies this control
-- ◐ Partial/Supporting — Guard contributes to or supports this control
-- ○ Evidence Provider — Guard generates evidence for compliance audits
+- ● Direct Implementation  -  Guard directly satisfies this control
+- ◐ Partial/Supporting  -  Guard contributes to or supports this control
+- ○ Evidence Provider  -  Guard generates evidence for compliance audits
 
 ---
 
@@ -66,7 +66,7 @@ This document maps AWS Agent Identity Guard capabilities to NIST Special Publica
 | Control ID | Control Name | Coverage | Guard Capability |
 |------------|-------------|----------|-----------------|
 | IA-2 | Identification and Authentication | ● | API key authentication; agent identity binding |
-| IA-2(6) | Access to Accounts — Separate Device | ◐ | Approval workflow requires separate approver identity for step-up |
+| IA-2(6) | Access to Accounts  -  Separate Device | ◐ | Approval workflow requires separate approver identity for step-up |
 | IA-4 | Identifier Management | ● | Unique agent IDs with lifecycle management (create, suspend, decommission) |
 | IA-8 | Identification and Authentication (Non-Organizational Users) | ◐ | ExternalId enforcement for cross-account access (scanner rule) |
 

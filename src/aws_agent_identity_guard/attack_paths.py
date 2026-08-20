@@ -2,7 +2,7 @@
 Attack Path Analysis Engine for AWS Agent Identity Guard.
 
 This module provides a graph-based attack path discovery and analysis engine
-that identifies complete attack chains — not just individual findings — across
+that identifies complete attack chains  -  not just individual findings  -  across
 AWS AI agent permissions and resource configurations.
 
 Attack chains represent multi-step exploitation paths such as:
@@ -1190,7 +1190,7 @@ class AttackPathAnalyzer:
                                 elif isinstance(actions, list):
                                     permissions.extend(actions)
         if hasattr(agent, "role_arn"):
-            # Agent has an assumed role — add sts:AssumeRole implicitly
+            # Agent has an assumed role  -  add sts:AssumeRole implicitly
             permissions.append("sts:AssumeRole")
 
         return list(set(permissions))
@@ -1739,7 +1739,7 @@ class AttackPathAnalyzer:
             List of prioritized recommendation strings.
         """
         if not paths:
-            return ["No attack paths discovered — permissions appear well-scoped."]
+            return ["No attack paths discovered  -  permissions appear well-scoped."]
 
         # Collect and deduplicate remediations, ordered by path severity
         recommendation_scores: dict[str, float] = {}

@@ -59,7 +59,7 @@ We enforce consistent code style through automated tooling:
 2. Use `from __future__ import annotations` in all modules.
 3. Prefer `pathlib.Path` over `os.path`.
 4. Use dataclasses or Pydantic models for structured data.
-5. Keep modules focused — one responsibility per file.
+5. Keep modules focused  -  one responsibility per file.
 6. Import ordering: stdlib → third-party → local (enforced by ruff `I` rule).
 
 ### Running linters locally
@@ -209,7 +209,7 @@ src/aws_agent_identity_guard/
 ### Key Design Principles
 
 1. **Offline-first**: Core analysis works without AWS credentials using policy files.
-2. **Layered evaluation**: Policies are evaluated in order — deny > require_approval > warn > audit > allow.
+2. **Layered evaluation**: Policies are evaluated in order  -  deny > require_approval > warn > audit > allow.
 3. **Extensible rules**: New rule types can be added by extending the rule evaluator.
 4. **SARIF-native**: All findings are modeled as SARIF results for CI/CD integration.
 5. **Zero runtime dependencies**: Core package only requires PyYAML; AWS/server deps are optional.

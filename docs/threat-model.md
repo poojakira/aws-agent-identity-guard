@@ -20,9 +20,9 @@ This document presents the formal threat model for AWS Agent Identity Guard, cov
 │  │  │                                                                    │  │  │
 │  │  │  ┌────────────────┐     ┌────────────────────────────────────┐    │  │  │
 │  │  │  │  API Layer     │────▶│  Decision Engine (trusted core)     │    │  │  │
-│  │  │  │  (auth gate)   │     │  • Policy Engine                   │    │  │  │
-│  │  │  └────────────────┘     │  • Risk Engine                     │    │  │  │
-│  │  │                         │  • Authorization Service            │    │  │  │
+│  │  │  │  (auth gate)   │     │  * Policy Engine                   │    │  │  │
+│  │  │  └────────────────┘     │  * Risk Engine                     │    │  │  │
+│  │  │                         │  * Authorization Service            │    │  │  │
 │  │  │                         └────────────────────────────────────┘    │  │  │
 │  │  │                                                                    │  │  │
 │  │  └──────────────────────────────────────────────────────────────────┘  │  │
@@ -94,8 +94,8 @@ This document presents the formal threat model for AWS Agent Identity Guard, cov
 
 | Threat | Component | Mitigation | Residual Risk |
 |--------|-----------|------------|---------------|
-| S1: Forge API key to bypass auth | API Server | API key validation, rate limiting | Low — keys rotated regularly |
-| S2: Agent impersonation (claim different agent_id) | Authorization | Agent ID bound to IAM principal in production | Medium — depends on deployment |
+| S1: Forge API key to bypass auth | API Server | API key validation, rate limiting | Low  -  keys rotated regularly |
+| S2: Agent impersonation (claim different agent_id) | Authorization | Agent ID bound to IAM principal in production | Medium  -  depends on deployment |
 | S3: Replay authorized requests | API Server | Correlation ID uniqueness, cache TTL, non-replayable approvals | Low |
 
 ### Tampering
@@ -139,7 +139,7 @@ This document presents the formal threat model for AWS Agent Identity Guard, cov
 |--------|-----------|------------|---------------|
 | E1: Agent escalates via iam:PassRole | Scanner + Policy Engine | PRIV-001 detection rule, runtime deny policy | Low |
 | E2: Agent creates new policy version | Scanner + Policy Engine | PRIV-002 detection rule | Low |
-| E3: Bypass Guard via direct AWS call | Enforcement Engine | SDK middleware intercepts all boto3 calls | Medium — only if middleware deployed |
+| E3: Bypass Guard via direct AWS call | Enforcement Engine | SDK middleware intercepts all boto3 calls | Medium  -  only if middleware deployed |
 | E4: Self-approve step-up request | Approval Service | Approver cannot be same as requestor, role-based policies | Low |
 | E5: Use expired approval | Approval Service | TTL enforcement, one-time use, non-replayable tokens | Low |
 
@@ -149,25 +149,25 @@ This document presents the formal threat model for AWS Agent Identity Guard, cov
 
 ### Protected Threat Scenarios
 
-1. **Over-permissioned agent deployment** — Static scanner blocks CI merge when policy grants dangerous permissions (iam:PassRole without conditions, wildcard actions, etc.)
+1. **Over-permissioned agent deployment**  -  Static scanner blocks CI merge when policy grants dangerous permissions (iam:PassRole without conditions, wildcard actions, etc.)
 
-2. **Privilege escalation chains** — Attack path analyzer identifies multi-step escalation paths (Agent → PassRole → Lambda → Admin) before they can be exploited.
+2. **Privilege escalation chains**  -  Attack path analyzer identifies multi-step escalation paths (Agent → PassRole → Lambda → Admin) before they can be exploited.
 
-3. **Compromised agent lateral movement** — Runtime authorization denies unexpected cross-service actions that deviate from the agent's declared intent.
+3. **Compromised agent lateral movement**  -  Runtime authorization denies unexpected cross-service actions that deviate from the agent's declared intent.
 
-4. **Audit trail tampering** — Scanner flags and policy engine denies actions that would disable CloudTrail, GuardDuty, or Config.
+4. **Audit trail tampering**  -  Scanner flags and policy engine denies actions that would disable CloudTrail, GuardDuty, or Config.
 
-5. **Data exfiltration via agent** — Data classification-aware policies restrict agent access to data above its clearance level.
+5. **Data exfiltration via agent**  -  Data classification-aware policies restrict agent access to data above its clearance level.
 
-6. **Behavioral anomaly exploitation** — Behavior analyzer detects when a compromised agent deviates from its learned baseline (new services, unusual times, volume spikes).
+6. **Behavioral anomaly exploitation**  -  Behavior analyzer detects when a compromised agent deviates from its learned baseline (new services, unusual times, volume spikes).
 
-7. **Permission drift** — Drift detector identifies when agent permissions change outside the approved CI/CD pipeline.
+7. **Permission drift**  -  Drift detector identifies when agent permissions change outside the approved CI/CD pipeline.
 
-8. **Missing security conditions** — Scanner catches policies lacking condition keys (SourceVpc, PrincipalOrgId, MFA) that would constrain abuse.
+8. **Missing security conditions**  -  Scanner catches policies lacking condition keys (SourceVpc, PrincipalOrgId, MFA) that would constrain abuse.
 
-9. **Prompt injection leading to unauthorized actions** — Runtime authorization evaluates every action regardless of how the agent decided to take it, providing defense-in-depth against prompt injection.
+9. **Prompt injection leading to unauthorized actions**  -  Runtime authorization evaluates every action regardless of how the agent decided to take it, providing defense-in-depth against prompt injection.
 
-10. **Shadow IT agent deployments** — Live scanner discovers agent roles that bypassed the CI gate.
+10. **Shadow IT agent deployments**  -  Live scanner discovers agent roles that bypassed the CI gate.
 
 ---
 
@@ -190,13 +190,13 @@ This document presents the formal threat model for AWS Agent Identity Guard, cov
 
 ### Important Limitations
 
-1. **Bypass if not deployed** — Guard only protects workloads where it is integrated. An agent calling AWS directly (without SDK middleware or API gateway enforcement) is not protected at runtime.
+1. **Bypass if not deployed**  -  Guard only protects workloads where it is integrated. An agent calling AWS directly (without SDK middleware or API gateway enforcement) is not protected at runtime.
 
-2. **Fail-open risk** — If configured with `fail_mode=open` and the Guard service becomes unavailable, all actions are allowed. Production MUST use `fail_closed`.
+2. **Fail-open risk**  -  If configured with `fail_mode=open` and the Guard service becomes unavailable, all actions are allowed. Production MUST use `fail_closed`.
 
-3. **Static analysis coverage** — The 24 scanning rules cover known patterns. Novel attack techniques not yet codified as rules will not be detected until rules are updated.
+3. **Static analysis coverage**  -  The 24 scanning rules cover known patterns. Novel attack techniques not yet codified as rules will not be detected until rules are updated.
 
-4. **Policy correctness** — The Guard enforces whatever policies are loaded. Incorrect policies (too permissive allow rules) reduce protection. Policy testing and review processes are essential.
+4. **Policy correctness**  -  The Guard enforces whatever policies are loaded. Incorrect policies (too permissive allow rules) reduce protection. Policy testing and review processes are essential.
 
 ---
 

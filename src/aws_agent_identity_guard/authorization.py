@@ -579,7 +579,7 @@ class DefaultRiskEngine:
 
     Computes risk based on action sensitivity, resource criticality,
     data classification, and environment. Designed as a baseline
-    implementation — production deployments should provide a custom
+    implementation  -  production deployments should provide a custom
     RiskEngine with ML-based scoring.
 
     Attributes:

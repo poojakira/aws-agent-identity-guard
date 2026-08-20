@@ -182,7 +182,7 @@ rules:
     conditions:
       custom:
         cross_account: [true]
-    message: "Cross-account access detected — verify this is intended"
+    message: "Cross-account access detected  -  verify this is intended"
     severity: MEDIUM
     notify:
       - slack-security-channel
@@ -418,7 +418,7 @@ spec:
           - "iam:AttachRolePolicy"
           - "sts:AssumeRole"
       severity: HIGH
-      message: "Privilege escalation pattern detected — review required"
+      message: "Privilege escalation pattern detected  -  review required"
       notify: [slack-security, pagerduty-on-call]
 
     # Allow: specific well-scoped actions
@@ -714,9 +714,9 @@ Validate policy files against the schema before deployment:
 python -m aws_agent_identity_guard validate-policies ./policies/
 
 # Output:
-# ✓ production-guardrails.yaml — valid (5 rules)
-# ✓ data-classification.yaml — valid (3 rules)
-# ✗ broken-policy.yaml — invalid:
+# ✓ production-guardrails.yaml  -  valid (5 rules)
+# ✓ data-classification.yaml  -  valid (3 rules)
+# ✗ broken-policy.yaml  -  invalid:
 #     Line 15: Unknown rule type 'block' (valid: deny, allow, require_approval, warn, audit)
 #     Line 22: Missing required field 'match.actions'
 ```

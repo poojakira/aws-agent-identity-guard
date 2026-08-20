@@ -27,7 +27,7 @@ class EnforcementMode(Enum):
     """Operational mode for the enforcement engine."""
 
     MONITOR = "monitor"
-    """Log only — never block requests."""
+    """Log only  -  never block requests."""
 
     ENFORCE = "enforce"
     """Actively block unauthorized actions."""
@@ -58,13 +58,13 @@ class CircuitState(Enum):
     """Circuit breaker states."""
 
     CLOSED = "closed"
-    """Normal operation — enforcement checks proceed."""
+    """Normal operation  -  enforcement checks proceed."""
 
     OPEN = "open"
-    """Enforcement service considered down — fallback behaviour active."""
+    """Enforcement service considered down  -  fallback behaviour active."""
 
     HALF_OPEN = "half_open"
-    """Probing recovery — limited requests sent to enforcement service."""
+    """Probing recovery  -  limited requests sent to enforcement service."""
 
 
 class InterceptorType(Enum):
@@ -162,9 +162,9 @@ class CircuitBreaker:
     """Circuit breaker for graceful degradation when enforcement is unavailable.
 
     States:
-        CLOSED  — Normal operation; enforcement checks proceed.
-        OPEN    — Enforcement service considered down; fallback active.
-        HALF_OPEN — Probing recovery with limited requests.
+        CLOSED   -  Normal operation; enforcement checks proceed.
+        OPEN     -  Enforcement service considered down; fallback active.
+        HALF_OPEN  -  Probing recovery with limited requests.
     """
 
     def __init__(self, config: CircuitBreakerConfig | None = None) -> None:
@@ -195,7 +195,7 @@ class CircuitBreaker:
                 if self._half_open_requests >= self._config.half_open_max_requests:
                     self._state = CircuitState.CLOSED
                     self._failure_count = 0
-                    logger.info("Circuit breaker CLOSED — service recovered")
+                    logger.info("Circuit breaker CLOSED  -  service recovered")
             else:
                 self._failure_count = 0
 
@@ -359,7 +359,7 @@ class EnforcementEngine:
                     start=start,
                 )
 
-        # All interceptors passed — determine action based on mode
+        # All interceptors passed  -  determine action based on mode
         return self._build_result(request=request, allowed=True, reason="", start=start)
 
     def _build_result(
@@ -373,7 +373,7 @@ class EnforcementEngine:
         latency_ms = (time.perf_counter() - start) * 1000.0
 
         if self._mode == EnforcementMode.MONITOR:
-            # Log only — never block
+            # Log only  -  never block
             action = ActionTaken.LOGGED
             decision = AuthorizationDecision(
                 allowed=True,
@@ -474,7 +474,7 @@ class EnforcementEngine:
     ) -> EnforcementResult:
         """Handle unexpected enforcement failures with logging and fallback."""
         logger.error(
-            "Enforcement failure on point '%s': %s — applying failure_mode=%s",
+            "Enforcement failure on point '%s': %s  -  applying failure_mode=%s",
             self._enforcement_point,
             exc,
             self._failure_mode.value,
@@ -593,7 +593,7 @@ class SDKMiddleware:
         decision = self.before_call(service, operation, params)
         if not decision.allow:
             raise PermissionError(
-                f"Blocked by enforcement: {service}:{operation} — {decision.reason}"
+                f"Blocked by enforcement: {service}:{operation}  -  {decision.reason}"
             )
 
     def after_call_hook(self, **kwargs: Any) -> None:

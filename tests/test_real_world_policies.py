@@ -381,10 +381,10 @@ class TestSageMakerFullAccessPolicy:
         assert len(aig013) >= 4
 
     def test_passrole_with_condition_not_flagged_by_aig004(self):
-        """The PassRole statement HAS PassedToService condition — AIG004 should NOT fire for it."""
+        """The PassRole statement HAS PassedToService condition  -  AIG004 should NOT fire for it."""
         findings = scan_policy_document(self.SAGEMAKER_FULL_ACCESS_POLICY)
         aig004 = [f for f in findings if f.rule_id == "AIG004"]
-        # Statement index 3 is PassRole with condition — should not appear
+        # Statement index 3 is PassRole with condition  -  should not appear
         assert not any(f.statement_index == 3 for f in aig004)
 
     def test_example_file_matches_inline_policy(self):
@@ -563,7 +563,7 @@ class TestLambdaOverPermissiveRole:
 # The #1 misconfiguration in ECS-based Bedrock agent deployments:
 # iam:PassRole without iam:PassedToService condition. Teams add PassRole so
 # the ECS task can pass roles to Bedrock, but forget the condition key,
-# allowing the task to pass ANY role to ANY service — classic privilege
+# allowing the task to pass ANY role to ANY service  -  classic privilege
 # escalation vector.
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -656,7 +656,7 @@ class TestECSTaskRoleBedrockAgent:
     }
 
     def test_catches_passrole_without_passed_to_service(self):
-        """AIG004: The #1 ECS misconfiguration — PassRole without PassedToService."""
+        """AIG004: The #1 ECS misconfiguration  -  PassRole without PassedToService."""
         findings = scan_policy_document(self.ECS_TASK_ROLE_POLICY)
         aig004 = [f for f in findings if f.rule_id == "AIG004"]
         assert len(aig004) == 1
@@ -757,7 +757,7 @@ class TestECSTaskRoleBedrockAgent:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# TEST 5: Cross-Account Trust Policy — Confused Deputy
+# TEST 5: Cross-Account Trust Policy  -  Confused Deputy
 # Source: AWS Organizations cross-account role assumption pattern
 # Reference: https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html
 # Reference: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html
@@ -783,7 +783,7 @@ class TestCrossAccountTrustPolicyConfusedDeputy:
     Reference: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html
     """
 
-    # Trust policy missing ExternalId — the confused deputy vulnerability
+    # Trust policy missing ExternalId  -  the confused deputy vulnerability
     VULNERABLE_TRUST_POLICY = {
         "Version": "2012-10-17",
         "Statement": [
@@ -796,7 +796,7 @@ class TestCrossAccountTrustPolicyConfusedDeputy:
         ],
     }
 
-    # Trust policy with wildcard principal — worst case
+    # Trust policy with wildcard principal  -  worst case
     WILDCARD_TRUST_POLICY = {
         "Version": "2012-10-17",
         "Statement": [

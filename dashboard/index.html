@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agent Identity Guard — Security Dashboard</title>
+<title>Agent Identity Guard  -  Security Dashboard</title>
 <style>
 :root {
   --bg-primary: #0f1419;
@@ -433,27 +433,27 @@ tr:hover td { background: rgba(59,130,246,0.04); }
   <section class="summary-cards" aria-label="Summary Statistics">
     <div class="stat-card" role="group" aria-label="Total Agents">
       <span class="stat-label">Total Agents</span>
-      <span class="stat-value" id="statAgents">—</span>
+      <span class="stat-value" id="statAgents"> - </span>
       <span class="stat-trend" id="trendAgents"></span>
     </div>
     <div class="stat-card" role="group" aria-label="Average Risk Score">
       <span class="stat-label">Avg Risk Score</span>
-      <span class="stat-value" id="statRisk">—</span>
+      <span class="stat-value" id="statRisk"> - </span>
       <span class="stat-trend" id="trendRisk"></span>
     </div>
     <div class="stat-card" role="group" aria-label="Critical Findings">
       <span class="stat-label">Critical Findings</span>
-      <span class="stat-value critical" id="statCritical">—</span>
+      <span class="stat-value critical" id="statCritical"> - </span>
       <span class="stat-trend" id="trendCritical"></span>
     </div>
     <div class="stat-card" role="group" aria-label="Pending Approvals">
       <span class="stat-label">Pending Approvals</span>
-      <span class="stat-value warning" id="statApprovals">—</span>
+      <span class="stat-value warning" id="statApprovals"> - </span>
       <span class="stat-trend" id="trendApprovals"></span>
     </div>
     <div class="stat-card" role="group" aria-label="Decisions per Second">
       <span class="stat-label">Decisions/sec</span>
-      <span class="stat-value good" id="statDecisions">—</span>
+      <span class="stat-value good" id="statDecisions"> - </span>
       <span class="stat-trend" id="trendDecisions"></span>
     </div>
   </section>
@@ -713,7 +713,7 @@ tr:hover td { background: rgba(59,130,246,0.04); }
           <span class="approval-agent">${esc(a.agent)}</span>
           <span class="approval-time">${esc(a.time)}</span>
         </div>
-        <div class="approval-action">${esc(a.action)} — ${esc(a.reason)}</div>
+        <div class="approval-action">${esc(a.action)}  -  ${esc(a.reason)}</div>
         <div class="approval-buttons">
           <button class="btn-approve" onclick="handleApproval('${a.id}','approve')" aria-label="Approve request from ${esc(a.agent)}">Approve</button>
           <button class="btn-deny" onclick="handleApproval('${a.id}','deny')" aria-label="Deny request from ${esc(a.agent)}">Deny</button>

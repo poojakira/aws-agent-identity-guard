@@ -181,7 +181,7 @@ session = GuardedSession(
     data_classification="CONFIDENTIAL",
 )
 
-# Use like a normal boto3 session — authorization happens transparently
+# Use like a normal boto3 session  -  authorization happens transparently
 s3 = session.client("s3")
 ```
 
@@ -513,14 +513,14 @@ if not result.compliant:
 
 ## Best Practices
 
-1. **Reuse clients** — Create one `AgentIdentityGuard` instance and share it across your application. The connection pool handles concurrency.
+1. **Reuse clients**  -  Create one `AgentIdentityGuard` instance and share it across your application. The connection pool handles concurrency.
 
-2. **Set appropriate timeouts** — In hot paths, use shorter timeouts (1–2s) with `fail_mode="open"`. For security-critical paths, use longer timeouts (5–10s) with `fail_mode="closed"`.
+2. **Set appropriate timeouts**  -  In hot paths, use shorter timeouts (1-2s) with `fail_mode="open"`. For security-critical paths, use longer timeouts (5-10s) with `fail_mode="closed"`.
 
-3. **Handle all decision types** — Always check `denied`, `step_up_required`, and `allowed`. Don't assume `not denied == allowed`.
+3. **Handle all decision types**  -  Always check `denied`, `step_up_required`, and `allowed`. Don't assume `not denied == allowed`.
 
-4. **Include context** — Richer context enables better policy evaluation. Include `data_classification`, `principal`, and relevant `context` fields.
+4. **Include context**  -  Richer context enables better policy evaluation. Include `data_classification`, `principal`, and relevant `context` fields.
 
-5. **Use correlation IDs** — Pass your existing trace ID as `correlation_id` in the context for end-to-end tracing.
+5. **Use correlation IDs**  -  Pass your existing trace ID as `correlation_id` in the context for end-to-end tracing.
 
-6. **Monitor the SDK** — Track authorization latency and error rates in your application metrics. Alert if denial rates spike unexpectedly.
+6. **Monitor the SDK**  -  Track authorization latency and error rates in your application metrics. Alert if denial rates spike unexpectedly.

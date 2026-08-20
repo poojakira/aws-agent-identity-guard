@@ -1,4 +1,4 @@
-# RUNBOOK — AWS Agent Identity Guard
+# RUNBOOK  -  AWS Agent Identity Guard
 
 ## Prerequisites
 

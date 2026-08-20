@@ -89,7 +89,7 @@ class _GuardedClientProxy:
         guard: The AgentIdentityGuard instance.
         agent_id: Identifier of the agent making calls.
         service_name: AWS service name (e.g. 's3', 'dynamodb').
-        fail_mode: Behavior on guard service failure — 'closed' (deny) or 'open' (allow).
+        fail_mode: Behavior on guard service failure  -  'closed' (deny) or 'open' (allow).
         principal: Optional principal identity for authorization context.
         data_classification: Optional default data classification.
     """
@@ -154,7 +154,7 @@ class _GuardedClientProxy:
                         name,
                         resource,
                     ) from exc
-                # fail_mode == 'open' — allow through
+                # fail_mode == 'open'  -  allow through
                 return attr(**kwargs)
 
             if decision.denied:
@@ -184,7 +184,7 @@ class _GuardedClientProxy:
                 )
                 raise AuthorizationDeniedError(decision, self._service_name, name, resource)
 
-            # Authorized — execute the actual AWS call
+            # Authorized  -  execute the actual AWS call
             logger.debug(
                 "Authorization ALLOWED for %s on %s (risk_score=%d, correlation_id=%s)",
                 tool,
@@ -332,7 +332,7 @@ class GuardedSession:
         )
 
     def resource(self, service_name: str, **kwargs: Any) -> Any:
-        """Create a boto3 resource (not guarded — use client() for authorization).
+        """Create a boto3 resource (not guarded  -  use client() for authorization).
 
         Note:
             Resource-level guarding is not supported. Use ``client()`` for

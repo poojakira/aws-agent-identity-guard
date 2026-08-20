@@ -10,10 +10,10 @@ This runbook covers incident response procedures for security events detected by
 
 | Severity | Definition | Response Time | Examples |
 |----------|-----------|---------------|----------|
-| **P1 — Critical** | Active exploitation or imminent data loss | 15 minutes | Agent privilege escalation in progress; audit trail tampering detected |
-| **P2 — High** | Confirmed security violation, no active exploitation | 1 hour | Unauthorized cross-account access; data classification violation |
-| **P3 — Medium** | Policy violation with limited blast radius | 4 hours | Permission drift detected; unexpected service access |
-| **P4 — Low** | Minor policy deviations, informational | 24 hours | Missing condition key; unused permissions flagged |
+| **P1  -  Critical** | Active exploitation or imminent data loss | 15 minutes | Agent privilege escalation in progress; audit trail tampering detected |
+| **P2  -  High** | Confirmed security violation, no active exploitation | 1 hour | Unauthorized cross-account access; data classification violation |
+| **P3  -  Medium** | Policy violation with limited blast radius | 4 hours | Permission drift detected; unexpected service access |
+| **P4  -  Low** | Minor policy deviations, informational | 24 hours | Missing condition key; unused permissions flagged |
 
 ---
 
@@ -103,7 +103,7 @@ This runbook covers incident response procedures for security events detected by
 **Response Steps:**
 
 1. **Triage (5 min)**
-   - This is ALWAYS P1 — audit tampering indicates active attack
+   - This is ALWAYS P1  -  audit tampering indicates active attack
    - Verify CloudTrail is still logging: `aws cloudtrail get-trail-status --name {trail}`
    - Notify security on-call immediately
 
@@ -139,7 +139,7 @@ This runbook covers incident response procedures for security events detected by
 
 ---
 
-### Scenario 3: Behavioral Anomaly — Possible Compromise
+### Scenario 3: Behavioral Anomaly  -  Possible Compromise
 
 **Trigger:** Behavior analyzer detects multiple anomalies in short succession for a single agent.
 
@@ -279,7 +279,7 @@ This runbook covers incident response procedures for security events detected by
 ### P1 Notification
 
 ```
-🚨 P1 SECURITY INCIDENT — Agent Identity Guard
+🚨 P1 SECURITY INCIDENT  -  Agent Identity Guard
 
 WHAT: [Brief description - e.g., "Agent privilege escalation detected"]
 WHEN: [Timestamp UTC]
@@ -293,7 +293,7 @@ NEXT UPDATE: [Time - within 30 minutes]
 ### P2 Notification
 
 ```
-⚠️ P2 SECURITY EVENT — Agent Identity Guard
+⚠️ P2 SECURITY EVENT  -  Agent Identity Guard
 
 WHAT: [Brief description]
 WHEN: [Timestamp UTC]

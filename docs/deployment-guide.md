@@ -19,8 +19,8 @@ docker build -t aws-agent-identity-guard:1.0.0 .
 ```
 
 The Dockerfile uses a multi-stage build:
-1. **Builder stage** — compiles the Python wheel
-2. **Production stage** — minimal runtime image with non-root user
+1. **Builder stage**  -  compiles the Python wheel
+2. **Production stage**  -  minimal runtime image with non-root user
 
 ### Run the Container
 
@@ -48,7 +48,7 @@ docker run -d \
 | `GUARD_METRICS_PORT` | `9090` | Prometheus metrics port |
 | `GUARD_AUTH_ENABLED` | `true` | Enable API key authentication |
 | `GUARD_RATE_LIMIT_PER_SECOND` | `1000` | Global rate limit |
-| `REDIS_URL` | — | Redis connection URL (optional) |
+| `REDIS_URL` |  -  | Redis connection URL (optional) |
 
 ### Health Check
 
@@ -448,11 +448,11 @@ policies/
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `REDIS_URL` | — | Full Redis URL (`redis://host:port/db`) |
+| `REDIS_URL` |  -  | Full Redis URL (`redis://host:port/db`) |
 | `REDIS_HOST` | `localhost` | Redis hostname |
 | `REDIS_PORT` | `6379` | Redis port |
 | `REDIS_DB` | `0` | Redis database number |
-| `REDIS_PASSWORD` | — | Redis authentication password |
+| `REDIS_PASSWORD` |  -  | Redis authentication password |
 | `REDIS_TLS` | `false` | Enable TLS connections |
 
 ### Performance Tuning

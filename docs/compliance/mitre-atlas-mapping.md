@@ -4,7 +4,7 @@
 
 This document maps AWS Agent Identity Guard capabilities to the [MITRE ATLAS](https://atlas.mitre.org/) (Adversarial Threat Landscape for AI Systems) framework. ATLAS extends ATT&CK to cover threats specific to machine learning and AI systems.
 
-Agent Identity Guard focuses on the **infrastructure and access control** dimension of AI security — specifically preventing AI agents from being used as attack vectors against AWS resources.
+Agent Identity Guard focuses on the **infrastructure and access control** dimension of AI security  -  specifically preventing AI agents from being used as attack vectors against AWS resources.
 
 ---
 

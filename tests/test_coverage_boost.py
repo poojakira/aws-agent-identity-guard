@@ -6,11 +6,11 @@ Additional tests to boost coverage from 62% to 90%+.
 Targets:
 - __main__.py (lines 3-7)
 - cli.py (75 missed lines: argparse, live-scan path, remediation, formats)
-- remediate.py (all 83 lines — 0% covered)
-- live_scanner.py (75 missed lines — user enumeration, error handling, etc.)
+- remediate.py (all 83 lines  -  0% covered)
+- live_scanner.py (75 missed lines  -  user enumeration, error handling, etc.)
 - scanner.py (11 missed lines)
 
-All AWS/boto3 calls are mocked — no credentials needed.
+All AWS/boto3 calls are mocked  -  no credentials needed.
 """
 
 from __future__ import annotations
@@ -552,7 +552,7 @@ class TestCli:
 
 
 class TestRemediate:
-    """Cover remediate.py — generate_remediations and remediate_to_json."""
+    """Cover remediate.py  -  generate_remediations and remediate_to_json."""
 
     def _make_finding(self, rule_id, severity="high", message="test", remediation="fix"):
         from aws_agent_identity_guard.scanner import Finding
@@ -1035,7 +1035,7 @@ class TestLiveScannerAdditional:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# scanner.py coverage (missed lines — edge cases)
+# scanner.py coverage (missed lines  -  edge cases)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 

@@ -1,10 +1,10 @@
-{"timestamp": "2026-08-20T22:11:00.973897+00:00", "level": "WARN", "message": "Cache hit ratio below threshold", "agent_id": "system"}
-FAIL-OPEN: Allowing dev-agent:s3:PutObject on arn:aws:s3:::dev-bucket/test.txt with no explicit policy match (environment=dev, correlation=225da9ce-4c87-4717-8fa0-ea40827e80c7)
-Detected 1 drift events for agent 941fd5bc-d3e9-4d99-92f2-f88dc373f5e7
+{"timestamp": "2026-08-20T22:12:38.007653+00:00", "level": "WARN", "message": "Cache hit ratio below threshold", "agent_id": "system"}
+FAIL-OPEN: Allowing dev-agent:s3:PutObject on arn:aws:s3:::dev-bucket/test.txt with no explicit policy match (environment=dev, correlation=2c251230-faee-4845-a569-4a975adf5cad)
+Detected 1 drift events for agent 3a55243e-e8c3-41b7-8c25-265ca9019a07
 
 **********************************************************************
 *  AWS Agent Identity Guard - Operations Runbook Execution
-*  2026-08-20 22:10:59 UTC
+*  2026-08-20 22:12:36 UTC
 **********************************************************************
 
 ======================================================================
@@ -92,20 +92,41 @@ Detected 1 drift events for agent 941fd5bc-d3e9-4d99-92f2-f88dc373f5e7
 ======================================================================
 
 [4.1] Scanning example policies...
-  [ERROR] agent_policy_wildcard.json: scan_policy_document() takes 1 positional argument but 2 were given
-  [ERROR] overprivileged_agent_bad.json: scan_policy_document() takes 1 positional argument but 2 were given
-  [ERROR] aws_bedrock_agent_default.json: scan_policy_document() takes 1 positional argument but 2 were given
-  [ERROR] aws_sagemaker_full_access.json: scan_policy_document() takes 1 positional argument but 2 were given
-  [ERROR] lambda_over_permissive.json: scan_policy_document() takes 1 positional argument but 2 were given
-  [ERROR] well_scoped_bedrock_agent.json: scan_policy_document() takes 1 positional argument but 2 were given
+  [CRITICAL] agent_policy_wildcard.json: 7 finding(s)
+         CRITICAL AIG002: Agent policy grants wildcard service or full-account actions...
+         HIGH AIG003: Agent policy grants access to all resources in the account. ...
+         CRITICAL AIG004: iam:PassRole without iam:PassedToService condition. An agent...
+         ... and 4 more
+  [CRITICAL] overprivileged_agent_bad.json: 17 finding(s)
+         CRITICAL AIG002: Agent policy grants wildcard service or full-account actions...
+         HIGH AIG003: Agent policy grants access to all resources in the account. ...
+         CRITICAL AIG004: iam:PassRole without iam:PassedToService condition. An agent...
+         ... and 14 more
+  [CRITICAL] aws_bedrock_agent_default.json: 33 finding(s)
+         HIGH AIG003: Agent policy grants access to all resources in the account. ...
+         HIGH AIG006: Tool execution action 'bedrock:InvokeModel' targets Resource...
+         HIGH AIG006: Tool execution action 'bedrock:InvokeModelWithResponseStream...
+         ... and 30 more
+  [CRITICAL] aws_sagemaker_full_access.json: 27 finding(s)
+         CRITICAL AIG002: Agent policy grants wildcard service or full-account actions...
+         HIGH AIG003: Agent policy grants access to all resources in the account. ...
+         MEDIUM AIG013: Statement has Resource: '*' and zero Condition keys. Agent p...
+         ... and 24 more
+  [CRITICAL] lambda_over_permissive.json: 29 finding(s)
+         HIGH AIG003: Agent policy grants access to all resources in the account. ...
+         HIGH AIG010: Agent has network-modification action 'ec2:CreateNetworkInte...
+         MEDIUM AIG013: Statement has Resource: '*' and zero Condition keys. Agent p...
+         ... and 26 more
+  [PASS] well_scoped_bedrock_agent.json: 0 finding(s)
 
 [4.2] CI Gate Decision
-  Total findings: 0
-  Critical: 0
-  High: 0
-  Medium: 0
+  Total findings: 113
+  Critical: 25
+  High: 44
+  Medium: 44
 
-  Gate Decision: PASS (exit code 0)
+  Gate Decision: BLOCK (exit code 1)
+  Reason: 25 critical + 44 high findings detected
   Result: OPERATIONAL (scanner working correctly)
 
 ======================================================================
@@ -146,8 +167,8 @@ Detected 1 drift events for agent 941fd5bc-d3e9-4d99-92f2-f88dc373f5e7
 ======================================================================
 
 [6.1] Capturing baseline for: production-agent
-  Agent ID: 941fd5bc-d3e9-4d99-92f2-f88dc373f5e7
-  Captured at: 2026-08-20 22:11:01.087458+00:00
+  Agent ID: 3a55243e-e8c3-41b7-8c25-265ca9019a07
+  Captured at: 2026-08-20 22:12:38.101849+00:00
   Permissions in baseline: 0
   Policy hash: 9d6901242dd9c64e...
 
@@ -176,7 +197,7 @@ Detected 1 drift events for agent 941fd5bc-d3e9-4d99-92f2-f88dc373f5e7
  OPERATIONAL SUMMARY REPORT
 ======================================================================
 
-  Timestamp: 2026-08-20T22:11:10.947200+00:00
+  Timestamp: 2026-08-20T22:12:47.356064+00:00
   Version:   1.0.0
   Mode:      Local (no AWS credentials)
 

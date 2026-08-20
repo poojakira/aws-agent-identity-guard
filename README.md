@@ -13,40 +13,40 @@
 
 ## The Problem
 
-AI agents operating on AWS are fundamentally different from human users and traditional service accounts. An agent autonomously decides which API calls to make, chains tool invocations dynamically, and often operates across trust boundaries—all without a human in the loop for each action. Standard IAM policies were designed for static, human-authored permission sets. They answer "can this principal call this API?" but not "should this agent, given its current task context, invoke this sequence of actions on these specific resources right now?" Traditional IAM linting tools catch misconfigurations at deploy time; they are blind to runtime behavior, lateral movement patterns, and privilege-escalation chains that emerge only when an agent is executing.
+AI agents operating on AWS are fundamentally different from human users and traditional service accounts. An agent autonomously decides which API calls to make, chains tool invocations dynamically, and often operates across trust boundaries - all without a human in the loop for each action. Standard IAM policies were designed for static, human-authored permission sets. They answer "can this principal call this API?" but not "should this agent, given its current task context, invoke this sequence of actions on these specific resources right now?" Traditional IAM linting tools catch misconfigurations at deploy time; they are blind to runtime behavior, lateral movement patterns, and privilege-escalation chains that emerge only when an agent is executing.
 
-The attack surface is new and expanding. An agent with `sts:AssumeRole` and `iam:PassRole` can chain assumptions to reach resources its direct policy never granted. An agent with `s3:GetObject` on a bucket containing Terraform state files can extract credentials embedded in infrastructure definitions. An agent that can invoke other agents creates transitive trust relationships invisible to static analysis. These are not theoretical risks—they are the natural consequence of giving autonomous software broad permissions "just in case" it needs them, which is the default posture of most agent frameworks today.
+The attack surface is new and expanding. An agent with `sts:AssumeRole` and `iam:PassRole` can chain assumptions to reach resources its direct policy never granted. An agent with `s3:GetObject` on a bucket containing Terraform state files can extract credentials embedded in infrastructure definitions. An agent that can invoke other agents creates transitive trust relationships invisible to static analysis. These are not theoretical risks - they are the natural consequence of giving autonomous software broad permissions "just in case" it needs them, which is the default posture of most agent frameworks today.
 
-Existing tools—AWS Access Analyzer, IAM linters, CSPM scanners—solve adjacent problems. They validate policy syntax, flag overly broad resource wildcards, or detect publicly exposed resources. None of them model agent-specific threat patterns: tool-chaining escalation, cross-agent delegation abuse, context-dependent authorization, or runtime behavioral drift. AWS Agent Identity Guard fills this gap with purpose-built detection logic, a runtime authorization layer, and continuous posture assessment designed specifically for the agent threat model.
+Existing tools - AWS Access Analyzer, IAM linters, CSPM scanners - solve adjacent problems. They validate policy syntax, flag overly broad resource wildcards, or detect publicly exposed resources. None of them model agent-specific threat patterns: tool-chaining escalation, cross-agent delegation abuse, context-dependent authorization, or runtime behavioral drift. AWS Agent Identity Guard fills this gap with purpose-built detection logic, a runtime authorization layer, and continuous posture assessment designed specifically for the agent threat model.
 
 ---
 
 ## What This Does
 
-- **Runtime authorization decisions** — sub-millisecond allow/deny verdicts for every agent tool invocation
-- **Static policy analysis** — scan IAM policies, SCPs, and resource policies for agent-specific misconfigurations
-- **Privilege escalation detection** — 45+ rules identifying escalation paths unique to agent architectures
-- **Attack-path graph analysis** — computes reachable resource sets through role chaining, delegation, and tool composition
-- **Cross-agent trust modeling** — maps implicit trust relationships when agents can invoke other agents
-- **Behavioral drift detection** — baselines normal agent behavior and alerts on deviations
-- **Context-aware authorization** — factors in task context, session history, and resource sensitivity
-- **Policy-as-code enforcement** — define security invariants in YAML, enforce them in CI and at runtime
-- **SARIF output for IDE integration** — findings surface directly in VS Code, IntelliJ, and GitHub code scanning
-- **Risk scoring engine** — multidimensional scoring across blast radius, exploitability, and business impact
-- **Least-privilege recommendations** — generates minimal policy sets from observed agent behavior
-- **Session replay and forensics** — full audit trail of every authorization decision with context
-- **Anomaly detection** — statistical models flag unusual API call patterns and resource access
-- **Toxic combination detection** — identifies dangerous permission combinations (e.g., `iam:CreateRole` + `sts:AssumeRole`)
-- **Resource sensitivity classification** — auto-labels resources by data sensitivity for risk-weighted decisions
-- **Multi-account support** — works across AWS Organizations with delegated administrator model
-- **Real-time event streaming** — publishes decisions and alerts to EventBridge, SNS, or webhooks
-- **Custom rule authoring** — write detection rules in Python or declarative YAML
-- **Compliance mapping** — maps findings to NIST 800-53, MITRE ATT&CK, and OWASP Top 10 for LLMs
-- **Guardrail templates** — pre-built policy sets for common agent patterns (RAG, tool-use, multi-agent)
-- **Break-glass override** — emergency escalation path with mandatory justification and audit
-- **Integration SDK** — Python SDK for embedding authorization checks in any agent framework
-- **Dashboard and reporting** — Grafana-compatible metrics and executive summary reports
-- **Kubernetes admission controller** — blocks pod deployments with overprivileged agent roles
+- **Runtime authorization decisions**  -  sub-millisecond allow/deny verdicts for every agent tool invocation
+- **Static policy analysis**  -  scan IAM policies, SCPs, and resource policies for agent-specific misconfigurations
+- **Privilege escalation detection**  -  45+ rules identifying escalation paths unique to agent architectures
+- **Attack-path graph analysis**  -  computes reachable resource sets through role chaining, delegation, and tool composition
+- **Cross-agent trust modeling**  -  maps implicit trust relationships when agents can invoke other agents
+- **Behavioral drift detection**  -  baselines normal agent behavior and alerts on deviations
+- **Context-aware authorization**  -  factors in task context, session history, and resource sensitivity
+- **Policy-as-code enforcement**  -  define security invariants in YAML, enforce them in CI and at runtime
+- **SARIF output for IDE integration**  -  findings surface directly in VS Code, IntelliJ, and GitHub code scanning
+- **Risk scoring engine**  -  multidimensional scoring across blast radius, exploitability, and business impact
+- **Least-privilege recommendations**  -  generates minimal policy sets from observed agent behavior
+- **Session replay and forensics**  -  full audit trail of every authorization decision with context
+- **Anomaly detection**  -  statistical models flag unusual API call patterns and resource access
+- **Toxic combination detection**  -  identifies dangerous permission combinations (e.g., `iam:CreateRole` + `sts:AssumeRole`)
+- **Resource sensitivity classification**  -  auto-labels resources by data sensitivity for risk-weighted decisions
+- **Multi-account support**  -  works across AWS Organizations with delegated administrator model
+- **Real-time event streaming**  -  publishes decisions and alerts to EventBridge, SNS, or webhooks
+- **Custom rule authoring**  -  write detection rules in Python or declarative YAML
+- **Compliance mapping**  -  maps findings to NIST 800-53, MITRE ATT&CK, and OWASP Top 10 for LLMs
+- **Guardrail templates**  -  pre-built policy sets for common agent patterns (RAG, tool-use, multi-agent)
+- **Break-glass override**  -  emergency escalation path with mandatory justification and audit
+- **Integration SDK**  -  Python SDK for embedding authorization checks in any agent framework
+- **Dashboard and reporting**  -  Grafana-compatible metrics and executive summary reports
+- **Kubernetes admission controller**  -  blocks pod deployments with overprivileged agent roles
 
 ---
 
@@ -74,9 +74,9 @@ Existing tools—AWS Access Analyzer, IAM linters, CSPM scanners—solve adjacen
 │  ┌──────────────────┐ ┌───────────────┐ ┌─────────────────────────────┐   │
 │  │  Policy Engine   │ │  Risk Scorer  │ │   Attack Path Analyzer      │   │
 │  │                  │ │               │ │                             │   │
-│  │ • Rule evaluator │ │ • Blast radius│ │ • Graph traversal          │   │
-│  │ • Context merge  │ │ • Exploit prob│ │ • Role chain enumeration   │   │
-│  │ • Decision cache │ │ • Sensitivity │ │ • Transitive trust compute │   │
+│  │ * Rule evaluator │ │ * Blast radius│ │ * Graph traversal          │   │
+│  │ * Context merge  │ │ * Exploit prob│ │ * Role chain enumeration   │   │
+│  │ * Decision cache │ │ * Sensitivity │ │ * Transitive trust compute │   │
 │  └────────┬─────────┘ └───────┬───────┘ └──────────────┬──────────────┘   │
 │           │                   │                         │                   │
 │           ▼                   ▼                         ▼                   │
@@ -142,7 +142,7 @@ Example output:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│ AWS Agent Identity Guard — Static Analysis Results                            │
+│ AWS Agent Identity Guard  -  Static Analysis Results                            │
 ├────────┬────────────────────────────────────────┬──────────┬─────────────────┤
 │ Rule   │ Description                            │ Severity │ Location        │
 ├────────┼────────────────────────────────────────┼──────────┼─────────────────┤
@@ -490,7 +490,7 @@ jobs:
             const fs = require('fs');
             const sarif = JSON.parse(fs.readFileSync('results.sarif', 'utf8'));
             const findings = sarif.runs[0].results;
-            let comment = '## 🚨 Agent Identity Guard — Security Findings\n\n';
+            let comment = '## 🚨 Agent Identity Guard  -  Security Findings\n\n';
             comment += `Found **${findings.length}** security issues:\n\n`;
             findings.forEach(f => {
               comment += `- **${f.ruleId}** (${f.level}): ${f.message.text}\n`;
@@ -563,7 +563,7 @@ Remediation:
 
 ## Risk Scoring
 
-The risk scoring engine evaluates agent posture across four independent dimensions, combined into a weighted composite score (0–100):
+The risk scoring engine evaluates agent posture across four independent dimensions, combined into a weighted composite score (0-100):
 
 ### Dimensions
 
@@ -611,10 +611,10 @@ composite_risk = (blast_radius × 0.30) +
 
 | Score Range | Classification | Response |
 |-------------|---------------|----------|
-| 0–25 | Low | Informational, no action required |
-| 26–50 | Medium | Review recommended within 7 days |
-| 51–75 | High | Action required within 24 hours |
-| 76–100 | Critical | Immediate response, consider agent isolation |
+| 0-25 | Low | Informational, no action required |
+| 26-50 | Medium | Review recommended within 7 days |
+| 51-75 | High | Action required within 24 hours |
+| 76-100 | Critical | Immediate response, consider agent isolation |
 
 ---
 
@@ -650,11 +650,11 @@ Detection difficulty: MEDIUM (spans multiple services)
 
 The analyzer uses breadth-first traversal with the following edge types:
 
-- **AssumeRole edges** — role trust relationships
-- **PassRole edges** — ability to delegate roles to services
-- **Resource policy edges** — cross-account access grants
-- **Service-linked edges** — implicit permissions granted by service roles
-- **Delegation edges** — agent-to-agent invocation permissions
+- **AssumeRole edges**  -  role trust relationships
+- **PassRole edges**  -  ability to delegate roles to services
+- **Resource policy edges**  -  cross-account access grants
+- **Service-linked edges**  -  implicit permissions granted by service roles
+- **Delegation edges**  -  agent-to-agent invocation permissions
 
 Pruning heuristics keep computation tractable:
 - Maximum chain depth: 8 hops (configurable)

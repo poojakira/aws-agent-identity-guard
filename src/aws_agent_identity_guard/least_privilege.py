@@ -2,7 +2,7 @@
 
 Production-grade engine for analyzing agent permissions and generating
 actionable, policy-level least-privilege recommendations. This module goes
-beyond flagging wildcards — it produces concrete replacement policies,
+beyond flagging wildcards  -  it produces concrete replacement policies,
 scoped resource ARNs, and unified diffs showing exactly what changes to make.
 
 Key capabilities:
