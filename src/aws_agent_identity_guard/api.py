@@ -40,8 +40,7 @@ from .models import (
     AuthorizationDecision,
     AuthorizationRequest,
     Permission,
-    Policy,
-    RiskAssessment,
+    RiskScore,
 )
 
 __all__ = ["APIServer", "APIHandler"]

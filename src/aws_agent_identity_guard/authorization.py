@@ -350,7 +350,7 @@ class AuthorizationDecision(SerializableMixin):
         """
         lines = [
             self.decision.value,
-            f"Agent: {request.agent_name}",
+            f"Agent: {request.agent_id}",
             f"Action: {request.action}",
             f"Resource: {request.resource}",
         ]
@@ -404,7 +404,7 @@ class DecisionCache:
         """
         key_data = (
             f"{request.agent_id}:{request.action}:{request.resource}"
-            f":{request.environment.value}:{request.data_classification.value}"
+            f":{request.environment.value if request.environment else 'none'}:{request.data_classification.value}"
             f":{request.tool}:{request.principal}"
         )
         return hashlib.sha256(key_data.encode("utf-8")).hexdigest()
@@ -682,7 +682,7 @@ class DefaultRiskEngine:
             Environment.STAGING: 5,
             Environment.PRODUCTION: 15,
         }
-        score += environment_scores.get(request.environment, 15)
+        score += environment_scores.get(request.environment, 15) if request.environment else 15
 
         # Pre-computed risk context boost
         if request.risk_context:
@@ -752,7 +752,7 @@ class DefaultPolicyEngine:
                 continue
 
             # Environment filter
-            if rule.environments and request.environment not in rule.environments:
+            if rule.environments and request.environment and request.environment not in rule.environments:
                 continue
 
             # Action pattern matching
@@ -1219,7 +1219,7 @@ class AuthorizationService:
                     "Cache hit for %s:%s (correlation=%s)",
                     request.agent_id,
                     request.action,
-                    request.correlation_id,
+                    getattr(request, 'correlation_id', str(uuid.uuid4())),
                 )
                 # Update correlation_id and timestamp for the new request
                 decision = AuthorizationDecision(
@@ -1228,7 +1228,7 @@ class AuthorizationService:
                     reasons=cached.reasons,
                     policy=cached.policy,
                     explanation=cached.explanation,
-                    correlation_id=request.correlation_id,
+                    correlation_id=getattr(request, 'correlation_id', str(uuid.uuid4())),
                     timestamp=_utcnow(),
                     approval_required=cached.approval_required,
                     approval_id=cached.approval_id,
@@ -1255,12 +1255,12 @@ class AuthorizationService:
             "Authorization decision: %s for %s:%s on %s "
             "(risk=%d, elapsed=%.2fms, correlation=%s)",
             decision.decision.value,
-            request.agent_name,
+            request.agent_id,
             request.action,
             request.resource,
             decision.risk_score,
             elapsed_ms,
-            request.correlation_id,
+            getattr(request, 'correlation_id', str(uuid.uuid4())),
         )
 
         return decision
@@ -1304,7 +1304,7 @@ class AuthorizationService:
                 policy=rule.rule_id,
                 explanation=explanation,
                 risk_score=max(risk_score, 80),
-                correlation_id=request.correlation_id,
+                correlation_id=getattr(request, 'correlation_id', str(uuid.uuid4())),
             )
 
         # Stage 2: Risk-based automatic denial
@@ -1319,7 +1319,7 @@ class AuthorizationService:
                 policy="risk-threshold-deny",
                 explanation=explanation,
                 risk_score=risk_score,
-                correlation_id=request.correlation_id,
+                correlation_id=getattr(request, 'correlation_id', str(uuid.uuid4())),
             )
 
         # Stage 3: Step-up rules (CONDITION_DEPENDENT treated as step-up)
@@ -1344,7 +1344,7 @@ class AuthorizationService:
                 policy=rule.rule_id,
                 explanation=explanation,
                 risk_score=risk_score,
-                correlation_id=request.correlation_id,
+                correlation_id=getattr(request, 'correlation_id', str(uuid.uuid4())),
             )
 
         # Stage 4: Risk-based step-up
@@ -1363,7 +1363,7 @@ class AuthorizationService:
                 policy="risk-threshold-step-up",
                 explanation=explanation,
                 risk_score=risk_score,
-                correlation_id=request.correlation_id,
+                correlation_id=getattr(request, 'correlation_id', str(uuid.uuid4())),
             )
 
         # Stage 5: Risk-based review
@@ -1377,7 +1377,7 @@ class AuthorizationService:
             )
             explanation = (
                 f"REVIEW REQUIRED\n"
-                f"Agent: {request.agent_name}\n"
+                f"Agent: {request.agent_id}\n"
                 f"Action: {request.action}\n"
                 f"Resource: {request.resource}\n"
                 f"Reason: {'; '.join(reasons)}"
@@ -1388,7 +1388,7 @@ class AuthorizationService:
                 policy="risk-threshold-review",
                 explanation=explanation,
                 risk_score=risk_score,
-                correlation_id=request.correlation_id,
+                correlation_id=getattr(request, 'correlation_id', str(uuid.uuid4())),
             )
 
         # Stage 6: Explicit allow rules
@@ -1406,7 +1406,7 @@ class AuthorizationService:
                 policy=rule.rule_id,
                 explanation=f"Access granted per policy '{rule.name}'.",
                 risk_score=risk_score,
-                correlation_id=request.correlation_id,
+                correlation_id=getattr(request, 'correlation_id', str(uuid.uuid4())),
                 conditions=conditions,
             )
 
@@ -1428,37 +1428,37 @@ class AuthorizationService:
         Returns:
             Default AuthorizationDecision for the environment.
         """
-        if request.environment in self.config.fail_open_environments:
+        if request.environment and request.environment in self.config.fail_open_environments:
             # Fail-open: allow with logging
             reasons = [
-                f"Default ALLOW in {request.environment.value} environment "
+                f"Default ALLOW in {request.environment.value if request.environment else 'unknown'} environment "
                 "(no matching policy rule; fail-open mode)."
             ]
             logger.warning(
                 "FAIL-OPEN: Allowing %s:%s on %s with no explicit policy match "
                 "(environment=%s, correlation=%s)",
-                request.agent_name,
+                request.agent_id,
                 request.action,
                 request.resource,
-                request.environment.value,
-                request.correlation_id,
+                request.environment.value if request.environment else "unknown",
+                getattr(request, 'correlation_id', str(uuid.uuid4())),
             )
             return AuthorizationDecision.allow(
                 reasons=reasons,
                 policy="default-fail-open",
                 explanation=(
                     f"Access granted by default (fail-open mode in "
-                    f"{request.environment.value}). No explicit policy matched."
+                    f"{request.environment.value if request.environment else 'unknown'}). No explicit policy matched."
                 ),
                 risk_score=risk_score,
-                correlation_id=request.correlation_id,
+                correlation_id=getattr(request, 'correlation_id', str(uuid.uuid4())),
                 conditions=["audit-logged", "monitor-for-anomalies"],
             )
 
         # Fail-closed: deny (default for production/staging)
         reasons = [
             f"No explicit allow policy matched. "
-            f"Default DENY in {request.environment.value} environment "
+            f"Default DENY in {request.environment.value if request.environment else 'production'} environment "
             "(fail-closed mode)."
         ]
         explanation = self._build_deny_explanation(request, reasons)
@@ -1467,7 +1467,7 @@ class AuthorizationService:
             policy="default-fail-closed",
             explanation=explanation,
             risk_score=max(risk_score, 50),
-            correlation_id=request.correlation_id,
+            correlation_id=getattr(request, 'correlation_id', str(uuid.uuid4())),
         )
 
     def _build_deny_explanation(
@@ -1484,7 +1484,7 @@ class AuthorizationService:
         """
         return (
             f"DENIED\n"
-            f"Agent: {request.agent_name}\n"
+            f"Agent: {request.agent_id}\n"
             f"Action: {request.action}\n"
             f"Resource: {request.resource}\n"
             f"Reason: {'; '.join(reasons)}"
@@ -1504,7 +1504,7 @@ class AuthorizationService:
         """
         return (
             f"STEP-UP REQUIRED\n"
-            f"Agent: {request.agent_name}\n"
+            f"Agent: {request.agent_id}\n"
             f"Action: {request.action}\n"
             f"Resource: {request.resource}\n"
             f"Reason: {'; '.join(reasons)}"
@@ -1546,13 +1546,13 @@ class AuthorizationService:
 
         event = AuditEvent.create(
             who=request.principal,
-            agent=request.agent_name,
+            agent=request.agent_id,
             action=request.action,
             resource=request.resource,
             decision=decision.decision,
             reason="; ".join(decision.reasons),
             policy_version=decision.policy,
-            correlation_id=request.correlation_id,
+            correlation_id=getattr(request, 'correlation_id', str(uuid.uuid4())),
             previous_hash=previous_hash,
         )
         self.audit_logger.log(event)

@@ -707,6 +707,7 @@ class AuthorizationRequest(SerializableMixin):
         "data_classification",
         "context",
         "risk_context",
+        "environment",
     )
 
     agent_id: str
@@ -717,10 +718,17 @@ class AuthorizationRequest(SerializableMixin):
     data_classification: DataClassification
     context: dict[str, Any]
     risk_context: dict[str, Any]
+    environment: Optional[Environment]
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> AuthorizationRequest:
         """Reconstruct an AuthorizationRequest from a dictionary."""
+        env = None
+        if "environment" in data and data["environment"]:
+            try:
+                env = Environment(data["environment"])
+            except (ValueError, KeyError):
+                env = None
         return cls(
             agent_id=data["agent_id"],
             principal=data["principal"],
@@ -730,6 +738,7 @@ class AuthorizationRequest(SerializableMixin):
             data_classification=DataClassification(data["data_classification"]),
             context=data.get("context", {}),
             risk_context=data.get("risk_context", {}),
+            environment=env,
         )
 
     @classmethod
@@ -743,6 +752,7 @@ class AuthorizationRequest(SerializableMixin):
         data_classification: DataClassification = DataClassification.INTERNAL,
         context: dict[str, Any] | None = None,
         risk_context: dict[str, Any] | None = None,
+        environment: Optional[Environment] = None,
     ) -> AuthorizationRequest:
         """Factory method with defaults for optional fields."""
         return cls(
@@ -754,6 +764,7 @@ class AuthorizationRequest(SerializableMixin):
             data_classification=data_classification,
             context=context or {},
             risk_context=risk_context or {},
+            environment=environment,
         )
 
 
