@@ -4,17 +4,22 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aws-agent-identity-guard"
-version = "0.3.0"
-description = "Static IAM policy linter for AI agent roles on AWS. 25 rules targeting Bedrock, SageMaker, Lambda, and ECS agent permissions."
+version = "1.0.0"
+description = "AI agent identity security platform for AWS. Runtime authorization, risk scoring, attack-path analysis, policy-as-code, and enforcement for Bedrock, Lambda, SageMaker, and ECS agent workloads."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [{name = "Pooja Kiran"}]
-keywords = ["aws", "iam", "agentic-ai", "bedrock", "sagemaker", "security", "least-privilege", "policy-linter", "sarif"]
+keywords = [
+    "aws", "iam", "agentic-ai", "bedrock", "sagemaker", "lambda", "ecs",
+    "security", "least-privilege", "policy-linter", "sarif", "runtime-authorization",
+    "risk-scoring", "attack-path", "policy-as-code", "zero-trust", "agent-security",
+]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: System Administrators",
+    "Intended Audience :: Information Technology",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -23,37 +28,87 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Topic :: Security",
     "Topic :: Software Development :: Quality Assurance",
+    "Topic :: System :: Systems Administration",
     "Typing :: Typed",
 ]
-dependencies = []
+dependencies = [
+    "pyyaml>=6.0.1",
+]
 
 [project.optional-dependencies]
+api = [
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "pydantic>=2.5.0",
+]
 live = ["boto3>=1.34.0"]
-dev = ["pytest>=8.2", "ruff>=0.8", "pyright>=1.1.380", "moto[iam]>=5.0.0", "boto3>=1.34.0"]
+sdk = ["requests>=2.28.0"]
+observability = [
+    "prometheus-client>=0.20.0",
+    "opentelemetry-api>=1.22.0",
+    "opentelemetry-sdk>=1.22.0",
+]
+redis = ["redis>=5.0.0"]
+all = [
+    "aws-agent-identity-guard[api,live,sdk,observability,redis]",
+]
+dev = [
+    "pytest>=8.2",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.8",
+    "pyright>=1.1.380",
+    "moto[iam]>=5.0.0",
+    "boto3>=1.34.0",
+    "httpx>=0.27.0",
+    "respx>=0.21.0",
+]
 
 [project.scripts]
 aws-agent-identity-guard = "aws_agent_identity_guard.cli:main"
+agent-guard = "aws_agent_identity_guard.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/poojakira/aws-agent-identity-guard"
+Repository = "https://github.com/poojakira/aws-agent-identity-guard"
 Issues = "https://github.com/poojakira/aws-agent-identity-guard/issues"
-Documentation = "https://github.com/poojakira/aws-agent-identity-guard#readme"
+Documentation = "https://github.com/poojakira/aws-agent-identity-guard/docs"
+Changelog = "https://github.com/poojakira/aws-agent-identity-guard/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q --tb=short"
+addopts = "-q --tb=short --strict-markers"
 pythonpath = ["src"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks integration tests requiring AWS credentials",
+    "adversarial: marks adversarial security tests",
+    "benchmark: marks benchmark tests",
+]
 
 [tool.ruff]
 line-length = 100
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "SIM", "TCH"]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "TCH", "S", "A", "C4"]
+ignore = ["S101", "S603", "S607"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]
 
 [tool.pyright]
 pythonVersion = "3.10"
 typeCheckingMode = "standard"
+include = ["src"]
+
+[tool.coverage.run]
+source = ["aws_agent_identity_guard"]
+omit = ["tests/*", "demo/*"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80

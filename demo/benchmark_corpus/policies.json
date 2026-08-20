@@ -1,0 +1,90 @@
+[
+  {
+    "name": "deny-all-iam-mutation",
+    "effect": "DENY",
+    "actions": ["iam:*"],
+    "resources": ["*"],
+    "environments": ["PRODUCTION"],
+    "priority": 100,
+    "description": "Block all IAM mutations in production"
+  },
+  {
+    "name": "deny-secrets-high-risk",
+    "effect": "DENY",
+    "actions": ["secretsmanager:GetSecretValue"],
+    "resources": ["*"],
+    "conditions": {"risk_score_above": 70},
+    "priority": 95,
+    "description": "Block secrets access for high-risk agents"
+  },
+  {
+    "name": "deny-cross-account-assume",
+    "effect": "DENY",
+    "actions": ["sts:AssumeRole"],
+    "resources": ["arn:aws:iam::*:role/Admin*"],
+    "priority": 90,
+    "description": "Block cross-account admin role assumption"
+  },
+  {
+    "name": "step-up-destructive-actions",
+    "effect": "STEP_UP",
+    "actions": ["s3:DeleteBucket", "rds:DeleteDBInstance", "ec2:TerminateInstances"],
+    "resources": ["*"],
+    "priority": 85,
+    "description": "Require step-up auth for destructive operations"
+  },
+  {
+    "name": "require-approval-data-export",
+    "effect": "REQUIRE_APPROVAL",
+    "actions": ["s3:GetObject"],
+    "resources": ["arn:aws:s3:::classified-*"],
+    "conditions": {"data_classification_in": ["SECRET", "REGULATED"]},
+    "priority": 80,
+    "description": "Require approval for classified data export"
+  },
+  {
+    "name": "allow-bedrock-invoke",
+    "effect": "ALLOW",
+    "actions": ["bedrock:InvokeModel", "bedrock:InvokeAgent"],
+    "resources": ["*"],
+    "environments": ["*"],
+    "priority": 50,
+    "description": "Allow Bedrock model invocation for all agents"
+  },
+  {
+    "name": "allow-s3-read-public",
+    "effect": "ALLOW",
+    "actions": ["s3:GetObject", "s3:ListBucket"],
+    "resources": ["arn:aws:s3:::public-*"],
+    "priority": 40,
+    "description": "Allow reading public S3 buckets"
+  },
+  {
+    "name": "deny-ec2-launch-prod",
+    "effect": "DENY",
+    "actions": ["ec2:RunInstances"],
+    "resources": ["*"],
+    "environments": ["PRODUCTION"],
+    "conditions": {"risk_score_above": 50},
+    "priority": 75,
+    "description": "Deny EC2 launches in prod for risky agents"
+  },
+  {
+    "name": "step-up-secrets-staging",
+    "effect": "STEP_UP",
+    "actions": ["secretsmanager:GetSecretValue"],
+    "resources": ["*"],
+    "environments": ["STAGING"],
+    "priority": 70,
+    "description": "Require step-up for secrets in staging"
+  },
+  {
+    "name": "allow-lambda-invoke-dev",
+    "effect": "ALLOW",
+    "actions": ["lambda:InvokeFunction"],
+    "resources": ["arn:aws:lambda:*:*:function:dev-*"],
+    "environments": ["DEVELOPMENT"],
+    "priority": 30,
+    "description": "Allow Lambda invocation for dev functions"
+  }
+]

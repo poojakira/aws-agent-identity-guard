@@ -1,230 +1,1010 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AWS Agent Identity Guard — IAM Findings Dashboard</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d1117;color:#c9d1d9;line-height:1.6;padding:2rem}
-h1{color:#58a6ff;font-size:1.8rem;margin-bottom:0.5rem}
-h2{color:#79c0ff;font-size:1.3rem;margin:2rem 0 1rem;border-bottom:1px solid #21262d;padding-bottom:0.5rem}
-h3{color:#d2a8ff;font-size:1.1rem;margin:1.5rem 0 0.75rem}
-.subtitle{color:#8b949e;font-size:0.95rem;margin-bottom:2rem}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
-.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1.25rem;text-align:center}
-.card .count{font-size:2.2rem;font-weight:700;margin-bottom:0.25rem}
-.card .label{color:#8b949e;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.5px}
-.critical .count{color:#f85149}
-.high .count{color:#f0883e}
-.medium .count{color:#d29922}
-.low .count{color:#3fb950}
-.pass .count{color:#58a6ff}
-table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem}
-th,td{padding:0.75rem 1rem;text-align:left;border-bottom:1px solid #21262d}
-th{background:#161b22;color:#79c0ff;font-weight:600;position:sticky;top:0}
-tr:hover{background:#1c2128}
-.badge{display:inline-block;padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:600;text-transform:uppercase}
-.badge-critical{background:#f8514922;color:#f85149;border:1px solid #f8514955}
-.badge-high{background:#f0883e22;color:#f0883e;border:1px solid #f0883e55}
-.badge-medium{background:#d2992222;color:#d29922;border:1px solid #d2992255}
-.badge-low{background:#3fb95022;color:#3fb950;border:1px solid #3fb95055}
-code{background:#1c2128;padding:0.15rem 0.4rem;border-radius:4px;font-size:0.85rem;color:#79c0ff}
-pre{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1.25rem;overflow-x:auto;font-size:0.85rem;line-height:1.5;color:#c9d1d9;margin:1rem 0}
-.json-key{color:#79c0ff}
-.json-str{color:#a5d6ff}
-.json-val{color:#d2a8ff}
-.finding-box{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1rem 1.25rem;margin:0.75rem 0}
-.finding-box .title{color:#f0f6fc;font-weight:600;margin-bottom:0.25rem}
-.finding-box .remediation{color:#8b949e;font-size:0.85rem;margin-top:0.5rem;padding-left:1rem;border-left:2px solid #30363d}
-.run-box{background:#0d1117;border:1px solid #238636;border-radius:8px;padding:1.25rem;margin:1rem 0}
-.run-box code{background:#161b22;display:block;padding:0.75rem 1rem;margin:0.5rem 0;border-radius:4px;color:#3fb950}
-.section{margin-bottom:3rem}
-.header-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:1.5rem}
-.timestamp{color:#8b949e;font-size:0.8rem}
-.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem}
-.check-card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1rem 1.25rem}
-.check-card .rule-id{color:#d2a8ff;font-weight:700;font-size:0.9rem}
-.check-card .desc{margin-top:0.4rem;font-size:0.88rem;color:#c9d1d9}
-.check-card .patterns{margin-top:0.5rem;font-size:0.8rem;color:#8b949e}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Identity Guard - Security Dashboard</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --border: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-yellow: #d29922;
+            --accent-orange: #db6d28;
+            --accent-red: #f85149;
+            --accent-purple: #a371f7;
+            --risk-low: #3fb950;
+            --risk-medium: #d29922;
+            --risk-high: #db6d28;
+            --risk-critical: #f85149;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .refresh-timer {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto;
+            gap: 16px;
+            padding: 24px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        /* Metrics Row */
+        .metrics-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 8px 0;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .metric-change {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .metric-change.positive { color: var(--accent-green); }
+        .metric-change.negative { color: var(--accent-red); }
+        .metric-change.neutral { color: var(--text-muted); }
+
+        /* Agent Inventory */
+        .agent-inventory {
+            grid-column: 1 / 3;
+            grid-row: span 2;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            text-align: left;
+            padding: 10px 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        tr:hover td {
+            background: var(--bg-tertiary);
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .risk-low { background: rgba(63, 185, 80, 0.15); color: var(--risk-low); }
+        .risk-medium { background: rgba(210, 153, 34, 0.15); color: var(--risk-medium); }
+        .risk-high { background: rgba(219, 109, 40, 0.15); color: var(--risk-high); }
+        .risk-critical { background: rgba(248, 81, 73, 0.15); color: var(--risk-critical); }
+
+        .env-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .env-prod { background: rgba(248, 81, 73, 0.1); color: var(--accent-red); }
+        .env-staging { background: rgba(210, 153, 34, 0.1); color: var(--accent-yellow); }
+        .env-dev { background: rgba(63, 185, 80, 0.1); color: var(--accent-green); }
+
+        /* Risk Overview */
+        .risk-overview {
+            grid-column: 3 / 5;
+        }
+
+        .risk-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .risk-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .risk-bar-label {
+            width: 70px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .risk-bar-container {
+            flex: 1;
+            height: 24px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .risk-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease-in-out;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .risk-bar-fill.low { background: var(--risk-low); }
+        .risk-bar-fill.medium { background: var(--risk-medium); }
+        .risk-bar-fill.high { background: var(--risk-high); }
+        .risk-bar-fill.critical { background: var(--risk-critical); }
+
+        .risk-bar-count {
+            width: 40px;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Risk Gauge */
+        .gauge-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 32px;
+            margin-top: 20px;
+        }
+
+        .gauge {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: var(--bg-tertiary);
+            stroke-width: 10;
+        }
+
+        .gauge-fill {
+            fill: none;
+            stroke-width: 10;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            transition: stroke-dashoffset 1.5s ease-in-out;
+        }
+
+        .gauge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .gauge-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .gauge-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        /* Attack Paths */
+        .attack-paths {
+            grid-column: 3 / 5;
+        }
+
+        .attack-path-item {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background: var(--bg-tertiary);
+        }
+
+        .attack-path-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .attack-path-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .attack-path-chain {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+            font-size: 11px;
+        }
+
+        .chain-step {
+            background: var(--bg-secondary);
+            padding: 3px 8px;
+            border-radius: 3px;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .chain-arrow {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        /* Recent Decisions */
+        .recent-decisions {
+            grid-column: 1 / 3;
+        }
+
+        .decision-allow { color: var(--accent-green); }
+        .decision-deny { color: var(--accent-red); }
+        .decision-step-up { color: var(--accent-yellow); }
+        .decision-review { color: var(--accent-purple); }
+
+        /* Permission Drift */
+        .permission-drift {
+            grid-column: 3 / 5;
+        }
+
+        .drift-alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 3px solid;
+        }
+
+        .drift-alert.severity-critical {
+            background: rgba(248, 81, 73, 0.05);
+            border-left-color: var(--accent-red);
+        }
+
+        .drift-alert.severity-high {
+            background: rgba(219, 109, 40, 0.05);
+            border-left-color: var(--accent-orange);
+        }
+
+        .drift-alert.severity-medium {
+            background: rgba(210, 153, 34, 0.05);
+            border-left-color: var(--accent-yellow);
+        }
+
+        .drift-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .drift-content {
+            flex: 1;
+        }
+
+        .drift-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .drift-detail {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .drift-time {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .severity-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .severity-badge.critical { background: rgba(248, 81, 73, 0.2); color: var(--accent-red); }
+        .severity-badge.high { background: rgba(219, 109, 40, 0.2); color: var(--accent-orange); }
+        .severity-badge.medium { background: rgba(210, 153, 34, 0.2); color: var(--accent-yellow); }
+
+        /* Pending Approvals */
+        .pending-approvals {
+            grid-column: 1 / 3;
+        }
+
+        .approval-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .approval-info {
+            flex: 1;
+        }
+
+        .approval-agent {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .approval-action {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .approval-time {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .approval-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .btn-approve {
+            background: rgba(63, 185, 80, 0.1);
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .btn-approve:hover {
+            background: rgba(63, 185, 80, 0.2);
+        }
+
+        .btn-deny {
+            background: rgba(248, 81, 73, 0.1);
+            color: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        .btn-deny:hover {
+            background: rgba(248, 81, 73, 0.2);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .metrics-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .agent-inventory,
+            .recent-decisions,
+            .pending-approvals,
+            .risk-overview,
+            .attack-paths,
+            .permission-drift {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                padding: 12px;
+            }
+            .metrics-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="header-bar">
-<div>
-<h1>&#x1F6E1; AWS Agent Identity Guard</h1>
-<p class="subtitle">Static IAM Policy Scanner for AI Agent Workloads — Findings Dashboard</p>
-</div>
-<div class="timestamp">Last scan: <span id="scan-time"></span></div>
-</div>
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo">AG</div>
+            <div>
+                <div class="header-title">Agent Identity Guard</div>
+                <div class="header-subtitle">Security Dashboard</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span>All systems operational</span>
+            </div>
+            <div class="refresh-timer" id="refresh-timer">Refresh in 30s</div>
+        </div>
+    </header>
 
-<!-- Section 1: Scan Results Summary -->
-<div class="section">
-<h2>&#x1F4CA; Scan Results Summary — Example Agent Policy</h2>
-<p style="color:#8b949e;margin-bottom:1rem;">Results from scanning <code>examples/agent_policy_wildcard.json</code></p>
-<div class="grid">
-<div class="card critical"><div class="count">3</div><div class="label">Critical</div></div>
-<div class="card high"><div class="count">2</div><div class="label">High</div></div>
-<div class="card medium"><div class="count">0</div><div class="label">Medium</div></div>
-<div class="card low"><div class="count">0</div><div class="label">Low</div></div>
-<div class="card pass"><div class="count">5</div><div class="label">Total Findings</div></div>
-</div>
-</div>
+    <div class="dashboard">
+        <!-- Metrics Row -->
+        <div class="metrics-row">
+            <div class="metric-card">
+                <div class="metric-label">Decisions / sec</div>
+                <div class="metric-value" style="color: var(--accent-blue)">1,247</div>
+                <div class="metric-change positive">+12% from last hour</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Denied</div>
+                <div class="metric-value" style="color: var(--accent-red)">23</div>
+                <div class="metric-change negative">+3 from last hour</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Step-ups</div>
+                <div class="metric-value" style="color: var(--accent-yellow)">7</div>
+                <div class="metric-change neutral">No change</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Violations</div>
+                <div class="metric-value" style="color: var(--accent-red)">2</div>
+                <div class="metric-change negative">+1 from last hour</div>
+            </div>
+        </div>
 
-<!-- Section 2: Finding Details Table -->
-<div class="section">
-<h2>&#x1F50D; Finding Details</h2>
-<p style="color:#8b949e;margin-bottom:1rem;">Detailed findings from scanning the example wildcard agent policy</p>
-<div style="overflow-x:auto;">
-<table>
-<thead>
-<tr><th>Rule</th><th>Severity</th><th>Finding</th><th>Remediation</th><th>Statement</th></tr>
-</thead>
-<tbody>
-<tr>
-<td><code>AIG002</code></td>
-<td><span class="badge badge-critical">Critical</span></td>
-<td>Agent policy grants wildcard service or account actions.</td>
-<td>Scope actions to the exact services and APIs the agent tool is allowed to call.</td>
-<td>#0</td>
-</tr>
-<tr>
-<td><code>AIG003</code></td>
-<td><span class="badge badge-high">High</span></td>
-<td>Agent policy grants access to all resources.</td>
-<td>Bind permissions to specific ARNs and add tenant/session conditions where possible.</td>
-<td>#0</td>
-</tr>
-<tr>
-<td><code>AIG004</code></td>
-<td><span class="badge badge-critical">Critical</span></td>
-<td>iam:PassRole is allowed without an iam:PassedToService condition.</td>
-<td>Constrain PassRole to the one AWS service that runs the agent or tool workload.</td>
-<td>#0</td>
-</tr>
-<tr>
-<td><code>AIG005</code></td>
-<td><span class="badge badge-critical">Critical</span></td>
-<td>Agent policy includes privilege-management action iam:PassRole.</td>
-<td>Separate agent runtime roles from IAM administration and role-broker permissions.</td>
-<td>#0</td>
-</tr>
-<tr>
-<td><code>AIG006</code></td>
-<td><span class="badge badge-high">High</span></td>
-<td>Tool execution action lambda:InvokeFunction is not resource-scoped.</td>
-<td>Restrict tool execution to approved Lambda, SSM, Step Functions, ECS, or Bedrock resources.</td>
-<td>#0</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+        <!-- Agent Inventory -->
+        <div class="card agent-inventory">
+            <div class="card-header">
+                <span class="card-title">Agent Inventory</span>
+                <span class="card-badge" style="background: rgba(88, 166, 255, 0.1); color: var(--accent-blue);">14 active</span>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>Type</th>
+                            <th>Environment</th>
+                            <th>Risk Score</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="agent-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
+        <!-- Risk Overview -->
+        <div class="card risk-overview">
+            <div class="card-header">
+                <span class="card-title">Risk Overview</span>
+                <span class="card-badge" style="background: rgba(63, 185, 80, 0.1); color: var(--accent-green);">Healthy</span>
+            </div>
+            <div class="risk-chart">
+                <div class="risk-bar-row">
+                    <span class="risk-bar-label">Critical</span>
+                    <div class="risk-bar-container">
+                        <div class="risk-bar-fill critical" style="width: 7%;">1</div>
+                    </div>
+                    <span class="risk-bar-count" style="color: var(--risk-critical)">1</span>
+                </div>
+                <div class="risk-bar-row">
+                    <span class="risk-bar-label">High</span>
+                    <div class="risk-bar-container">
+                        <div class="risk-bar-fill high" style="width: 14%;">2</div>
+                    </div>
+                    <span class="risk-bar-count" style="color: var(--risk-high)">2</span>
+                </div>
+                <div class="risk-bar-row">
+                    <span class="risk-bar-label">Medium</span>
+                    <div class="risk-bar-container">
+                        <div class="risk-bar-fill medium" style="width: 36%;">5</div>
+                    </div>
+                    <span class="risk-bar-count" style="color: var(--risk-medium)">5</span>
+                </div>
+                <div class="risk-bar-row">
+                    <span class="risk-bar-label">Low</span>
+                    <div class="risk-bar-container">
+                        <div class="risk-bar-fill low" style="width: 43%;">6</div>
+                    </div>
+                    <span class="risk-bar-count" style="color: var(--risk-low)">6</span>
+                </div>
+            </div>
+            <div class="gauge-container">
+                <div class="gauge">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="gauge-bg" cx="60" cy="60" r="50"></circle>
+                        <circle class="gauge-fill" cx="60" cy="60" r="50"
+                            stroke="var(--accent-green)"
+                            stroke-dasharray="314"
+                            stroke-dashoffset="94"></circle>
+                    </svg>
+                    <div class="gauge-text">
+                        <div class="gauge-value" style="color: var(--accent-green)">70%</div>
+                        <div class="gauge-label">Allow Rate</div>
+                    </div>
+                </div>
+                <div class="gauge">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="gauge-bg" cx="60" cy="60" r="50"></circle>
+                        <circle class="gauge-fill" cx="60" cy="60" r="50"
+                            stroke="var(--accent-yellow)"
+                            stroke-dasharray="314"
+                            stroke-dashoffset="220"></circle>
+                    </svg>
+                    <div class="gauge-text">
+                        <div class="gauge-value" style="color: var(--accent-yellow)">30</div>
+                        <div class="gauge-label">Avg Risk</div>
+                    </div>
+                </div>
+                <div class="gauge">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="gauge-bg" cx="60" cy="60" r="50"></circle>
+                        <circle class="gauge-fill" cx="60" cy="60" r="50"
+                            stroke="var(--accent-blue)"
+                            stroke-dasharray="314"
+                            stroke-dashoffset="31"></circle>
+                    </svg>
+                    <div class="gauge-text">
+                        <div class="gauge-value" style="color: var(--accent-blue)">2.1ms</div>
+                        <div class="gauge-label">p50 Latency</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<!-- Section 3: Example Scan Output Visualization -->
-<div class="section">
-<h2>&#x1F4C4; Example Policy &amp; Scan Output</h2>
-<h3>Input Policy: <code>agent_policy_wildcard.json</code></h3>
-<pre>{
-  <span class="json-key">"Version"</span>: <span class="json-str">"2012-10-17"</span>,
-  <span class="json-key">"Statement"</span>: [
-    {
-      <span class="json-key">"Effect"</span>: <span class="json-str">"Allow"</span>,
-      <span class="json-key">"Action"</span>: [<span class="json-str">"bedrock:*"</span>, <span class="json-str">"lambda:InvokeFunction"</span>, <span class="json-str">"iam:PassRole"</span>],
-      <span class="json-key">"Resource"</span>: <span class="json-str">"*"</span>
-    }
-  ]
-}</pre>
-<h3>Scanner JSON Output</h3>
-<pre>[
-  {<span class="json-key">"rule_id"</span>: <span class="json-str">"AIG002"</span>, <span class="json-key">"severity"</span>: <span class="json-str">"critical"</span>, <span class="json-key">"message"</span>: <span class="json-str">"Agent policy grants wildcard service or account actions."</span>, <span class="json-key">"statement_index"</span>: <span class="json-val">0</span>},
-  {<span class="json-key">"rule_id"</span>: <span class="json-str">"AIG003"</span>, <span class="json-key">"severity"</span>: <span class="json-str">"high"</span>, <span class="json-key">"message"</span>: <span class="json-str">"Agent policy grants access to all resources."</span>, <span class="json-key">"statement_index"</span>: <span class="json-val">0</span>},
-  {<span class="json-key">"rule_id"</span>: <span class="json-str">"AIG004"</span>, <span class="json-key">"severity"</span>: <span class="json-str">"critical"</span>, <span class="json-key">"message"</span>: <span class="json-str">"iam:PassRole is allowed without an iam:PassedToService condition."</span>, <span class="json-key">"statement_index"</span>: <span class="json-val">0</span>},
-  {<span class="json-key">"rule_id"</span>: <span class="json-str">"AIG005"</span>, <span class="json-key">"severity"</span>: <span class="json-str">"critical"</span>, <span class="json-key">"message"</span>: <span class="json-str">"Agent policy includes privilege-management action iam:PassRole."</span>, <span class="json-key">"statement_index"</span>: <span class="json-val">0</span>},
-  {<span class="json-key">"rule_id"</span>: <span class="json-str">"AIG006"</span>, <span class="json-key">"severity"</span>: <span class="json-str">"high"</span>, <span class="json-key">"message"</span>: <span class="json-str">"Tool execution action lambda:InvokeFunction is not resource-scoped."</span>, <span class="json-key">"statement_index"</span>: <span class="json-val">0</span>}
-]</pre>
-</div>
+        <!-- Attack Paths -->
+        <div class="card attack-paths">
+            <div class="card-header">
+                <span class="card-title">Top Attack Paths</span>
+                <span class="card-badge" style="background: rgba(248, 81, 73, 0.1); color: var(--accent-red);">5 active</span>
+            </div>
+            <div id="attack-paths-list">
+            </div>
+        </div>
 
+        <!-- Recent Decisions -->
+        <div class="card recent-decisions">
+            <div class="card-header">
+                <span class="card-title">Recent Decisions</span>
+                <span class="card-badge" style="background: rgba(88, 166, 255, 0.1); color: var(--accent-blue);">Live</span>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Agent</th>
+                            <th>Action</th>
+                            <th>Decision</th>
+                            <th>Risk</th>
+                        </tr>
+                    </thead>
+                    <tbody id="decisions-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-<!-- Section 4: Quick Reference of Checks -->
-<div class="section">
-<h2>&#x2705; Scanner Rules Reference</h2>
-<p style="color:#8b949e;margin-bottom:1rem;">All checks performed by <code>scan_policy_document()</code> on each Allow statement</p>
-<div class="check-grid">
-<div class="check-card">
-<div class="rule-id">AIG001 <span class="badge badge-high">High</span></div>
-<div class="desc">Detects use of <code>NotAction</code> or <code>NotResource</code> in agent policies — difficult to reason about for autonomous workloads.</div>
-<div class="patterns">Trigger: Statement contains NotAction or NotResource key</div>
-</div>
-<div class="check-card">
-<div class="rule-id">AIG002 <span class="badge badge-critical">Critical</span></div>
-<div class="desc">Flags wildcard service actions (<code>*</code> or <code>service:*</code>) that give agents unrestricted API access.</div>
-<div class="patterns">Trigger: Action ends with <code>:*</code> or is <code>*</code></div>
-</div>
-<div class="check-card">
-<div class="rule-id">AIG003 <span class="badge badge-high">High</span></div>
-<div class="desc">Flags <code>Resource: "*"</code> — agent has access to all resources in the account.</div>
-<div class="patterns">Trigger: Resource list contains <code>"*"</code></div>
-</div>
-<div class="check-card">
-<div class="rule-id">AIG004 <span class="badge badge-critical">Critical</span></div>
-<div class="desc">Detects <code>iam:PassRole</code> without <code>iam:PassedToService</code> condition — agent can pass roles to any service.</div>
-<div class="patterns">Trigger: iam:PassRole action without condition constraint</div>
-</div>
-<div class="check-card">
-<div class="rule-id">AIG005 <span class="badge badge-critical">Critical</span></div>
-<div class="desc">Flags privilege-management actions that let agents modify IAM or assume other roles.</div>
-<div class="patterns">Actions: <code>iam:*</code>, <code>iam:CreateRole</code>, <code>iam:PutRolePolicy</code>, <code>iam:AttachRolePolicy</code>, <code>iam:CreatePolicy</code>, <code>iam:CreatePolicyVersion</code>, <code>iam:SetDefaultPolicyVersion</code>, <code>iam:PassRole</code>, <code>sts:AssumeRole</code></div>
-</div>
-<div class="check-card">
-<div class="rule-id">AIG006 <span class="badge badge-high">High</span></div>
-<div class="desc">Tool-execution actions without resource scoping — agent can invoke any function/command/task.</div>
-<div class="patterns">Actions: <code>lambda:InvokeFunction</code>, <code>ssm:SendCommand</code>, <code>ssm:StartSession</code>, <code>states:StartExecution</code>, <code>ecs:RunTask</code>, <code>bedrock:Invoke*</code>, <code>bedrock-agent*:Invoke*</code></div>
-</div>
-<div class="check-card">
-<div class="rule-id">AIG007 <span class="badge badge-medium">Medium</span></div>
-<div class="desc">Sensitive data access without principal/session tag conditions — no tenant isolation for agent data reads.</div>
-<div class="patterns">Actions: <code>secretsmanager:GetSecretValue</code>, <code>ssm:GetParameter*</code>, <code>kms:Decrypt</code>, <code>s3:GetObject</code>, <code>logs:GetLogEvents</code></div>
-</div>
-</div>
-</div>
+        <!-- Permission Drift -->
+        <div class="card permission-drift">
+            <div class="card-header">
+                <span class="card-title">Permission Drift Alerts</span>
+                <span class="card-badge" style="background: rgba(219, 109, 40, 0.1); color: var(--accent-orange);">3 active</span>
+            </div>
+            <div id="drift-alerts">
+            </div>
+        </div>
 
+        <!-- Pending Approvals -->
+        <div class="card pending-approvals">
+            <div class="card-header">
+                <span class="card-title">Pending Approvals</span>
+                <span class="card-badge" style="background: rgba(210, 153, 34, 0.1); color: var(--accent-yellow);">4 pending</span>
+            </div>
+            <div id="approvals-list">
+            </div>
+        </div>
+    </div>
 
-<!-- Section 5: Run Instructions -->
-<div class="section">
-<h2>&#x1F680; Run Instructions</h2>
-<div class="run-box">
-<h3 style="color:#3fb950;margin-bottom:0.75rem">Install</h3>
-<code>pip install aws-agent-identity-guard</code>
-</div>
-<div class="run-box">
-<h3 style="color:#3fb950;margin-bottom:0.75rem">Scan a Policy File (CLI)</h3>
-<code>aws-agent-identity-guard scan examples/agent_policy_wildcard.json</code>
-</div>
-<div class="run-box">
-<h3 style="color:#3fb950;margin-bottom:0.75rem">Scan Programmatically (Python)</h3>
-<code>from aws_agent_identity_guard import scan_policy_document</code>
-<code>import json</code>
-<code style="margin-top:0.5rem">with open("policy.json") as f:</code>
-<code>&nbsp;&nbsp;&nbsp;&nbsp;doc = json.load(f)</code>
-<code style="margin-top:0.5rem">findings = scan_policy_document(doc)</code>
-<code>for f in findings:</code>
-<code>&nbsp;&nbsp;&nbsp;&nbsp;print(f"{f.severity.upper()} [{f.rule_id}] {f.message}")</code>
-</div>
-<div class="run-box">
-<h3 style="color:#3fb950;margin-bottom:0.75rem">Run Tests</h3>
-<code>pytest tests/ -v --cov --cov-fail-under=80</code>
-</div>
-</div>
+    <script>
+        // Mock Data
+        const agents = [
+            { name: "data-analyst-bedrock", type: "BEDROCK", env: "PRODUCTION", risk: 82, status: "active" },
+            { name: "report-generator", type: "LAMBDA", env: "PRODUCTION", risk: 45, status: "active" },
+            { name: "customer-support-bot", type: "BEDROCK", env: "PRODUCTION", risk: 28, status: "active" },
+            { name: "etl-pipeline-agent", type: "ECS", env: "PRODUCTION", risk: 61, status: "active" },
+            { name: "code-review-agent", type: "BEDROCK", env: "STAGING", risk: 15, status: "active" },
+            { name: "ml-training-agent", type: "SAGEMAKER", env: "PRODUCTION", risk: 73, status: "active" },
+            { name: "backup-agent", type: "LAMBDA", env: "PRODUCTION", risk: 12, status: "active" },
+            { name: "monitoring-agent", type: "ECS", env: "PRODUCTION", risk: 8, status: "active" },
+            { name: "deploy-agent", type: "ECS", env: "STAGING", risk: 55, status: "active" },
+            { name: "test-runner-agent", type: "LAMBDA", env: "DEVELOPMENT", risk: 5, status: "active" },
+            { name: "data-ingestion-agent", type: "ECS", env: "PRODUCTION", risk: 38, status: "active" },
+            { name: "notification-agent", type: "LAMBDA", env: "PRODUCTION", risk: 10, status: "active" },
+            { name: "audit-agent", type: "LAMBDA", env: "PRODUCTION", risk: 20, status: "active" },
+            { name: "admin-helper-agent", type: "BEDROCK", env: "PRODUCTION", risk: 91, status: "flagged" }
+        ];
 
-<footer style="text-align:center;color:#484f58;font-size:0.8rem;margin-top:3rem;padding-top:1rem;border-top:1px solid #21262d;">
-AWS Agent Identity Guard — Static IAM Policy Scanner for AI Agent Workloads<br>
-Dashboard generated for security review. Open this file in any browser — no server required.
-</footer>
+        const attackPaths = [
+            {
+                title: "PassRole to Admin via STS Chain",
+                severity: "CRITICAL",
+                steps: ["iam:PassRole", "sts:AssumeRole", "AdminAccess"],
+                agent: "admin-helper-agent"
+            },
+            {
+                title: "Cross-Account Pivot via Lambda",
+                severity: "HIGH",
+                steps: ["lambda:InvokeFunction", "sts:AssumeRole", "s3:GetObject"],
+                agent: "data-analyst-bedrock"
+            },
+            {
+                title: "S3 Policy Modification",
+                severity: "HIGH",
+                steps: ["s3:PutBucketPolicy", "s3:GetObject", "Exfiltration"],
+                agent: "etl-pipeline-agent"
+            },
+            {
+                title: "SageMaker Notebook Escape",
+                severity: "MEDIUM",
+                steps: ["sagemaker:CreatePresignedUrl", "RoleCredentials"],
+                agent: "ml-training-agent"
+            },
+            {
+                title: "CloudFormation Stack IAM",
+                severity: "MEDIUM",
+                steps: ["cloudformation:CreateStack", "iam:CreateRole", "Escalation"],
+                agent: "deploy-agent"
+            }
+        ];
 
-<script>
-document.getElementById('scan-time').textContent = new Date().toLocaleString();
-</script>
+        const decisions = [
+            { time: "12:22:35", agent: "data-analyst-bedrock", action: "s3:GetObject", decision: "ALLOW", risk: 32 },
+            { time: "12:22:33", agent: "admin-helper-agent", action: "iam:PassRole", decision: "DENY", risk: 91 },
+            { time: "12:22:30", agent: "etl-pipeline-agent", action: "s3:PutObject", decision: "ALLOW", risk: 28 },
+            { time: "12:22:28", agent: "ml-training-agent", action: "sagemaker:CreateEndpoint", decision: "STEP_UP", risk: 72 },
+            { time: "12:22:25", agent: "customer-support-bot", action: "dynamodb:GetItem", decision: "ALLOW", risk: 15 },
+            { time: "12:22:22", agent: "data-analyst-bedrock", action: "athena:StartQuery", decision: "ALLOW", risk: 35 },
+            { time: "12:22:20", agent: "admin-helper-agent", action: "sts:AssumeRole", decision: "DENY", risk: 88 },
+            { time: "12:22:18", agent: "report-generator", action: "s3:GetObject", decision: "ALLOW", risk: 22 },
+            { time: "12:22:15", agent: "deploy-agent", action: "ecs:UpdateService", decision: "REVIEW", risk: 55 },
+            { time: "12:22:12", agent: "backup-agent", action: "s3:PutObject", decision: "ALLOW", risk: 10 }
+        ];
+
+        const driftAlerts = [
+            {
+                severity: "critical",
+                title: "New iam:PassRole permission added",
+                detail: "admin-helper-agent gained iam:PassRole on role/AdminRole",
+                time: "12 minutes ago"
+            },
+            {
+                severity: "high",
+                title: "Cross-account trust policy modified",
+                detail: "data-analyst-bedrock role trust policy updated with new account",
+                time: "45 minutes ago"
+            },
+            {
+                severity: "medium",
+                title: "S3 bucket policy expanded",
+                detail: "etl-pipeline-agent bucket policy allows new principal",
+                time: "2 hours ago"
+            }
+        ];
+
+        const approvals = [
+            {
+                agent: "ml-training-agent",
+                action: "sagemaker:CreateEndpoint",
+                resource: "arn:aws:sagemaker:us-east-1:*:endpoint/prod-*",
+                time: "2 min ago",
+                ttl: "4:58 remaining"
+            },
+            {
+                agent: "data-analyst-bedrock",
+                action: "s3:GetObject",
+                resource: "arn:aws:s3:::confidential-reports/*",
+                time: "5 min ago",
+                ttl: "2:12 remaining"
+            },
+            {
+                agent: "deploy-agent",
+                action: "ecs:UpdateService",
+                resource: "arn:aws:ecs:us-east-1:*:service/prod-cluster/*",
+                time: "8 min ago",
+                ttl: "1:45 remaining"
+            },
+            {
+                agent: "etl-pipeline-agent",
+                action: "glue:StartJobRun",
+                resource: "arn:aws:glue:us-east-1:*:job/sensitive-etl",
+                time: "12 min ago",
+                ttl: "0:33 remaining"
+            }
+        ];
+
+        // Render functions
+        function getRiskClass(score) {
+            if (score >= 80) return "critical";
+            if (score >= 60) return "high";
+            if (score >= 40) return "medium";
+            return "low";
+        }
+
+        function getEnvClass(env) {
+            if (env === "PRODUCTION") return "prod";
+            if (env === "STAGING") return "staging";
+            return "dev";
+        }
+
+        function renderAgentTable() {
+            const tbody = document.getElementById("agent-table");
+            tbody.innerHTML = agents.map(a => `
+                <tr>
+                    <td><strong>${a.name}</strong></td>
+                    <td>${a.type}</td>
+                    <td><span class="env-badge env-${getEnvClass(a.env)}">${a.env}</span></td>
+                    <td><span class="risk-badge risk-${getRiskClass(a.risk)}">${a.risk}</span></td>
+                    <td>${a.status === "flagged" ? '<span style="color:var(--accent-red)">&#9888; Flagged</span>' : '<span style="color:var(--accent-green)">&#10003; Active</span>'}</td>
+                </tr>
+            `).join("");
+        }
+
+        function renderAttackPaths() {
+            const container = document.getElementById("attack-paths-list");
+            container.innerHTML = attackPaths.map(p => `
+                <div class="attack-path-item">
+                    <div class="attack-path-header">
+                        <span class="attack-path-title">${p.title}</span>
+                        <span class="severity-badge ${p.severity.toLowerCase()}">${p.severity}</span>
+                    </div>
+                    <div class="attack-path-chain">
+                        ${p.steps.map((s, i) => `
+                            <span class="chain-step">${s}</span>
+                            ${i < p.steps.length - 1 ? '<span class="chain-arrow">&#8594;</span>' : ''}
+                        `).join("")}
+                    </div>
+                    <div style="margin-top:6px;font-size:11px;color:var(--text-muted)">Agent: ${p.agent}</div>
+                </div>
+            `).join("");
+        }
+
+        function renderDecisions() {
+            const tbody = document.getElementById("decisions-table");
+            tbody.innerHTML = decisions.map(d => `
+                <tr>
+                    <td style="color:var(--text-muted)">${d.time}</td>
+                    <td>${d.agent}</td>
+                    <td><code style="font-size:11px;background:var(--bg-tertiary);padding:2px 6px;border-radius:3px">${d.action}</code></td>
+                    <td><span class="decision-${d.decision.toLowerCase().replace('_','-')}">${d.decision}</span></td>
+                    <td><span class="risk-badge risk-${getRiskClass(d.risk)}">${d.risk}</span></td>
+                </tr>
+            `).join("");
+        }
+
+        function renderDriftAlerts() {
+            const container = document.getElementById("drift-alerts");
+            container.innerHTML = driftAlerts.map(a => `
+                <div class="drift-alert severity-${a.severity}">
+                    <span class="drift-icon">${a.severity === 'critical' ? '&#9888;' : a.severity === 'high' ? '&#9888;' : '&#8505;'}</span>
+                    <div class="drift-content">
+                        <div class="drift-title">${a.title} <span class="severity-badge ${a.severity}">${a.severity.toUpperCase()}</span></div>
+                        <div class="drift-detail">${a.detail}</div>
+                        <div class="drift-time">${a.time}</div>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function renderApprovals() {
+            const container = document.getElementById("approvals-list");
+            container.innerHTML = approvals.map(a => `
+                <div class="approval-item">
+                    <div class="approval-info">
+                        <div class="approval-agent">${a.agent}</div>
+                        <div class="approval-action">${a.action} on ${a.resource.substring(0, 50)}...</div>
+                        <div class="approval-time">${a.time} -- ${a.ttl}</div>
+                    </div>
+                    <div class="approval-actions">
+                        <button class="btn btn-approve" onclick="handleApproval('approve', '${a.agent}')">Approve</button>
+                        <button class="btn btn-deny" onclick="handleApproval('deny', '${a.agent}')">Deny</button>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function handleApproval(action, agent) {
+            alert(`${action.toUpperCase()} action for ${agent} -- this would call PUT /v1/approvals/{id}`);
+        }
+
+        // Auto-refresh
+        let refreshCountdown = 30;
+        function updateRefreshTimer() {
+            refreshCountdown--;
+            if (refreshCountdown <= 0) {
+                refreshCountdown = 30;
+                renderAll();
+            }
+            document.getElementById("refresh-timer").textContent = `Refresh in ${refreshCountdown}s`;
+        }
+
+        function renderAll() {
+            renderAgentTable();
+            renderAttackPaths();
+            renderDecisions();
+            renderDriftAlerts();
+            renderApprovals();
+        }
+
+        // Initialize
+        renderAll();
+        setInterval(updateRefreshTimer, 1000);
+    </script>
 </body>
 </html>

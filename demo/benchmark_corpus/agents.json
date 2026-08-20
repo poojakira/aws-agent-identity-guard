@@ -1,0 +1,92 @@
+[
+  {
+    "agent_id": "bench-agent-0001",
+    "name": "ReadOnlyS3Agent",
+    "agent_type": "LAMBDA",
+    "owner": "data-team",
+    "environment": "DEVELOPMENT",
+    "data_classification": "PUBLIC",
+    "purpose": "Read public data from S3"
+  },
+  {
+    "agent_id": "bench-agent-0002",
+    "name": "BedrockChatAgent",
+    "agent_type": "BEDROCK",
+    "owner": "ai-team",
+    "environment": "PRODUCTION",
+    "data_classification": "INTERNAL",
+    "purpose": "Customer-facing chatbot powered by Bedrock"
+  },
+  {
+    "agent_id": "bench-agent-0003",
+    "name": "DataPipelineAgent",
+    "agent_type": "ECS",
+    "owner": "analytics-team",
+    "environment": "PRODUCTION",
+    "data_classification": "CONFIDENTIAL",
+    "purpose": "ETL pipeline processing confidential records"
+  },
+  {
+    "agent_id": "bench-agent-0004",
+    "name": "MLTrainingAgent",
+    "agent_type": "SAGEMAKER",
+    "owner": "ml-team",
+    "environment": "STAGING",
+    "data_classification": "SECRET",
+    "purpose": "Train ML models on sensitive customer data"
+  },
+  {
+    "agent_id": "bench-agent-0005",
+    "name": "CICDDeployAgent",
+    "agent_type": "LAMBDA",
+    "owner": "devops-team",
+    "environment": "PRODUCTION",
+    "data_classification": "INTERNAL",
+    "purpose": "Automated deployment pipeline agent"
+  },
+  {
+    "agent_id": "bench-agent-0006",
+    "name": "SecurityScanAgent",
+    "agent_type": "EKS",
+    "owner": "security-team",
+    "environment": "PRODUCTION",
+    "data_classification": "CONFIDENTIAL",
+    "purpose": "Continuous security scanning and compliance"
+  },
+  {
+    "agent_id": "bench-agent-0007",
+    "name": "CustomerSupportBot",
+    "agent_type": "BEDROCK",
+    "owner": "support-team",
+    "environment": "PRODUCTION",
+    "data_classification": "REGULATED",
+    "purpose": "Handle customer support tickets with PII access"
+  },
+  {
+    "agent_id": "bench-agent-0008",
+    "name": "DevTestRunner",
+    "agent_type": "LAMBDA",
+    "owner": "dev-team",
+    "environment": "DEVELOPMENT",
+    "data_classification": "PUBLIC",
+    "purpose": "Run automated test suites in development"
+  },
+  {
+    "agent_id": "bench-agent-0009",
+    "name": "InfraProvisionAgent",
+    "agent_type": "ECS",
+    "owner": "platform-team",
+    "environment": "STAGING",
+    "data_classification": "INTERNAL",
+    "purpose": "Provision infrastructure via CloudFormation"
+  },
+  {
+    "agent_id": "bench-agent-0010",
+    "name": "OverprivilegedAgent",
+    "agent_type": "CUSTOM",
+    "owner": "unknown",
+    "environment": "PRODUCTION",
+    "data_classification": "SECRET",
+    "purpose": "Legacy agent with excessive permissions"
+  }
+]

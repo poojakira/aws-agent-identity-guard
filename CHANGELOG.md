@@ -1,53 +1,85 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to AWS Agent Identity Guard are documented here.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] — 2026-08-07
+---
+
+## [1.0.0] - 2026-08-20
+
+### Major Rewrite
+
+Complete platform rewrite from static IAM policy linter to full runtime authorization platform for AI agent workloads.
 
 ### Added
-- 11 new agent-specific detection rules (AIG008-AIG018)
-- Bedrock control-plane detection (AIG008)
-- SageMaker control-plane detection (AIG009)
-- Network egress modification detection (AIG010)
-- Audit trail tampering detection (AIG011)
-- Excessive action breadth check (AIG012)
-- Missing condition keys check (AIG013)
-- S3 write without prefix scoping (AIG014)
-- Bedrock model-ID scoping check (AIG015)
-- Lambda function-name scoping check (AIG016)
-- AssumeRole session tag check (AIG017)
-- Database access scoping check (AIG018)
-- Well-scoped and overprivileged example policies
+
+- **Runtime Authorization Engine** -- real-time ALLOW/DENY/STEP_UP/REVIEW decisions per agent request
+- **Policy-as-Code Engine** -- declarative YAML policies with conditions, priorities, conflict resolution
+- **Multi-dimensional Risk Scoring** -- permission, network, data, and behavior risk dimensions
+- **Attack Path Analysis** -- graph-based privilege escalation chain detection and severity classification
+- **Escalation Detection** -- pattern matching for known privilege escalation techniques
+- **Agent Registry** -- identity lifecycle management with IAM role binding
+- **Human-in-the-Loop Approvals** -- step-up workflow with TTL, delegation, audit trail
+- **Permission Drift Detection** -- continuous monitoring of permission changes with alerting
+- **Behavior Analysis** -- statistical anomaly detection on agent action patterns
+- **Intent Alignment Verification** -- verify agent actions match declared purpose
+- **Least Privilege Engine** -- automatic minimum permission boundary recommendation
+- **Capability Inventory** -- track and enforce declared agent capabilities
+- **Enforcement Module** -- inline blocking, async remediation, quarantine
+- **Observability Stack** -- Prometheus metrics, structured JSON logging, OpenTelemetry traces
+- **Python SDK** -- thread-safe client with retries, circuit breaker, decorator and context manager patterns
+- **REST API** -- FastAPI with OpenAPI docs, CORS, rate limiting, API key auth
+- **Security Dashboard** -- real-time HTML dashboard with agent inventory, risk overview, attack paths
+- **Docker Support** -- multi-stage production image, docker-compose with Prometheus and Grafana
+- **Helm Chart** -- Kubernetes deployment with HPA, PDB, ingress, secrets management
+- **Terraform Modules** -- AWS reference architecture for ECS/Fargate, EKS, Lambda
+- **CI/CD Workflows** -- security gate workflow, release pipeline, dependency scanning
+- **Comprehensive Test Suite** -- authorization, risk, policy, attack path, escalation, adversarial, resilience tests
+- **Benchmark Suite** -- latency and throughput measurement harness
+- **Demo System** -- interactive demonstration of all platform capabilities
+- **Compliance Mappings** -- NIST AI RMF, NIST SP 800-53, MITRE ATLAS, OWASP LLM Top 10
+- **Runbooks** -- incident response and operations procedures
+- **Threat Model** -- formal STRIDE analysis with honest limitations disclosure
 
 ### Changed
-- Expanded PRIVILEGE_ACTIONS, TOOL_EXECUTION_PATTERNS, SENSITIVE_DATA_PATTERNS
-- Improved _matches_any function for pattern vs exact matching
 
-## [0.1.1] — agent/security-hardening-v1
+- Scanner module retained and enhanced (now part of larger platform)
+- CLI extended with new commands for authorization and policy management
+- README completely rewritten for platform scope
+
+### Removed
+
+- Static-only analysis mode as default (now available via `scan` subcommand)
+
+---
+
+## [0.2.0] - 2026-08-19
 
 ### Added
-- `scan_trust_policy()` function with 3 rules: wildcard principal (AIG-TP001), missing ExternalId (AIG-TP002), missing aws:SourceArn (AIG-TP003)
-- Live Boto3 account scanner (`live_scanner.py`) — enumerates IAM roles and users, runs all static rules against collected policy documents
-- `--live-scan` CLI flag with `--role-name` filter and `--region` override
-- SARIF 2.1.0 output format (`--format sarif`)
-- `SECURITY.md`, `THREAT_MODEL.md`, `CONTRIBUTING.md`, `.github/dependabot.yml`
-- GitHub Actions SHA-pinned in CI workflow
+
+- Real-world policy test corpus
+- Kill chain detection patterns
+- Live AWS account scanning
+- CI workflow with security checks
+- Dependabot configuration
+- N8N workflow integration
 
 ### Changed
-- `README.md` updated to describe both static and live scanning modes
-- `SECURITY_AUDIT.md` updated with new rules and findings
 
-### Fixed
-- CI actions (`actions/checkout`, `actions/setup-python`, `actions/upload-artifact`) pinned to commit SHAs
+- Improved scanner detection rules
+- Enhanced CLI output formatting
 
-## [0.1.0] — Initial release
+---
+
+## [0.1.0] - 2026-08-02
 
 ### Added
-- Static IAM policy linter with 7 core rule categories (AIG001–AIG007)
-- CLI with `--format text/json` output
-- Trust-policy scanning (AIG-TP001–AIG-TP003)
-- Exit code 0 (clean) / 1 (high+critical findings) / 2 (input error)
-- Example policy fixture (`examples/agent_policy_wildcard.json`)
-- GitHub Actions CI (lint + security + test matrix)
+
+- Initial IAM policy scanner
+- Wildcard detection rules
+- Overprivileged agent detection
+- Basic CLI interface
+- Example policies
+- MIT license

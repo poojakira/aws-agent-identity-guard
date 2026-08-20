@@ -1,0 +1,388 @@
+name: Security Gate - Agent Policy Review
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/*policy*.json'
+      - '**/agent-*.json'
+      - '**/permissions/**'
+
+concurrency:
+  group: security-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  scan-agent-policies:
+    name: Scan Agent Policies
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    outputs:
+      findings: ${{ steps.scan.outputs.findings }}
+      policy-files: ${{ steps.find-policies.outputs.files }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@65d7f2d534ac1bc67fcd62888c5f4f3d2cb2b236  # v4.7.1
+        with:
+          python-version: '3.12'
+
+      - name: Install SDK
+        run: |
+          pip install --quiet ./sdk/python
+
+      - name: Find changed policy files
+        id: find-policies
+        run: |
+          FILES=$(git diff --name-only origin/main...HEAD | grep -i 'policy.*\.json\|permissions.*\.json' || true)
+          if [ -z "$FILES" ]; then
+            echo "files=" >> "$GITHUB_OUTPUT"
+            echo "No policy files changed in this PR."
+          else
+            echo "files<<EOF" >> "$GITHUB_OUTPUT"
+            echo "$FILES" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+            echo "Policy files found:"
+            echo "$FILES"
+          fi
+
+      - name: Scan policies with Agent Identity Guard
+        id: scan
+        if: steps.find-policies.outputs.files != ''
+        env:
+          GUARD_ENDPOINT: ${{ secrets.GUARD_ENDPOINT }}
+          GUARD_API_KEY: ${{ secrets.GUARD_API_KEY }}
+        run: |
+          cat > scan_policies.py << 'PYTHON_SCRIPT'
+          import json
+          import os
+          import sys
+
+          # If SDK is available, use it; otherwise parse policies locally
+          try:
+              from aws_agent_identity_guard import AgentIdentityGuard
+              guard = AgentIdentityGuard(
+                  endpoint=os.environ.get("GUARD_ENDPOINT", "http://localhost:8000"),
+                  api_key=os.environ.get("GUARD_API_KEY"),
+                  timeout=10.0,
+                  fail_open=False,
+              )
+              USE_SDK = True
+          except Exception:
+              USE_SDK = False
+
+          policy_files = os.environ.get("POLICY_FILES", "").strip().split("\n")
+          policy_files = [f for f in policy_files if f.strip()]
+
+          findings = []
+          for policy_file in policy_files:
+              if not os.path.exists(policy_file):
+                  continue
+
+              with open(policy_file, "r") as fh:
+                  try:
+                      policy_data = json.load(fh)
+                  except json.JSONDecodeError as e:
+                      findings.append({
+                          "file": policy_file,
+                          "severity": "CRITICAL",
+                          "finding": f"Invalid JSON: {e}",
+                          "remediation": "Fix JSON syntax errors in the policy file.",
+                      })
+                      continue
+
+              # Check for overly permissive actions
+              statements = policy_data.get("Statement", [])
+              if isinstance(statements, dict):
+                  statements = [statements]
+
+              for stmt in statements:
+                  actions = stmt.get("Action", [])
+                  if isinstance(actions, str):
+                      actions = [actions]
+                  resources = stmt.get("Resource", [])
+                  if isinstance(resources, str):
+                      resources = [resources]
+                  effect = stmt.get("Effect", "Deny")
+
+                  if effect == "Allow":
+                      for action in actions:
+                          if action == "*" or action.endswith(":*"):
+                              findings.append({
+                                  "file": policy_file,
+                                  "severity": "CRITICAL",
+                                  "finding": f"Wildcard action detected: {action}",
+                                  "remediation": "Restrict to specific actions following least privilege.",
+                              })
+                      for resource in resources:
+                          if resource == "*":
+                              findings.append({
+                                  "file": policy_file,
+                                  "severity": "HIGH",
+                                  "finding": "Wildcard resource (*) with Allow effect",
+                                  "remediation": "Scope resource to specific ARNs.",
+                              })
+
+              # Use SDK for deeper analysis if available
+              if USE_SDK:
+                  try:
+                      agent_id = policy_data.get("AgentId", policy_file)
+                      decision = guard.authorize(
+                          agent=agent_id,
+                          action="policy:Update",
+                          resource=policy_file,
+                          context={"policy": policy_data},
+                      )
+                      if decision.decision != "ALLOW":
+                          findings.append({
+                              "file": policy_file,
+                              "severity": "HIGH",
+                              "finding": f"Guard denied policy: {decision.explanation}",
+                              "remediation": "; ".join(decision.reasons),
+                          })
+                  except Exception as e:
+                      findings.append({
+                          "file": policy_file,
+                          "severity": "INFO",
+                          "finding": f"Could not validate with guard service: {e}",
+                          "remediation": "Ensure guard service is accessible in CI.",
+                      })
+
+          output = json.dumps(findings, indent=2)
+          print(output)
+
+          with open(os.environ.get("GITHUB_OUTPUT", "/dev/null"), "a") as gh:
+              gh.write(f"findings<<EOF\n{output}\nEOF\n")
+
+          if any(f["severity"] == "CRITICAL" for f in findings):
+              sys.exit(1)
+          PYTHON_SCRIPT
+
+          POLICY_FILES="${{ steps.find-policies.outputs.files }}" python scan_policies.py
+
+  risk-assessment:
+    name: Risk Assessment
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    needs: scan-agent-policies
+    if: needs.scan-agent-policies.outputs.policy-files != ''
+    outputs:
+      risk-score: ${{ steps.assess.outputs.risk_score }}
+      risk-level: ${{ steps.assess.outputs.risk_level }}
+      attack-paths: ${{ steps.assess.outputs.attack_paths }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+
+      - name: Set up Python
+        uses: actions/setup-python@65d7f2d534ac1bc67fcd62888c5f4f3d2cb2b236  # v4.7.1
+        with:
+          python-version: '3.12'
+
+      - name: Calculate risk score
+        id: assess
+        env:
+          FINDINGS: ${{ needs.scan-agent-policies.outputs.findings }}
+        run: |
+          cat > assess_risk.py << 'PYTHON_SCRIPT'
+          import json
+          import os
+
+          findings_raw = os.environ.get("FINDINGS", "[]")
+          try:
+              findings = json.loads(findings_raw)
+          except json.JSONDecodeError:
+              findings = []
+
+          # Score calculation
+          severity_weights = {
+              "CRITICAL": 40,
+              "HIGH": 25,
+              "MEDIUM": 15,
+              "LOW": 5,
+              "INFO": 0,
+          }
+
+          total_score = 0
+          attack_paths = []
+
+          for finding in findings:
+              severity = finding.get("severity", "INFO")
+              weight = severity_weights.get(severity, 0)
+              total_score += weight
+
+              if severity in ("CRITICAL", "HIGH"):
+                  attack_paths.append({
+                      "file": finding.get("file", "unknown"),
+                      "description": finding.get("finding", ""),
+                      "severity": severity,
+                  })
+
+          # Cap at 100
+          risk_score = min(total_score, 100)
+
+          if risk_score >= 75:
+              risk_level = "CRITICAL"
+          elif risk_score >= 50:
+              risk_level = "HIGH"
+          elif risk_score >= 25:
+              risk_level = "MEDIUM"
+          else:
+              risk_level = "LOW"
+
+          with open(os.environ.get("GITHUB_OUTPUT", "/dev/null"), "a") as gh:
+              gh.write(f"risk_score={risk_score}\n")
+              gh.write(f"risk_level={risk_level}\n")
+              gh.write(f"attack_paths<<EOF\n{json.dumps(attack_paths)}\nEOF\n")
+
+          print(f"Risk Score: {risk_score}/100 ({risk_level})")
+          print(f"Attack Paths: {len(attack_paths)}")
+          PYTHON_SCRIPT
+
+          python assess_risk.py
+
+  comment-on-pr:
+    name: Post Security Report
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    needs: [scan-agent-policies, risk-assessment]
+    if: always() && needs.scan-agent-policies.outputs.policy-files != ''
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Generate and post comment
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
+        env:
+          FINDINGS: ${{ needs.scan-agent-policies.outputs.findings }}
+          RISK_SCORE: ${{ needs.risk-assessment.outputs.risk-score }}
+          RISK_LEVEL: ${{ needs.risk-assessment.outputs.risk-level }}
+          ATTACK_PATHS: ${{ needs.risk-assessment.outputs.attack-paths }}
+        with:
+          script: |
+            const findings = JSON.parse(process.env.FINDINGS || '[]');
+            const riskScore = parseInt(process.env.RISK_SCORE || '0');
+            const riskLevel = process.env.RISK_LEVEL || 'LOW';
+            const attackPaths = JSON.parse(process.env.ATTACK_PATHS || '[]');
+
+            // Determine badge color
+            let badgeColor = 'brightgreen';
+            if (riskLevel === 'CRITICAL') badgeColor = 'red';
+            else if (riskLevel === 'HIGH') badgeColor = 'orange';
+            else if (riskLevel === 'MEDIUM') badgeColor = 'yellow';
+
+            // Determine verdict
+            let verdict = 'PASS';
+            let verdictEmoji = ':white_check_mark:';
+            if (findings.some(f => f.severity === 'CRITICAL') || riskScore > 75) {
+              verdict = 'BLOCK';
+              verdictEmoji = ':no_entry:';
+            } else if (riskScore > 25) {
+              verdict = 'WARN';
+              verdictEmoji = ':warning:';
+            }
+
+            // Build comment
+            let comment = `## :shield: Agent Identity Guard - Security Report\n\n`;
+            comment += `**Verdict:** ${verdictEmoji} ${verdict}\n\n`;
+            comment += `![Risk Score](https://img.shields.io/badge/Risk_Score-${riskScore}%2F100-${badgeColor})\n\n`;
+
+            // Permissions detected
+            const permissions = findings.filter(f => f.finding && f.finding.includes('action'));
+            if (permissions.length > 0) {
+              comment += `### New Permissions Detected\n\n`;
+              comment += `| File | Finding | Severity |\n|------|---------|----------|\n`;
+              for (const p of permissions) {
+                comment += `| \`${p.file}\` | ${p.finding} | ${p.severity} |\n`;
+              }
+              comment += `\n`;
+            }
+
+            // Attack paths
+            if (attackPaths.length > 0) {
+              comment += `### Attack Paths Found\n\n`;
+              for (const path of attackPaths) {
+                comment += `- **[${path.severity}]** \`${path.file}\`: ${path.description}\n`;
+              }
+              comment += `\n`;
+            }
+
+            // Remediations
+            const remediations = [...new Set(findings.map(f => f.remediation).filter(Boolean))];
+            if (remediations.length > 0) {
+              comment += `### Recommended Remediations\n\n`;
+              for (const r of remediations) {
+                comment += `- ${r}\n`;
+              }
+              comment += `\n`;
+            }
+
+            // Summary
+            comment += `---\n`;
+            comment += `*Scanned by [Agent Identity Guard](https://github.com/aws/agent-identity-guard)*\n`;
+
+            // Find existing comment and update, or create new
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(c =>
+              c.body.includes('Agent Identity Guard - Security Report')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment,
+              });
+            }
+
+  gate-decision:
+    name: Security Gate Decision
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    needs: [scan-agent-policies, risk-assessment]
+    if: always()
+    steps:
+      - name: Evaluate gate
+        env:
+          FINDINGS: ${{ needs.scan-agent-policies.outputs.findings }}
+          RISK_SCORE: ${{ needs.risk-assessment.outputs.risk-score }}
+        run: |
+          SCORE="${RISK_SCORE:-0}"
+          echo "Risk score: $SCORE"
+
+          # Check for CRITICAL findings
+          if echo "$FINDINGS" | grep -q '"severity": "CRITICAL"'; then
+            echo "::error::CRITICAL security findings detected in agent policies."
+            echo "Gate decision: BLOCK"
+            exit 1
+          fi
+
+          # Check risk score threshold
+          if [ "$SCORE" -gt 75 ] 2>/dev/null; then
+            echo "::error::Risk score ($SCORE) exceeds threshold of 75."
+            echo "Gate decision: BLOCK"
+            exit 1
+          fi
+
+          echo "Gate decision: PASS (risk score: $SCORE)"

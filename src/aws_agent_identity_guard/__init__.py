@@ -1,7 +1,33 @@
-"""AWS Agent Identity Guard."""
+"""AWS Agent Identity Guard - Runtime authorization for AI agents."""
 
-from .scanner import Finding, scan_policy_document, scan_trust_policy
+from aws_agent_identity_guard.scanner import scan_policy_document, scan_trust_policy
+from aws_agent_identity_guard.sdk import (
+    AgentIdentityGuard,
+    Decision,
+    AgentInfo,
+    PermissionInfo,
+    AttackPathInfo,
+    RiskScoreInfo,
+    ApprovalInfo,
+    GuardError,
+    AuthorizationError,
+    ConnectionError as GuardConnectionError,
+    TimeoutError as GuardTimeoutError,
+)
 
-__version__ = "0.3.0"
-
-__all__ = ["Finding", "__version__", "scan_policy_document", "scan_trust_policy"]
+__version__ = "1.0.0"
+__all__ = [
+    "scan_policy_document",
+    "scan_trust_policy",
+    "AgentIdentityGuard",
+    "Decision",
+    "AgentInfo",
+    "PermissionInfo",
+    "AttackPathInfo",
+    "RiskScoreInfo",
+    "ApprovalInfo",
+    "GuardError",
+    "AuthorizationError",
+    "GuardConnectionError",
+    "GuardTimeoutError",
+]

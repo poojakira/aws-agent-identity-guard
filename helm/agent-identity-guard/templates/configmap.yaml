@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "agent-identity-guard.fullname" . }}-config
+  labels:
+    {{- include "agent-identity-guard.labels" . | nindent 4 }}
+data:
+  ENVIRONMENT: {{ .Values.config.environment | quote }}
+  LOG_LEVEL: {{ .Values.config.logLevel | quote }}
+  FAIL_OPEN: {{ .Values.config.failOpen | quote }}
+  REDIS_ENABLED: {{ .Values.config.redis.enabled | quote }}
+  REDIS_URL: {{ .Values.config.redis.url | quote }}
+  RATE_LIMIT_ENABLED: {{ .Values.config.rateLimit.enabled | quote }}
+  RATE_LIMIT_RPM: {{ .Values.config.rateLimit.requestsPerMinute | quote }}
+  POLICY_DEFAULT_DENY: {{ .Values.config.policies.defaultDeny | quote }}
+  POLICY_MAX_RISK_SCORE: {{ .Values.config.policies.maxRiskScore | quote }}
+  POLICY_REQUIRE_APPROVAL_ABOVE: {{ .Values.config.policies.requireApprovalAbove | quote }}

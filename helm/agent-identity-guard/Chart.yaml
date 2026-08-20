@@ -1,0 +1,22 @@
+apiVersion: v2
+name: agent-identity-guard
+description: AWS Agent Identity Guard - Runtime authorization for AI agents
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+kubeVersion: ">=1.25.0-0"
+keywords:
+  - security
+  - agents
+  - authorization
+  - identity
+  - aws
+home: https://github.com/aws/agent-identity-guard
+sources:
+  - https://github.com/aws/agent-identity-guard
+maintainers:
+  - name: Agent Identity Guard Contributors
+    url: https://github.com/aws/agent-identity-guard
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/category: security
