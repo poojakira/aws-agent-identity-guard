@@ -177,7 +177,7 @@ chore: update dependencies
 
 ---
 
-## Security Issues
+### Data Flow
 
 **Do not open a public issue for security vulnerabilities.**
 

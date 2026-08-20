@@ -59,7 +59,7 @@ class TestKillChainCombinations:
         assert "AIG021" in rule_ids, "complete chain must trigger AIG021"
 
     def test_harvest_only_does_not_trigger_combination(self):
-        """Reading secrets alone is not a kill chain — no combination rule fires."""
+        """Reading secrets alone is not a kill chain  -  no combination rule fires."""
         policy = {
             "Statement": [
                 {

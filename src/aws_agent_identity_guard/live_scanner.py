@@ -300,7 +300,7 @@ class LiveAccountScanner:
                 for page in paginator.paginate():
                     role_list.extend(page.get("Roles", []))
                     if len(role_list) >= self._max_roles:
-                        logger.warning("Role cap (%d) reached — truncating.", self._max_roles)
+                        logger.warning("Role cap (%d) reached  -  truncating.", self._max_roles)
                         role_list = role_list[: self._max_roles]
                         break
         except botocore.exceptions.ClientError as exc:

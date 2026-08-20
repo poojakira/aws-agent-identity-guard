@@ -1,4 +1,4 @@
-# AWS Architecture — AWS Agent Identity Guard
+# AWS Architecture  -  AWS Agent Identity Guard
 
 ## Purpose
 
@@ -60,9 +60,9 @@ configuration by the operator.
 | **CloudWatch Logs** | Evidence retention | Provisioned by Terraform module; log shipping from the CLI is not implemented |
 
 Services **not used** (and why):
-- **S3** — Not needed for a CLI tool; scan artifacts are stored in CI artifact storage.
-- **DynamoDB** — No persistent finding database at this scale.
-- **Security Hub** — Future work: ASFF output format is prepared in code but publication not yet automated.
+- **S3**  -  Not needed for a CLI tool; scan artifacts are stored in CI artifact storage.
+- **DynamoDB**  -  No persistent finding database at this scale.
+- **Security Hub**  -  Future work: ASFF output format is prepared in code but publication not yet automated.
 
 ---
 

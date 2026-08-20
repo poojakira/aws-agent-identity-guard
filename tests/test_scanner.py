@@ -12,7 +12,7 @@ import pytest
 from aws_agent_identity_guard import scan_policy_document, scan_trust_policy
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# ORIGINAL RULES (AIG001–AIG007)
+# ORIGINAL RULES (AIG001-AIG007)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
@@ -179,7 +179,7 @@ class TestAIG005PrivilegeEscalation:
     """AIG005: IAM privilege-management actions in agent policies."""
 
     def test_iam_star_fires(self):
-        """iam:* triggers AIG002 (wildcard action) — the broader catch-all."""
+        """iam:* triggers AIG002 (wildcard action)  -  the broader catch-all."""
         findings = scan_policy_document(
             {
                 "Statement": [
@@ -289,7 +289,7 @@ class TestAIG007SensitiveDataAccess:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# NEW RULES (AIG008–AIG018) — Agent-specific escalation patterns
+# NEW RULES (AIG008-AIG018)  -  Agent-specific escalation patterns
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
@@ -373,7 +373,7 @@ class TestAIG009SageMakerControlPlane:
         assert any(f.rule_id == "AIG009" for f in findings)
 
     def test_invoke_endpoint_does_not_fire(self):
-        """Runtime invocation is fine — the agent needs to call the model."""
+        """Runtime invocation is fine  -  the agent needs to call the model."""
         findings = scan_policy_document(
             {
                 "Statement": [
@@ -737,7 +737,7 @@ class TestAIG018DatabaseFullAccess:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# TRUST POLICY RULES (AIG-TP001–TP003)
+# TRUST POLICY RULES (AIG-TP001-TP003)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
@@ -836,7 +836,7 @@ class TestTrustPolicyRules:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# INTEGRATION TESTS — Realistic Agent Policies
+# INTEGRATION TESTS  -  Realistic Agent Policies
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
@@ -919,7 +919,7 @@ class TestRealisticAgentPolicies:
         assert "AIG013" in rule_ids  # No conditions + Resource: *
 
     def test_deny_statements_are_ignored(self):
-        """Deny statements should not generate findings — they restrict, not grant."""
+        """Deny statements should not generate findings  -  they restrict, not grant."""
         findings = scan_policy_document(
             {
                 "Statement": [

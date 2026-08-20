@@ -8,9 +8,9 @@ Scheduled n8n workflow for continuous IAM posture monitoring of AI agent roles.
 
 ### What it does
 
-1. **Scheduled trigger** — runs every weekday at 6 AM (configurable cron)
-2. **Live IAM scan** — executes `aws-agent-identity-guard --live-scan --format json` against the current AWS account
-3. **Parse & categorize** — groups findings by role, separates critical/high from medium
+1. **Scheduled trigger**  -  runs every weekday at 6 AM (configurable cron)
+2. **Live IAM scan**  -  executes `aws-agent-identity-guard --live-scan --format json` against the current AWS account
+3. **Parse & categorize**  -  groups findings by role, separates critical/high from medium
 4. **Route by severity:**
    - **Critical/High found:** Alert Slack → Generate remediations → Create Jira ticket
    - **Clean:** Post summary to Slack (X roles scanned, 0 critical/high)
@@ -54,9 +54,9 @@ Roles Scanned: 47
 Critical: 2 | High: 5 | Medium: 12
 
 Top findings:
-• AIG004 on `bedrock-agent-prod`: iam:PassRole without PassedToService...
-• AIG011 on `data-pipeline-role`: cloudtrail:StopLogging in agent runtime...
-• AIG008 on `mcp-server-role`: bedrock:CreateAgent in runtime role...
+* AIG004 on `bedrock-agent-prod`: iam:PassRole without PassedToService...
+* AIG011 on `data-pipeline-role`: cloudtrail:StopLogging in agent runtime...
+* AIG008 on `mcp-server-role`: bedrock:CreateAgent in runtime role...
 ```
 
 ### Customization
