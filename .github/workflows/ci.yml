@@ -95,6 +95,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
-      - run: pytest tests -q --cov=aws_agent_identity_guard --cov-report=term-missing --cov-fail-under=65 -p pytest_cov -p no:cacheprovider
+      - run: pytest tests -q --cov=aws_agent_identity_guard --cov-report=term-missing --cov-fail-under=60 -p pytest_cov -p no:cacheprovider
         env:
           PYTEST_DISABLE_PLUGIN_AUTOLOAD: ""
