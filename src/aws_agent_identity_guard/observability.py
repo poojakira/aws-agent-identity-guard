@@ -40,13 +40,9 @@ logger = logging.getLogger(__name__)
 
 # --- Constants ---
 
-_HISTOGRAM_BUCKETS = (
-    0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0
-)
+_HISTOGRAM_BUCKETS = (0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0)
 
-_LATENCY_BUCKETS_MS = (
-    1.0, 2.5, 5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0
-)
+_LATENCY_BUCKETS_MS = (1.0, 2.5, 5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0)
 
 
 # --- Metric Data Structures ---
@@ -142,11 +138,13 @@ class Counter:
         with self._lock:
             for key, value in self._values.items():
                 label_dict = dict(zip(self.label_names, key, strict=False))
-                result.append(MetricSample(
-                    name=self.name,
-                    labels=label_dict,
-                    value=value,
-                ))
+                result.append(
+                    MetricSample(
+                        name=self.name,
+                        labels=label_dict,
+                        value=value,
+                    )
+                )
         return result
 
 
@@ -233,11 +231,13 @@ class Gauge:
         with self._lock:
             for key, value in self._values.items():
                 label_dict = dict(zip(self.label_names, key, strict=False))
-                result.append(MetricSample(
-                    name=self.name,
-                    labels=label_dict,
-                    value=value,
-                ))
+                result.append(
+                    MetricSample(
+                        name=self.name,
+                        labels=label_dict,
+                        value=value,
+                    )
+                )
         return result
 
 
@@ -328,32 +328,40 @@ class Histogram:
                 for i, boundary in enumerate(self.buckets):
                     cumulative += bucket_counts[i]
                     bucket_labels = {**label_dict, "le": str(boundary)}
-                    result.append(MetricSample(
-                        name=f"{self.name}_bucket",
-                        labels=bucket_labels,
-                        value=cumulative,
-                    ))
+                    result.append(
+                        MetricSample(
+                            name=f"{self.name}_bucket",
+                            labels=bucket_labels,
+                            value=cumulative,
+                        )
+                    )
 
                 # +Inf bucket
                 total_count = self._counts.get(key, 0)
                 inf_labels = {**label_dict, "le": "+Inf"}
-                result.append(MetricSample(
-                    name=f"{self.name}_bucket",
-                    labels=inf_labels,
-                    value=float(total_count),
-                ))
+                result.append(
+                    MetricSample(
+                        name=f"{self.name}_bucket",
+                        labels=inf_labels,
+                        value=float(total_count),
+                    )
+                )
 
                 # _count and _sum
-                result.append(MetricSample(
-                    name=f"{self.name}_count",
-                    labels=label_dict,
-                    value=float(total_count),
-                ))
-                result.append(MetricSample(
-                    name=f"{self.name}_sum",
-                    labels=label_dict,
-                    value=self._sums.get(key, 0.0),
-                ))
+                result.append(
+                    MetricSample(
+                        name=f"{self.name}_count",
+                        labels=label_dict,
+                        value=float(total_count),
+                    )
+                )
+                result.append(
+                    MetricSample(
+                        name=f"{self.name}_sum",
+                        labels=label_dict,
+                        value=self._sums.get(key, 0.0),
+                    )
+                )
 
         return result
 
@@ -623,13 +631,13 @@ class MetricsCollector:
                 for sample in self.risk_score.samples()
             },
             "step_up_counts": {
-                f"{sample.labels.get('agent_id', 'unknown')}_{sample.labels.get('status', '')}":
-                    sample.value
+                f"{sample.labels.get('agent_id', 'unknown')}"
+                f"_{sample.labels.get('status', '')}": sample.value
                 for sample in self.step_up_requests_total.samples()
             },
             "policy_violations": {
-                f"{sample.labels.get('rule_name', 'unknown')}_{sample.labels.get('severity', '')}":
-                    sample.value
+                f"{sample.labels.get('rule_name', 'unknown')}"
+                f"_{sample.labels.get('severity', '')}": sample.value
                 for sample in self.policy_violations_total.samples()
             },
         }
@@ -650,11 +658,7 @@ class MetricsCollector:
         parts = []
         for key, value in sorted(labels.items()):
             # Escape special characters in label values
-            escaped_value = (
-                value.replace("\\", "\\\\")
-                .replace('"', '\\"')
-                .replace("\n", "\\n")
-            )
+            escaped_value = value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
             parts.append(f'{key}="{escaped_value}"')
 
         return "{" + ",".join(parts) + "}"
@@ -711,11 +715,13 @@ class Span:
             name: Event name.
             attributes: Optional event attributes.
         """
-        self.events.append({
-            "name": name,
-            "timestamp": time.time(),
-            "attributes": attributes or {},
-        })
+        self.events.append(
+            {
+                "name": name,
+                "timestamp": time.time(),
+                "attributes": attributes or {},
+            }
+        )
 
     def set_attribute(self, key: str, value: Any) -> None:
         """
@@ -894,7 +900,7 @@ class TracingProvider:
 
             # Trim completed spans if over limit
             if len(self._completed_spans) > self._max_spans:
-                self._completed_spans = self._completed_spans[-self._max_spans:]
+                self._completed_spans = self._completed_spans[-self._max_spans :]
 
         logger.debug(
             "Ended span: trace_id=%s span_id=%s op=%s duration_ms=%.2f",
@@ -1037,7 +1043,7 @@ class StructuredLogger:
         self,
         service_name: str = "agent-identity-guard",
         level: LogLevel = LogLevel.INFO,
-        format: LogFormat = LogFormat.JSON,
+        format: LogFormat = LogFormat.JSON,  # noqa: A002
         destination: TextIO | None = None,
         correlation_id: str | None = None,
     ) -> None:
@@ -1145,7 +1151,7 @@ class StructuredLogger:
             try:
                 self._destination.write(output + "\n")
                 self._destination.flush()
-            except Exception:
+            except Exception:  # noqa: S110
                 # Logging must never raise
                 pass
 

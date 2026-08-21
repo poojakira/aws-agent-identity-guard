@@ -9,13 +9,11 @@ audit event integrity hashing, and attack path composite scoring.
 
 from __future__ import annotations
 
-import hashlib
-from datetime import datetime, timezone
+import dataclasses
 
 import pytest
 
 from aws_agent_identity_guard.models import (
-    AgentCapability,
     AgentIdentity,
     AgentType,
     AttackPath,
@@ -24,19 +22,16 @@ from aws_agent_identity_guard.models import (
     AuthorizationDecision,
     AuthorizationDecisionType,
     DataClassification,
-    DriftEvent,
     EffectiveEffect,
     EffectivePermission,
     Environment,
     Permission,
     PermissionEffect,
-    PolicyDocument,
     PolicySource,
     RiskScore,
     TransactionRequest,
     _validate_range,
 )
-
 
 # ─── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -394,7 +389,7 @@ class TestPermission:
     def test_permission_frozen(self):
         """Permission is immutable (frozen dataclass)."""
         perm = Permission(action="s3:GetObject", resource="*", effect=PermissionEffect.ALLOW)
-        with pytest.raises(Exception):
+        with pytest.raises(dataclasses.FrozenInstanceError):
             perm.action = "s3:PutObject"
 
     def test_permission_serialization(self):

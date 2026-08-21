@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import logging
 import threading
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from typing import Any, Protocol, runtime_checkable
 
 from aws_agent_identity_guard.models import (
@@ -126,9 +126,7 @@ class InMemoryApprovalStore:
             List of matching approval requests.
         """
         with self._lock:
-            results = [
-                req for req in self._store.values() if req.status == status
-            ]
+            results = [req for req in self._store.values() if req.status == status]
             if agent_id:
                 results = [r for r in results if r.agent_id == agent_id]
             return results
@@ -145,9 +143,7 @@ class InMemoryApprovalStore:
         """
         with self._lock:
             if request.request_id not in self._store:
-                raise KeyError(
-                    f"Approval request {request.request_id} not found"
-                )
+                raise KeyError(f"Approval request {request.request_id} not found")
             self._store[request.request_id] = request
             logger.debug("Updated approval request %s", request.request_id)
 
@@ -223,17 +219,19 @@ class RedisApprovalStore:
         if self._client is None:
             try:
                 import redis
+
                 self._client = redis.from_url(self._redis_url)
-            except ImportError:
+            except ImportError as exc:
                 raise ImportError(
                     "redis package is required for RedisApprovalStore. "
                     "Install with: pip install redis"
-                )
+                ) from exc
         return self._client
 
     def save(self, request: ApprovalRequest) -> None:
         """Persist an approval request to Redis."""
         import json
+
         client = self._get_client()
         key = f"{self._key_prefix}{request.request_id}"
         client.setex(key, self._default_ttl, json.dumps(request.to_dict()))
@@ -241,6 +239,7 @@ class RedisApprovalStore:
     def get(self, request_id: str) -> ApprovalRequest | None:
         """Retrieve an approval request from Redis."""
         import json
+
         client = self._get_client()
         key = f"{self._key_prefix}{request_id}"
         data = client.get(key)
@@ -253,6 +252,7 @@ class RedisApprovalStore:
     ) -> list[ApprovalRequest]:
         """List requests by status from Redis."""
         import json
+
         client = self._get_client()
         pattern = f"{self._key_prefix}*"
         results: list[ApprovalRequest] = []
@@ -260,9 +260,8 @@ class RedisApprovalStore:
             data = client.get(key)
             if data:
                 req = ApprovalRequest.from_dict(json.loads(data))
-                if req.status == status:
-                    if agent_id is None or req.agent_id == agent_id:
-                        results.append(req)
+                if req.status == status and (agent_id is None or req.agent_id == agent_id):
+                    results.append(req)
         return results
 
     def update(self, request: ApprovalRequest) -> None:
@@ -315,9 +314,7 @@ class ApprovalPolicy:
         if not approvers:
             raise ValueError("approvers list cannot be empty")
         self._rules.append((action_pattern, list(approvers)))
-        logger.debug(
-            "Added approval rule: %s -> %s", action_pattern, approvers
-        )
+        logger.debug("Added approval rule: %s -> %s", action_pattern, approvers)
 
     def get_authorized_approvers(self, action: str) -> list[str]:
         """
@@ -399,9 +396,7 @@ class ApprovalManager:
         self._default_ttl_seconds = default_ttl_seconds
         self._audit_events: list[AuditEvent] = []
         self._audit_lock = threading.Lock()
-        logger.info(
-            "ApprovalManager initialized with TTL=%ds", default_ttl_seconds
-        )
+        logger.info("ApprovalManager initialized with TTL=%ds", default_ttl_seconds)
 
     @property
     def audit_events(self) -> list[AuditEvent]:
@@ -482,9 +477,7 @@ class ApprovalManager:
 
         return approval_request
 
-    def approve(
-        self, request_id: str, approver: str, reason: str = ""
-    ) -> ApprovalRequest:
+    def approve(self, request_id: str, approver: str, reason: str = "") -> ApprovalRequest:
         """
         Approve a pending approval request.
 
@@ -507,9 +500,7 @@ class ApprovalManager:
         if request.is_expired:
             request.status = ApprovalStatus.EXPIRED
             self._store.update(request)
-            raise ValueError(
-                f"Approval request {request_id} has expired and cannot be approved"
-            )
+            raise ValueError(f"Approval request {request_id} has expired and cannot be approved")
 
         # Prevent self-approval
         if request.requester and request.requester == approver:
@@ -520,8 +511,7 @@ class ApprovalManager:
         # Check RBAC authorization
         if not self._policy.is_authorized_approver(approver, request.action):
             raise PermissionError(
-                f"Approver '{approver}' is not authorized to approve "
-                f"action '{request.action}'"
+                f"Approver '{approver}' is not authorized to approve " f"action '{request.action}'"
             )
 
         # Apply approval
@@ -554,9 +544,7 @@ class ApprovalManager:
 
         return request
 
-    def deny(
-        self, request_id: str, approver: str, reason: str = ""
-    ) -> ApprovalRequest:
+    def deny(self, request_id: str, approver: str, reason: str = "") -> ApprovalRequest:
         """
         Deny a pending approval request.
 
@@ -579,15 +567,12 @@ class ApprovalManager:
         if request.is_expired:
             request.status = ApprovalStatus.EXPIRED
             self._store.update(request)
-            raise ValueError(
-                f"Approval request {request_id} has expired"
-            )
+            raise ValueError(f"Approval request {request_id} has expired")
 
         # Check RBAC authorization
         if not self._policy.is_authorized_approver(approver, request.action):
             raise PermissionError(
-                f"Approver '{approver}' is not authorized to act on "
-                f"action '{request.action}'"
+                f"Approver '{approver}' is not authorized to act on " f"action '{request.action}'"
             )
 
         # Apply denial
@@ -700,8 +685,10 @@ class ApprovalManager:
                     decision=AuthorizationDecisionType.DENY,
                     reasons=[
                         "Approval request expired without decision",
-                        f"Created at: {request.created_at.isoformat() if request.created_at else 'unknown'}",
-                        f"Expired at: {request.expires_at.isoformat() if request.expires_at else 'unknown'}",
+                        f"Created at: "
+                        f"{request.created_at.isoformat() if request.created_at else 'unknown'}",
+                        f"Expired at: "
+                        f"{request.expires_at.isoformat() if request.expires_at else 'unknown'}",
                     ],
                 )
 
@@ -730,16 +717,11 @@ class ApprovalManager:
             return False
 
         # Verify the approval itself has not expired
-        if request.is_expired:
-            return False
-
-        return True
+        return not request.is_expired
 
     # --- Private Methods ---
 
-    def _get_and_validate(
-        self, request_id: str, approver: str
-    ) -> ApprovalRequest:
+    def _get_and_validate(self, request_id: str, approver: str) -> ApprovalRequest:
         """
         Retrieve and validate a request before approval/denial.
 

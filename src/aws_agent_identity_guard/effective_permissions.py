@@ -175,8 +175,13 @@ def _condition_applies(conditions: dict[str, Any], context: dict[str, Any]) -> b
                 bool_str = str(context_value).lower()
                 if bool_str not in [v.lower() for v in condition_values]:
                     return False
-            elif base_op in ("numericequals", "numericlessthan", "numericgreaterthan",
-                             "numericlessthanequals", "numericgreaterthanequals"):
+            elif base_op in (
+                "numericequals",
+                "numericlessthan",
+                "numericgreaterthan",
+                "numericlessthanequals",
+                "numericgreaterthanequals",
+            ):
                 try:
                     ctx_num = float(context_str)
                     for val_str in condition_values:
@@ -316,7 +321,8 @@ class EffectivePermissionAnalyzer:
 
         # Step 2: Apply permission boundaries (intersect with identity allows)
         identity_allows = [
-            p for p in all_permissions
+            p
+            for p in all_permissions
             if p.source == PolicySource.IDENTITY_POLICY and p.effect == PermissionEffect.ALLOW
         ]
 
@@ -424,9 +430,7 @@ class EffectivePermissionAnalyzer:
         for boundary in boundaries:
             for statement in boundary.statements:
                 perms = self._evaluate_statement(statement, PolicySource.PERMISSION_BOUNDARY)
-                boundary_allows.extend(
-                    p for p in perms if p.effect == PermissionEffect.ALLOW
-                )
+                boundary_allows.extend(p for p in perms if p.effect == PermissionEffect.ALLOW)
 
         # Intersect: keep only permissions that match something in the boundary
         surviving: list[Permission] = []
@@ -566,48 +570,54 @@ class EffectivePermissionAnalyzer:
 
             # Check for explicit deny across ALL policies
             if self._check_explicit_deny(perm.action, perm.resource, all_permissions):
-                effective.append(EffectivePermission(
-                    action=perm.action,
-                    resource=perm.resource,
-                    effective_effect=EffectiveEffect.DENIED,
-                    contributing_policies=self._get_contributing_policies(
-                        perm.action, perm.resource, all_permissions
-                    ),
-                    conditions_required=[],
-                    evaluation_reason=(
-                        f"Explicit DENY found for {perm.action} on {perm.resource}. "
-                        "Explicit deny overrides all allows per IAM evaluation logic."
-                    ),
-                ))
+                effective.append(
+                    EffectivePermission(
+                        action=perm.action,
+                        resource=perm.resource,
+                        effective_effect=EffectiveEffect.DENIED,
+                        contributing_policies=self._get_contributing_policies(
+                            perm.action, perm.resource, all_permissions
+                        ),
+                        conditions_required=[],
+                        evaluation_reason=(
+                            f"Explicit DENY found for {perm.action} on {perm.resource}. "
+                            "Explicit deny overrides all allows per IAM evaluation logic."
+                        ),
+                    )
+                )
             elif self._check_condition_dependency(perm):
-                effective.append(EffectivePermission(
-                    action=perm.action,
-                    resource=perm.resource,
-                    effective_effect=EffectiveEffect.CONDITIONAL,
-                    contributing_policies=self._get_contributing_policies(
-                        perm.action, perm.resource, all_permissions
-                    ),
-                    conditions_required=[perm.conditions] if perm.conditions else [],
-                    evaluation_reason=(
-                        f"Access to {perm.action} on {perm.resource} is conditional. "
-                        f"Conditions must be satisfied at request time: {perm.conditions}"
-                    ),
-                ))
+                effective.append(
+                    EffectivePermission(
+                        action=perm.action,
+                        resource=perm.resource,
+                        effective_effect=EffectiveEffect.CONDITIONAL,
+                        contributing_policies=self._get_contributing_policies(
+                            perm.action, perm.resource, all_permissions
+                        ),
+                        conditions_required=[perm.conditions] if perm.conditions else [],
+                        evaluation_reason=(
+                            f"Access to {perm.action} on {perm.resource} is conditional. "
+                            f"Conditions must be satisfied at request time: {perm.conditions}"
+                        ),
+                    )
+                )
             else:
-                effective.append(EffectivePermission(
-                    action=perm.action,
-                    resource=perm.resource,
-                    effective_effect=EffectiveEffect.ALLOWED,
-                    contributing_policies=self._get_contributing_policies(
-                        perm.action, perm.resource, all_permissions
-                    ),
-                    conditions_required=[],
-                    evaluation_reason=(
-                        f"Access to {perm.action} on {perm.resource} is allowed. "
-                        "Identity policy grants access, no explicit deny found, "
-                        "and permission survives boundary/SCP/session intersection."
-                    ),
-                ))
+                effective.append(
+                    EffectivePermission(
+                        action=perm.action,
+                        resource=perm.resource,
+                        effective_effect=EffectiveEffect.ALLOWED,
+                        contributing_policies=self._get_contributing_policies(
+                            perm.action, perm.resource, all_permissions
+                        ),
+                        conditions_required=[],
+                        evaluation_reason=(
+                            f"Access to {perm.action} on {perm.resource} is allowed. "
+                            "Identity policy grants access, no explicit deny found, "
+                            "and permission survives boundary/SCP/session intersection."
+                        ),
+                    )
+                )
 
         # Also report explicit denies that don't overlap with allows
         for perm in all_permissions:
@@ -615,17 +625,19 @@ class EffectivePermissionAnalyzer:
                 key = (perm.action, perm.resource)
                 if key not in seen:
                     seen.add(key)
-                    effective.append(EffectivePermission(
-                        action=perm.action,
-                        resource=perm.resource,
-                        effective_effect=EffectiveEffect.DENIED,
-                        contributing_policies=[perm.source.value],
-                        conditions_required=[],
-                        evaluation_reason=(
-                            f"Explicit DENY for {perm.action} on {perm.resource} "
-                            f"from {perm.source.value}."
-                        ),
-                    ))
+                    effective.append(
+                        EffectivePermission(
+                            action=perm.action,
+                            resource=perm.resource,
+                            effective_effect=EffectiveEffect.DENIED,
+                            contributing_policies=[perm.source.value],
+                            conditions_required=[],
+                            evaluation_reason=(
+                                f"Explicit DENY for {perm.action} on {perm.resource} "
+                                f"from {perm.source.value}."
+                            ),
+                        )
+                    )
 
         return effective
 
@@ -691,8 +703,9 @@ class EffectivePermissionAnalyzer:
             True if at least one permission in the covering set matches.
         """
         for cover in covering_set:
-            if (_action_matches(cover.action, permission.action)
-                    and _resource_matches(cover.resource, permission.resource)):
+            if _action_matches(cover.action, permission.action) and _resource_matches(
+                cover.resource, permission.resource
+            ):
                 return True
         return False
 
@@ -849,9 +862,7 @@ class EffectivePermissionAnalyzer:
                     resource=resource,
                     effective_effect=EffectiveEffect.CONDITIONAL,
                     contributing_policies=[PolicySource.IDENTITY_POLICY.value],
-                    conditions_required=[
-                        p.conditions for p in identity_allows if p.conditions
-                    ],
+                    conditions_required=[p.conditions for p in identity_allows if p.conditions],
                     evaluation_reason=(
                         f"Access to {action} on {resource} depends on conditions "
                         f"that could not be evaluated with the provided context."
@@ -917,9 +928,7 @@ class EffectivePermissionAnalyzer:
                 action=action,
                 resource=resource,
                 effective_effect=EffectiveEffect.CONDITIONAL,
-                contributing_policies=sorted(
-                    {p.source.value for p in all_allows + all_denies}
-                ),
+                contributing_policies=sorted({p.source.value for p in all_allows + all_denies}),
                 conditions_required=[p.conditions for p in all_denies if p.conditions],
                 evaluation_reason=(
                     f"Access to {action} on {resource} is allowed by policy but a "
@@ -1015,34 +1024,36 @@ class EffectivePermissionAnalyzer:
             # Handle wildcards in the permission  --  can't definitively say unused
             if "*" in perm.action:
                 # For wildcard permissions, check if ANY matching action was used
-                any_used = any(
-                    _action_matches(perm.action, used_act) for used_act in used_actions
-                )
+                any_used = any(_action_matches(perm.action, used_act) for used_act in used_actions)
                 if not any_used:
-                    unused.append(EffectivePermission(
-                        action=perm.action,
-                        resource=perm.resource,
-                        effective_effect=perm.effective_effect,
-                        contributing_policies=perm.contributing_policies,
-                        conditions_required=perm.conditions_required,
-                        evaluation_reason=(
-                            f"Wildcard permission {perm.action} on {perm.resource}  --  "
-                            f"no matching actions found in CloudTrail events."
-                        ),
-                    ))
+                    unused.append(
+                        EffectivePermission(
+                            action=perm.action,
+                            resource=perm.resource,
+                            effective_effect=perm.effective_effect,
+                            contributing_policies=perm.contributing_policies,
+                            conditions_required=perm.conditions_required,
+                            evaluation_reason=(
+                                f"Wildcard permission {perm.action} on {perm.resource}  --  "
+                                f"no matching actions found in CloudTrail events."
+                            ),
+                        )
+                    )
             else:
                 if action_lower not in used_actions:
-                    unused.append(EffectivePermission(
-                        action=perm.action,
-                        resource=perm.resource,
-                        effective_effect=perm.effective_effect,
-                        contributing_policies=perm.contributing_policies,
-                        conditions_required=perm.conditions_required,
-                        evaluation_reason=(
-                            f"Permission {perm.action} on {perm.resource} is granted "
-                            f"but was never used in the analyzed CloudTrail period."
-                        ),
-                    ))
+                    unused.append(
+                        EffectivePermission(
+                            action=perm.action,
+                            resource=perm.resource,
+                            effective_effect=perm.effective_effect,
+                            contributing_policies=perm.contributing_policies,
+                            conditions_required=perm.conditions_required,
+                            evaluation_reason=(
+                                f"Permission {perm.action} on {perm.resource} is granted "
+                                f"but was never used in the analyzed CloudTrail period."
+                            ),
+                        )
+                    )
 
         logger.info(
             "Found %d unused permissions out of %d allowed for agent '%s'",

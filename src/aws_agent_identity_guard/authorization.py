@@ -35,13 +35,11 @@ Performance tracking:
 from __future__ import annotations
 
 import logging
-import statistics
 import threading
 import time
 from collections import deque
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import Any
 
 from aws_agent_identity_guard.models import (
     AgentIdentity,
@@ -52,7 +50,6 @@ from aws_agent_identity_guard.models import (
     RiskScore,
     TransactionRequest,
     _generate_uuid,
-    _now_utc,
 )
 from aws_agent_identity_guard.policy_engine import (
     PolicyDecision,
@@ -308,9 +305,7 @@ class AuthorizationEngine:
         self._risk_engine = risk_engine or RiskEngine()
         self._policy_engine = policy_engine or PolicyEngine()
         self._agent_registry = agent_registry or AgentRegistry()
-        self._latency_tracker = LatencyTracker(
-            max_samples=self._config.max_latency_samples
-        )
+        self._latency_tracker = LatencyTracker(max_samples=self._config.max_latency_samples)
         self._audit_events: list[AuditEvent] = []
         self._audit_lock = threading.Lock()
         self._decision_count: int = 0
@@ -394,9 +389,7 @@ class AuthorizationEngine:
 
             # If risk scoring failed, apply mode-based default immediately
             if risk_score_is_fallback:
-                decision = self._apply_default_decision(
-                    correlation_id, risk_score, request
-                )
+                decision = self._apply_default_decision(correlation_id, risk_score, request)
                 self._record_decision(request, decision, start_time)
                 return decision
 
@@ -427,7 +420,9 @@ class AuthorizationEngine:
                     correlation_id=correlation_id,
                     risk_score=risk_score,
                     reasons=policy_reasons,
-                    policy_matched=", ".join(policy_reasons[:1]) if policy_reasons else "policy-deny",
+                    policy_matched=", ".join(policy_reasons[:1])
+                    if policy_reasons
+                    else "policy-deny",
                 )
 
             elif policy_decision == PolicyEffect.REQUIRE_APPROVAL:
@@ -496,9 +491,7 @@ class AuthorizationEngine:
 
             else:
                 # No matching policy -- apply mode-based default
-                decision = self._apply_default_decision(
-                    correlation_id, risk_score, request
-                )
+                decision = self._apply_default_decision(correlation_id, risk_score, request)
 
             self._record_decision(request, decision, start_time)
             return decision
@@ -566,15 +559,11 @@ class AuthorizationEngine:
         risk_score, _ = self._compute_risk_score(request, agent)
 
         # Evaluate policy rules
-        policy_decision: PolicyDecision = self._policy_engine.evaluate(
-            request, agent, risk_score
-        )
+        policy_decision: PolicyDecision = self._policy_engine.evaluate(request, agent, risk_score)
 
         reasons = [policy_decision.explanation] if policy_decision.explanation else []
         if policy_decision.matched_rules:
-            reasons.append(
-                f"Matched rules: {', '.join(policy_decision.matched_rules)}"
-            )
+            reasons.append(f"Matched rules: {', '.join(policy_decision.matched_rules)}")
 
         # If no rules explicitly matched, return None to signal "no policy decision"
         # This allows the authorization engine to apply its mode-based default
@@ -604,21 +593,18 @@ class AuthorizationEngine:
         import fnmatch
 
         for perm in policies:
-            if perm.effective_effect.value == "DENIED":
-                # Check if the action matches
-                if fnmatch.fnmatch(
-                    request.action.lower(), perm.action.lower()
-                ):
-                    # Check if the resource matches
-                    if fnmatch.fnmatch(
-                        request.resource.lower(), perm.resource.lower()
-                    ) or perm.resource == "*":
-                        return True
+            if (
+                perm.effective_effect.value == "DENIED"
+                and fnmatch.fnmatch(request.action.lower(), perm.action.lower())
+                and (
+                    fnmatch.fnmatch(request.resource.lower(), perm.resource.lower())
+                    or perm.resource == "*"
+                )
+            ):
+                return True
         return False
 
-    def _check_step_up_required(
-        self, request: TransactionRequest, risk_score: RiskScore
-    ) -> bool:
+    def _check_step_up_required(self, request: TransactionRequest, risk_score: RiskScore) -> bool:
         """
         Determine if the risk score requires step-up authentication.
 

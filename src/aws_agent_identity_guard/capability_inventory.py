@@ -78,7 +78,7 @@ class RoleAccessType(str, Enum):
     """Type of access to an IAM role."""
 
     ASSUME = "ASSUME"
-    PASS = "PASS"
+    PASS = "PASS"  # noqa: S105
 
 
 class EdgeRelationship(str, Enum):
@@ -358,7 +358,6 @@ _ROLE_ASSUME_ACTIONS = {"sts:AssumeRole", "sts:AssumeRoleWithSAML", "sts:AssumeR
 _ROLE_PASS_ACTIONS = {"iam:PassRole"}
 
 
-
 # ---------------------------------------------------------------------------
 # Capability Inventory
 # ---------------------------------------------------------------------------
@@ -417,8 +416,7 @@ class CapabilityInventory:
 
         # Filter to ALLOWED permissions
         allowed = [
-            p for p in effective_permissions
-            if p.effective_effect == EffectiveEffect.ALLOWED
+            p for p in effective_permissions if p.effective_effect == EffectiveEffect.ALLOWED
         ]
 
         services = self._enumerate_services(allowed)
@@ -455,9 +453,7 @@ class CapabilityInventory:
 
         return graph
 
-    def _enumerate_services(
-        self, permissions: list[EffectivePermission]
-    ) -> list[str]:
+    def _enumerate_services(self, permissions: list[EffectivePermission]) -> list[str]:
         """
         Enumerate all AWS services accessible via the given permissions.
 
@@ -480,9 +476,7 @@ class CapabilityInventory:
         logger.debug("Enumerated %d services: %s", len(result), result)
         return result
 
-    def _enumerate_apis(
-        self, permissions: list[EffectivePermission]
-    ) -> list[str]:
+    def _enumerate_apis(self, permissions: list[EffectivePermission]) -> list[str]:
         """
         Enumerate all specific API actions available.
 
@@ -564,9 +558,7 @@ class CapabilityInventory:
         logger.debug("Enumerated %d data stores", len(data_stores))
         return data_stores
 
-    def _enumerate_secrets(
-        self, permissions: list[EffectivePermission]
-    ) -> list[SecretAccess]:
+    def _enumerate_secrets(self, permissions: list[EffectivePermission]) -> list[SecretAccess]:
         """
         Enumerate all secrets and parameters accessible.
 
@@ -653,9 +645,7 @@ class CapabilityInventory:
         logger.debug("Enumerated %d external endpoints", len(endpoints))
         return endpoints
 
-    def _enumerate_roles(
-        self, permissions: list[EffectivePermission]
-    ) -> list[RoleAccess]:
+    def _enumerate_roles(self, permissions: list[EffectivePermission]) -> list[RoleAccess]:
         """
         Enumerate all IAM roles that can be assumed or passed.
 
@@ -725,7 +715,8 @@ class CapabilityInventory:
         # Edges from agent to services
         for service in services:
             service_perms = [
-                p.action for p in permissions
+                p.action
+                for p in permissions
                 if p.action.startswith(f"{service}:") or p.action == "*"
             ]
             edges.append(

@@ -8,7 +8,7 @@ Takes scanner findings and produces ready-to-apply IaC fixes:
 - CloudFormation YAML snippets
 - Raw IAM policy JSON (fixed version)
 
-This bridges the gap between "we found a problem" and "here's the fix"  - 
+This bridges the gap between "we found a problem" and "here's the fix"  -
 turning a security scanner into an infrastructure automation tool.
 
 No external AI service required. Uses rule-based templates with context

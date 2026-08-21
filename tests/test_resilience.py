@@ -10,7 +10,7 @@ stale policies, and circuit breaker behavior.
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -26,12 +26,10 @@ from aws_agent_identity_guard.models import (
     AuthorizationDecisionType,
     DataClassification,
     Environment,
-    RiskScore,
     TransactionRequest,
 )
-from aws_agent_identity_guard.policy_engine import PolicyDecision, PolicyEffect, PolicyEngine
+from aws_agent_identity_guard.policy_engine import PolicyEngine
 from aws_agent_identity_guard.risk_engine import RiskEngine
-
 
 # ─── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -149,7 +147,7 @@ class TestPolicyStoreUnavailable:
         with patch.object(
             policy_engine,
             "evaluate",
-            side_effect=IOError("Policy store connection refused"),
+            side_effect=OSError("Policy store connection refused"),
         ):
             decision = engine.authorize(request_obj)
             assert decision.decision == AuthorizationDecisionType.DENY
@@ -166,7 +164,7 @@ class TestPolicyStoreUnavailable:
         with patch.object(
             policy_engine,
             "evaluate",
-            side_effect=IOError("Policy store connection refused"),
+            side_effect=OSError("Policy store connection refused"),
         ):
             decision = engine.authorize(request_obj)
             assert decision.decision == AuthorizationDecisionType.ALLOW
@@ -234,24 +232,33 @@ class TestMalformedRequests:
         """TransactionRequest with empty action raises ValueError."""
         with pytest.raises(ValueError, match="action cannot be empty"):
             TransactionRequest(
-                agent_id="x", principal="r", tool="t",
-                action="", resource="*",
+                agent_id="x",
+                principal="r",
+                tool="t",
+                action="",
+                resource="*",
             )
 
     def test_empty_resource_raises_validation_error(self):
         """TransactionRequest with empty resource raises ValueError."""
         with pytest.raises(ValueError, match="resource cannot be empty"):
             TransactionRequest(
-                agent_id="x", principal="r", tool="t",
-                action="s3:GetObject", resource="",
+                agent_id="x",
+                principal="r",
+                tool="t",
+                action="s3:GetObject",
+                resource="",
             )
 
     def test_empty_agent_id_raises_validation_error(self):
         """TransactionRequest with empty agent_id raises ValueError."""
         with pytest.raises(ValueError, match="agent_id cannot be empty"):
             TransactionRequest(
-                agent_id="", principal="r", tool="t",
-                action="s3:GetObject", resource="*",
+                agent_id="",
+                principal="r",
+                tool="t",
+                action="s3:GetObject",
+                resource="*",
             )
 
     def test_nonexistent_agent_denied(self, request_obj):

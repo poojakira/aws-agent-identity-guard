@@ -215,9 +215,7 @@ _CONDITION_KEY_SUGGESTIONS: dict[str, dict[str, Any]] = {
         "aws:SourceVpc": {"StringEquals": {"aws:SourceVpc": "vpc-REPLACE_ME"}},
     },
     "iam": {
-        "iam:PassedToService": {
-            "StringEquals": {"iam:PassedToService": "lambda.amazonaws.com"}
-        },
+        "iam:PassedToService": {"StringEquals": {"iam:PassedToService": "lambda.amazonaws.com"}},
         "aws:RequestedRegion": {"StringEquals": {"aws:RequestedRegion": "us-east-1"}},
     },
     "lambda": {
@@ -227,9 +225,7 @@ _CONDITION_KEY_SUGGESTIONS: dict[str, dict[str, Any]] = {
     },
     "kms": {
         "kms:ViaService": {"StringEquals": {"kms:ViaService": "s3.us-east-1.amazonaws.com"}},
-        "kms:EncryptionContext": {
-            "StringEquals": {"kms:EncryptionContext:department": "finance"}
-        },
+        "kms:EncryptionContext": {"StringEquals": {"kms:EncryptionContext:department": "finance"}},
     },
     "bedrock": {
         "aws:RequestedRegion": {"StringEquals": {"aws:RequestedRegion": "us-east-1"}},
@@ -301,9 +297,7 @@ class Recommendation:
     def __post_init__(self) -> None:
         """Validate recommendation fields."""
         if not (0 <= self.risk_reduction <= 100):
-            raise ValueError(
-                f"risk_reduction must be between 0 and 100, got {self.risk_reduction}"
-            )
+            raise ValueError(f"risk_reduction must be between 0 and 100, got {self.risk_reduction}")
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize to a JSON-compatible dictionary."""
@@ -660,9 +654,7 @@ class LeastPrivilegeRecommender:
             # Default: recommend read-only tier
             read_actions = catalog.get("read_only", [])
             if read_actions:
-                narrowed_resource = self._construct_narrowed_resource(
-                    service, resource
-                )
+                narrowed_resource = self._construct_narrowed_resource(service, resource)
                 conditions = self._add_condition_keys(permission)
 
                 replacements.append(
@@ -678,9 +670,7 @@ class LeastPrivilegeRecommender:
             # If there are invoke/write actions, add them as separate replacements
             invoke_actions = catalog.get("invoke", [])
             if invoke_actions:
-                narrowed_resource = self._construct_narrowed_resource(
-                    service, resource
-                )
+                narrowed_resource = self._construct_narrowed_resource(service, resource)
                 replacements.append(
                     Replacement(
                         original_action=action,
@@ -751,9 +741,8 @@ class LeastPrivilegeRecommender:
         # Merge resource lists
         relevant_resources = []
         for res in accessed_resources + service_resources:
-            is_match = (
-                (service and f":{service}:" in res.lower())
-                or (service and res.startswith(f"arn:aws:{service}:"))
+            is_match = (service and f":{service}:" in res.lower()) or (
+                service and res.startswith(f"arn:aws:{service}:")
             )
             if is_match:
                 relevant_resources.append(res)
@@ -821,9 +810,7 @@ class LeastPrivilegeRecommender:
 
         # Always suggest source VPC restriction for production
         if not conditions:
-            conditions = {
-                "StringEquals": {"aws:SourceVpc": "vpc-REPLACE_WITH_YOUR_VPC_ID"}
-            }
+            conditions = {"StringEquals": {"aws:SourceVpc": "vpc-REPLACE_WITH_YOUR_VPC_ID"}}
 
         return conditions
 
@@ -894,13 +881,15 @@ class LeastPrivilegeRecommender:
             additions.append(addition_statement)
 
             # Build modification record (before/after pair)
-            modifications.append({
-                "finding_id": rec.finding_id,
-                "before": removal_statement,
-                "after": addition_statement,
-                "reason": rec.reason,
-                "risk_reduction": rec.risk_reduction,
-            })
+            modifications.append(
+                {
+                    "finding_id": rec.finding_id,
+                    "before": removal_statement,
+                    "after": addition_statement,
+                    "reason": rec.reason,
+                    "risk_reduction": rec.risk_reduction,
+                }
+            )
 
         # Compute net risk change (negative = improvement)
         net_risk_change = -min(100, total_risk_reduction)
@@ -915,9 +904,7 @@ class LeastPrivilegeRecommender:
             "Top changes:",
         ]
         for mod in modifications[:5]:
-            summary_parts.append(
-                f"  [{mod['risk_reduction']}% reduction] {mod['reason'][:80]}"
-            )
+            summary_parts.append(f"  [{mod['risk_reduction']}% reduction] {mod['reason'][:80]}")
 
         human_summary = "\n".join(summary_parts)
 
@@ -932,7 +919,7 @@ class LeastPrivilegeRecommender:
     def generate_iac_code(
         self,
         recommendations: list[Recommendation],
-        format: str = "terraform",
+        format: str = "terraform",  # noqa: A002
     ) -> str:
         """
         Generate infrastructure-as-code remediation from recommendations.
@@ -973,10 +960,18 @@ class LeastPrivilegeRecommender:
             True if the action is considered sensitive.
         """
         sensitive_prefixes = [
-            "iam:", "sts:AssumeRole", "kms:Decrypt", "kms:CreateGrant",
-            "secretsmanager:GetSecretValue", "lambda:UpdateFunctionCode",
-            "s3:DeleteObject", "s3:PutBucketPolicy", "dynamodb:DeleteTable",
-            "organizations:", "cloudtrail:StopLogging", "cloudtrail:DeleteTrail",
+            "iam:",
+            "sts:AssumeRole",
+            "kms:Decrypt",
+            "kms:CreateGrant",
+            "secretsmanager:GetSecretValue",
+            "lambda:UpdateFunctionCode",
+            "s3:DeleteObject",
+            "s3:PutBucketPolicy",
+            "dynamodb:DeleteTable",
+            "organizations:",
+            "cloudtrail:StopLogging",
+            "cloudtrail:DeleteTrail",
         ]
         action_lower = action.lower()
         return any(action_lower.startswith(prefix.lower()) for prefix in sensitive_prefixes)
@@ -995,25 +990,19 @@ class LeastPrivilegeRecommender:
         resource_templates: dict[str, str] = {
             "s3": "arn:aws:s3:::BUCKET_NAME/*",
             "dynamodb": (
-                f"arn:aws:dynamodb:{self._default_region}:{self._account_id}"
-                f":table/TABLE_NAME"
+                f"arn:aws:dynamodb:{self._default_region}:{self._account_id}" f":table/TABLE_NAME"
             ),
             "lambda": (
                 f"arn:aws:lambda:{self._default_region}:{self._account_id}"
                 f":function:FUNCTION_NAME"
             ),
             "iam": f"arn:aws:iam::{self._account_id}:role/ROLE_NAME",
-            "kms": (
-                f"arn:aws:kms:{self._default_region}:{self._account_id}"
-                f":key/KEY_ID"
-            ),
+            "kms": (f"arn:aws:kms:{self._default_region}:{self._account_id}" f":key/KEY_ID"),
             "secretsmanager": (
                 f"arn:aws:secretsmanager:{self._default_region}:{self._account_id}"
                 f":secret:SECRET_NAME"
             ),
-            "bedrock": (
-                f"arn:aws:bedrock:{self._default_region}::foundation-model/*"
-            ),
+            "bedrock": (f"arn:aws:bedrock:{self._default_region}::foundation-model/*"),
             "sagemaker": (
                 f"arn:aws:sagemaker:{self._default_region}:{self._account_id}"
                 f":endpoint/ENDPOINT_NAME"
@@ -1025,9 +1014,7 @@ class LeastPrivilegeRecommender:
             return resource_templates[service]
 
         # Generic fallback
-        return (
-            f"arn:aws:{service}:{self._default_region}:{self._account_id}:RESOURCE_ID"
-        )
+        return f"arn:aws:{service}:{self._default_region}:{self._account_id}:RESOURCE_ID"
 
     def _find_common_arn_prefix(self, arns: list[str]) -> str:
         """
@@ -1165,22 +1152,22 @@ class LeastPrivilegeRecommender:
             Complete Terraform code string.
         """
         lines = [
-            '# Terraform remediation generated by AWS Agent Identity Guard',
-            '# Apply these changes to enforce least-privilege for AI agent roles.',
-            '#',
-            '# IMPORTANT: Review and customize resource ARNs and condition values',
-            '# before applying to your environment.',
-            '',
+            "# Terraform remediation generated by AWS Agent Identity Guard",
+            "# Apply these changes to enforce least-privilege for AI agent roles.",
+            "#",
+            "# IMPORTANT: Review and customize resource ARNs and condition values",
+            "# before applying to your environment.",
+            "",
             'data "aws_caller_identity" "current" {}',
             'data "aws_region" "current" {}',
-            '',
+            "",
             'resource "aws_iam_policy" "agent_least_privilege" {',
             '  name        = "agent-identity-guard-least-privilege"',
             '  description = "Least-privilege policy generated by AWS Agent Identity Guard"',
-            '',
-            '  policy = jsonencode({',
+            "",
+            "  policy = jsonencode({",
             '    Version = "2012-10-17"',
-            '    Statement = [',
+            "    Statement = [",
         ]
 
         for _i, rec in enumerate(recommendations):
@@ -1200,17 +1187,19 @@ class LeastPrivilegeRecommender:
             lines.append(f'        Resource = "{rec_resource}"')
             lines.append("      },")
 
-        lines.extend([
-            "    ]",
-            "  })",
-            "}",
-            "",
-            '# Attach to the agent role:',
-            '# resource "aws_iam_role_policy_attachment" "agent_policy" {',
-            '#   role       = aws_iam_role.agent_role.name',
-            '#   policy_arn = aws_iam_policy.agent_least_privilege.arn',
-            '# }',
-        ])
+        lines.extend(
+            [
+                "    ]",
+                "  })",
+                "}",
+                "",
+                "# Attach to the agent role:",
+                '# resource "aws_iam_role_policy_attachment" "agent_policy" {',
+                "#   role       = aws_iam_role.agent_role.name",
+                "#   policy_arn = aws_iam_policy.agent_least_privilege.arn",
+                "# }",
+            ]
+        )
 
         return "\n".join(lines)
 
@@ -1262,14 +1251,16 @@ class LeastPrivilegeRecommender:
             lines.append("            Resource:")
             lines.append(f"              - {rec_resource}")
 
-        lines.extend([
-            "",
-            "  # Attach to agent role:",
-            "  # AgentRole:",
-            "  #   Type: AWS::IAM::Role",
-            "  #   Properties:",
-            "  #     ManagedPolicyArns:",
-            "  #       - !Ref AgentLeastPrivilegePolicy",
-        ])
+        lines.extend(
+            [
+                "",
+                "  # Attach to agent role:",
+                "  # AgentRole:",
+                "  #   Type: AWS::IAM::Role",
+                "  #   Properties:",
+                "  #     ManagedPolicyArns:",
+                "  #       - !Ref AgentLeastPrivilegePolicy",
+            ]
+        )
 
         return "\n".join(lines)

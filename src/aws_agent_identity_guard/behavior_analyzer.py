@@ -169,9 +169,7 @@ class BehaviorBaseline:
             "agent_id": self.agent_id,
             "normal_services": sorted(self.normal_services),
             "normal_resources": sorted(self.normal_resources),
-            "normal_action_patterns": [
-                list(pair) for pair in self.normal_action_patterns
-            ],
+            "normal_action_patterns": [list(pair) for pair in self.normal_action_patterns],
             "established_at": self.established_at.isoformat(),
             "action_count": self.action_count,
             "time_window_hours": self.time_window_hours,
@@ -271,7 +269,6 @@ class BehaviorDrift:
             "time_pattern_changes": dict(self.time_pattern_changes),
             "has_drift": self.has_drift,
         }
-
 
 
 # ---------------------------------------------------------------------------
@@ -771,12 +768,8 @@ class BehaviorAnalyzer:
 
             if recon_found and exploit_found:
                 # Verify ordering: recon before exploit
-                first_recon_idx = min(
-                    action_sequence.index(a) for a in recon_found
-                )
-                last_exploit_idx = max(
-                    action_sequence.index(a) for a in exploit_found
-                )
+                first_recon_idx = min(action_sequence.index(a) for a in recon_found)
+                last_exploit_idx = max(action_sequence.index(a) for a in exploit_found)
 
                 if first_recon_idx < last_exploit_idx:
                     agent_name = agent.name if agent else sorted_actions[0].agent_id
@@ -883,10 +876,7 @@ class BehaviorAnalyzer:
 
         # Keep only frequently occurring bigrams
         bigram_counts = Counter(action_bigrams)
-        frequent_bigrams = [
-            bigram for bigram, count in bigram_counts.items()
-            if count >= 2
-        ]
+        frequent_bigrams = [bigram for bigram, count in bigram_counts.items() if count >= 2]
 
         baseline = BehaviorBaseline(
             agent_id=agent_id,
@@ -949,8 +939,7 @@ class BehaviorAnalyzer:
         # Detect frequency changes
         current_action_counts = Counter(a.action for a in recent_actions)
         baseline_action_counts = Counter(
-            a.action for a in self._actions.get(agent_id, [])
-            if a.timestamp < cutoff
+            a.action for a in self._actions.get(agent_id, []) if a.timestamp < cutoff
         )
 
         frequency_changes: dict[str, float] = {}
@@ -969,8 +958,7 @@ class BehaviorAnalyzer:
         peak_hour = current_hours.most_common(1)[0][0] if current_hours else 0
 
         baseline_hours = Counter(
-            a.timestamp.hour for a in self._actions.get(agent_id, [])
-            if a.timestamp < cutoff
+            a.timestamp.hour for a in self._actions.get(agent_id, []) if a.timestamp < cutoff
         )
         baseline_peak = baseline_hours.most_common(1)[0][0] if baseline_hours else 0
 
@@ -1112,9 +1100,6 @@ class BehaviorAnalyzer:
             AnomalySeverity.CRITICAL: 25,
         }
 
-        total = sum(
-            severity_scores.get(a.severity, 5)
-            for a in anomalies
-        )
+        total = sum(severity_scores.get(a.severity, 5) for a in anomalies)
 
         return max(-50, min(50, total))

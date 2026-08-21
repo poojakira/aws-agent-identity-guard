@@ -23,14 +23,11 @@ from aws_agent_identity_guard.models import (
     TransactionRequest,
 )
 from aws_agent_identity_guard.policy_engine import (
-    PolicyDecision,
-    PolicyDiff,
     PolicyEffect,
     PolicyEngine,
     PolicyRule,
     PolicyVersion,
 )
-
 
 # ─── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -279,7 +276,9 @@ policies:
 class TestConditions:
     """Test condition-based rule matching."""
 
-    def test_risk_score_above_condition(self, engine, sample_agent, high_risk_score, low_risk_score):
+    def test_risk_score_above_condition(
+        self, engine, sample_agent, high_risk_score, low_risk_score
+    ):
         """Rule with risk_score_above matches only when score exceeds threshold."""
         engine.load_policies_from_string("""
 version: '1.0'
@@ -292,14 +291,20 @@ policies:
       risk_score_above: 70
 """)
         request = TransactionRequest(
-            agent_id="agent-test", principal="r", tool="t",
-            action="s3:GetObject", resource="*",
+            agent_id="agent-test",
+            principal="r",
+            tool="t",
+            action="s3:GetObject",
+            resource="*",
         )
         result_high = engine.evaluate(request, sample_agent, high_risk_score)
         result_low = engine.evaluate(request, sample_agent, low_risk_score)
         assert result_high.effect == PolicyEffect.DENY
         # Low risk should NOT match the deny condition
-        assert result_low.effect != PolicyEffect.DENY or "deny-high-risk" not in result_low.matched_rules
+        assert (
+            result_low.effect != PolicyEffect.DENY
+            or "deny-high-risk" not in result_low.matched_rules
+        )
 
     def test_data_classification_in_condition(self, engine, sample_agent, low_risk_score):
         """Rule with data_classification_in matches based on request classification."""
@@ -315,8 +320,11 @@ policies:
 """)
         # Agent has CONFIDENTIAL, not SECRET/REGULATED
         request = TransactionRequest(
-            agent_id="agent-test", principal="r", tool="t",
-            action="s3:GetObject", resource="*",
+            agent_id="agent-test",
+            principal="r",
+            tool="t",
+            action="s3:GetObject",
+            resource="*",
             data_classification=DataClassification.SECRET,
         )
         result = engine.evaluate(request, sample_agent, low_risk_score)
@@ -334,8 +342,11 @@ policies:
     environments: ['PRODUCTION']
 """)
         request = TransactionRequest(
-            agent_id="agent-dev", principal="r", tool="t",
-            action="s3:GetObject", resource="*",
+            agent_id="agent-dev",
+            principal="r",
+            tool="t",
+            action="s3:GetObject",
+            resource="*",
         )
         result = engine.evaluate(request, dev_agent, low_risk_score)
         # Should NOT match because agent is in DEVELOPMENT

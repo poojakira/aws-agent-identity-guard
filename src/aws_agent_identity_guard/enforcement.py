@@ -125,11 +125,13 @@ class EnforcementPolicy:
     """
 
     mode: EnforcementMode = EnforcementMode.FAIL_CLOSED
-    environment_modes: dict[str, EnforcementMode] = field(default_factory=lambda: {
-        "production": EnforcementMode.FAIL_CLOSED,
-        "staging": EnforcementMode.FAIL_CLOSED,
-        "development": EnforcementMode.FAIL_OPEN,
-    })
+    environment_modes: dict[str, EnforcementMode] = field(
+        default_factory=lambda: {
+            "production": EnforcementMode.FAIL_CLOSED,
+            "staging": EnforcementMode.FAIL_CLOSED,
+            "development": EnforcementMode.FAIL_OPEN,
+        }
+    )
     fallback_action: EnforcementAction = EnforcementAction.BLOCKED
     timeout_ms: float = 100.0
     max_retries: int = 1
@@ -146,9 +148,7 @@ class EnforcementPolicy:
         Returns:
             The enforcement mode for that environment.
         """
-        return self.environment_modes.get(
-            environment.lower(), self.mode
-        )
+        return self.environment_modes.get(environment.lower(), self.mode)
 
 
 # --- Circuit Breaker ---
@@ -832,9 +832,7 @@ class SDKMiddleware:
             IAM action string (e.g., 's3:GetObject').
         """
         # Convert snake_case to PascalCase
-        pascal_operation = "".join(
-            word.capitalize() for word in operation.split("_")
-        )
+        pascal_operation = "".join(word.capitalize() for word in operation.split("_"))
         return f"{service}:{pascal_operation}"
 
     def _extract_resource_arn(
@@ -1009,22 +1007,26 @@ class ProxyEnforcer:
                     self.send_header("Content-Type", "application/json")
                     self.send_header("X-AgentGuard-Correlation-Id", result.correlation_id)
                     self.end_headers()
-                    response = json.dumps({
-                        "error": "AccessDenied",
-                        "message": "Blocked by AWS Agent Identity Guard",
-                        "correlation_id": result.correlation_id,
-                    }).encode("utf-8")
+                    response = json.dumps(
+                        {
+                            "error": "AccessDenied",
+                            "message": "Blocked by AWS Agent Identity Guard",
+                            "correlation_id": result.correlation_id,
+                        }
+                    ).encode("utf-8")
                     self.wfile.write(response)
                 elif result.action_taken == EnforcementAction.PENDING_APPROVAL:
                     self.send_response(202)
                     self.send_header("Content-Type", "application/json")
                     self.send_header("X-AgentGuard-Correlation-Id", result.correlation_id)
                     self.end_headers()
-                    response = json.dumps({
-                        "status": "pending_approval",
-                        "message": "Request requires step-up authentication",
-                        "correlation_id": result.correlation_id,
-                    }).encode("utf-8")
+                    response = json.dumps(
+                        {
+                            "status": "pending_approval",
+                            "message": "Request requires step-up authentication",
+                            "correlation_id": result.correlation_id,
+                        }
+                    ).encode("utf-8")
                     self.wfile.write(response)
                 else:
                     # ALLOWED: return 200 with pass-through indication
@@ -1034,14 +1036,16 @@ class ProxyEnforcer:
                     self.send_header("X-AgentGuard-Correlation-Id", result.correlation_id)
                     self.send_header("X-AgentGuard-Action", "PASSTHROUGH")
                     self.end_headers()
-                    response = json.dumps({
-                        "status": "allowed",
-                        "message": "Request passed enforcement, forwarding to AWS",
-                        "correlation_id": result.correlation_id,
-                    }).encode("utf-8")
+                    response = json.dumps(
+                        {
+                            "status": "allowed",
+                            "message": "Request passed enforcement, forwarding to AWS",
+                            "correlation_id": result.correlation_id,
+                        }
+                    ).encode("utf-8")
                     self.wfile.write(response)
 
-            def log_message(self, format: str, *args: Any) -> None:
+            def log_message(self, format: str, *args: Any) -> None:  # noqa: A002
                 """Suppress default HTTP server logging."""
                 logger.debug("ProxyEnforcer: %s", format % args)
 
@@ -1286,9 +1290,7 @@ class SidecarEnforcer:
 
         # Fast path: check destination whitelist
         if self._allowed_destinations and destination in self._allowed_destinations:
-            logger.debug(
-                "SidecarEnforcer: destination %s is whitelisted", destination
-            )
+            logger.debug("SidecarEnforcer: destination %s is whitelisted", destination)
             return EnforcementResult(
                 enforced=False,
                 action_taken=EnforcementAction.ALLOWED,

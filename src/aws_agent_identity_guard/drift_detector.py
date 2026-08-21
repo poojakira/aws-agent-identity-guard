@@ -105,9 +105,7 @@ class DriftReport:
     @property
     def has_drift(self) -> bool:
         """Check if any drift was detected."""
-        return bool(
-            self.new_permissions or self.removed_permissions or self.modified_permissions
-        )
+        return bool(self.new_permissions or self.removed_permissions or self.modified_permissions)
 
     @property
     def total_changes(self) -> int:
@@ -361,7 +359,6 @@ _ANTI_FORENSICS_PERMISSIONS = {
     "guardduty:DeleteDetector",
     "securityhub:DisableSecurityHub",
 }
-
 
 
 # ---------------------------------------------------------------------------
@@ -825,13 +822,9 @@ class DriftDetector:
                 f"{', '.join(new_actions)}"
             )
         if drift_report.removed_permissions:
-            message_parts.append(
-                f"Removed permissions: {len(drift_report.removed_permissions)}"
-            )
+            message_parts.append(f"Removed permissions: {len(drift_report.removed_permissions)}")
         if drift_report.new_attack_paths:
-            message_parts.append(
-                f"New attack paths detected: {len(drift_report.new_attack_paths)}"
-            )
+            message_parts.append(f"New attack paths detected: {len(drift_report.new_attack_paths)}")
 
         message = " ".join(message_parts)
 
@@ -913,9 +906,7 @@ class DriftDetector:
     # Private Helpers
     # -----------------------------------------------------------------------
 
-    def _determine_alert_level(
-        self, risk_score: int, attack_paths: list[AttackPath]
-    ) -> AlertLevel:
+    def _determine_alert_level(self, risk_score: int, attack_paths: list[AttackPath]) -> AlertLevel:
         """Determine the appropriate alert level based on risk and attack paths."""
         if risk_score >= 70 or any(ap.composite_score >= 60 for ap in attack_paths):
             return AlertLevel.CRITICAL

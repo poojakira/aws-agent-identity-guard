@@ -20,7 +20,6 @@ from aws_agent_identity_guard.models import (
     EffectiveEffect,
     EffectivePermission,
     Environment,
-    RiskScore,
     TransactionRequest,
 )
 from aws_agent_identity_guard.risk_engine import (
@@ -29,7 +28,6 @@ from aws_agent_identity_guard.risk_engine import (
     RiskWeights,
     classify_risk,
 )
-
 
 # ─── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -137,34 +135,40 @@ class TestScoreAgent:
 
     def test_critical_actions_raise_privilege_score(self, engine, high_privilege_agent):
         """Multiple critical IAM actions produce high privilege score."""
-        perms = _make_permissions([
-            "iam:CreatePolicyVersion",
-            "iam:AttachRolePolicy",
-            "iam:PassRole",
-            "sts:AssumeRole",
-        ])
+        perms = _make_permissions(
+            [
+                "iam:CreatePolicyVersion",
+                "iam:AttachRolePolicy",
+                "iam:PassRole",
+                "sts:AssumeRole",
+            ]
+        )
         result = engine.score_agent(high_privilege_agent, perms, [])
         assert result.privilege >= 50
 
     def test_data_exposure_actions_scored(self, engine, low_privilege_agent):
         """S3 and DynamoDB scan actions increase data_exposure dimension."""
-        perms = _make_permissions([
-            "s3:GetObject",
-            "s3:ListBucket",
-            "dynamodb:Scan",
-            "logs:GetLogEvents",
-        ])
+        perms = _make_permissions(
+            [
+                "s3:GetObject",
+                "s3:ListBucket",
+                "dynamodb:Scan",
+                "logs:GetLogEvents",
+            ]
+        )
         result = engine.score_agent(low_privilege_agent, perms, [])
         assert result.data_exposure > 0
 
     def test_persistence_actions_scored(self, engine, low_privilege_agent):
         """IAM and event-based persistence actions increase persistence score."""
-        perms = _make_permissions([
-            "iam:CreateRole",
-            "iam:CreateUser",
-            "iam:CreateAccessKey",
-            "events:PutRule",
-        ])
+        perms = _make_permissions(
+            [
+                "iam:CreateRole",
+                "iam:CreateUser",
+                "iam:CreateAccessKey",
+                "events:PutRule",
+            ]
+        )
         result = engine.score_agent(low_privilege_agent, perms, [])
         assert result.persistence > 0
 
@@ -270,8 +274,12 @@ class TestRiskWeights:
     def test_zero_weights_raise_error(self):
         """All-zero weights raise ValueError on normalization."""
         weights = RiskWeights(
-            privilege=0, sensitivity=0, blast_radius=0,
-            data_exposure=0, persistence=0, lateral_movement=0,
+            privilege=0,
+            sensitivity=0,
+            blast_radius=0,
+            data_exposure=0,
+            persistence=0,
+            lateral_movement=0,
         )
         with pytest.raises(ValueError, match="Total weight cannot be zero"):
             weights.normalized()
@@ -281,13 +289,25 @@ class TestRiskWeights:
         perms = _make_permissions(["iam:PassRole", "iam:CreateRole"])
         # Heavy privilege weight
         engine_heavy_priv = RiskEngine(
-            weights=RiskWeights(privilege=0.9, sensitivity=0.02, blast_radius=0.02,
-                               data_exposure=0.02, persistence=0.02, lateral_movement=0.02)
+            weights=RiskWeights(
+                privilege=0.9,
+                sensitivity=0.02,
+                blast_radius=0.02,
+                data_exposure=0.02,
+                persistence=0.02,
+                lateral_movement=0.02,
+            )
         )
         # Heavy persistence weight
         engine_heavy_pers = RiskEngine(
-            weights=RiskWeights(privilege=0.02, sensitivity=0.02, blast_radius=0.02,
-                               data_exposure=0.02, persistence=0.9, lateral_movement=0.02)
+            weights=RiskWeights(
+                privilege=0.02,
+                sensitivity=0.02,
+                blast_radius=0.02,
+                data_exposure=0.02,
+                persistence=0.9,
+                lateral_movement=0.02,
+            )
         )
         r1 = engine_heavy_priv.score_agent(low_privilege_agent, perms, [])
         r2 = engine_heavy_pers.score_agent(low_privilege_agent, perms, [])

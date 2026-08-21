@@ -40,7 +40,6 @@ from aws_agent_identity_guard.models import (
 from aws_agent_identity_guard.policy_engine import PolicyEngine
 from aws_agent_identity_guard.risk_engine import RiskEngine
 
-
 # ─── Corpus Generation ────────────────────────────────────────────────────────
 
 
@@ -107,9 +106,13 @@ def _generate_requests(agents: list[AgentIdentity], count: int) -> list[Transact
 def _generate_permissions(count: int) -> list[EffectivePermission]:
     """Generate a reproducible set of effective permissions."""
     actions = [
-        "s3:GetObject", "s3:PutObject", "iam:PassRole",
-        "lambda:InvokeFunction", "sts:AssumeRole",
-        "secretsmanager:GetSecretValue", "dynamodb:Scan",
+        "s3:GetObject",
+        "s3:PutObject",
+        "iam:PassRole",
+        "lambda:InvokeFunction",
+        "sts:AssumeRole",
+        "secretsmanager:GetSecretValue",
+        "dynamodb:Scan",
     ]
     perms = []
     for i in range(count):
@@ -185,7 +188,7 @@ policies:
     requests = _generate_requests(agents, request_count)
 
     # Warm up
-    for req in requests[:min(10, request_count)]:
+    for req in requests[: min(10, request_count)]:
         engine.authorize(req)
 
     # Benchmark
@@ -333,19 +336,28 @@ def main() -> None:
         print(f"  Running authorize() benchmark with {size} requests...")
         result = benchmark_authorize(size)
         results["benchmarks"].append(result)
-        print(f"    p50={result['p50_ms']:.4f}ms  p95={result['p95_ms']:.4f}ms  p99={result['p99_ms']:.4f}ms")
+        print(
+            f"    p50={result['p50_ms']:.4f}ms  p95={result['p95_ms']:.4f}ms"
+            f"  p99={result['p99_ms']:.4f}ms"
+        )
 
     for size in request_sizes:
         print(f"  Running risk_scoring benchmark with {size} requests...")
         result = benchmark_risk_scoring(size)
         results["benchmarks"].append(result)
-        print(f"    p50={result['p50_ms']:.4f}ms  p95={result['p95_ms']:.4f}ms  p99={result['p99_ms']:.4f}ms")
+        print(
+            f"    p50={result['p50_ms']:.4f}ms  p95={result['p95_ms']:.4f}ms"
+            f"  p99={result['p99_ms']:.4f}ms"
+        )
 
     for size in request_sizes:
         print(f"  Running policy_evaluation benchmark with {size} requests...")
         result = benchmark_policy_evaluation(size)
         results["benchmarks"].append(result)
-        print(f"    p50={result['p50_ms']:.4f}ms  p95={result['p95_ms']:.4f}ms  p99={result['p99_ms']:.4f}ms")
+        print(
+            f"    p50={result['p50_ms']:.4f}ms  p95={result['p95_ms']:.4f}ms"
+            f"  p99={result['p99_ms']:.4f}ms"
+        )
 
     # Output full results as JSON
     output_path = Path(__file__).parent.parent.parent / "benchmark_results.json"

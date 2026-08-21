@@ -13,7 +13,6 @@ import pytest
 
 from aws_agent_identity_guard.escalation_engine import (
     EscalationDetector,
-    EscalationPath,
     EscalationSeverity,
 )
 from aws_agent_identity_guard.models import (
@@ -24,7 +23,6 @@ from aws_agent_identity_guard.models import (
     EffectivePermission,
     Environment,
 )
-
 
 # ─── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -206,13 +204,15 @@ class TestSeverityClassification:
 
     def test_results_sorted_by_severity(self, detector, test_agent):
         """Results are sorted: CRITICAL before HIGH before MEDIUM."""
-        perms = _perms([
-            "iam:CreatePolicyVersion",
-            "iam:PassRole",
-            "lambda:CreateFunction",
-            "ssm:StartSession",
-            "secretsmanager:GetSecretValue",
-        ])
+        perms = _perms(
+            [
+                "iam:CreatePolicyVersion",
+                "iam:PassRole",
+                "lambda:CreateFunction",
+                "ssm:StartSession",
+                "secretsmanager:GetSecretValue",
+            ]
+        )
         results = detector.detect(test_agent, perms)
         if len(results) >= 2:
             severity_order = {
@@ -222,7 +222,9 @@ class TestSeverityClassification:
                 EscalationSeverity.LOW: 3,
             }
             for i in range(len(results) - 1):
-                assert severity_order[results[i].severity] <= severity_order[results[i + 1].severity]
+                assert (
+                    severity_order[results[i].severity] <= severity_order[results[i + 1].severity]
+                )
 
 
 # ─── MITRE ATT&CK ID Tests ───────────────────────────────────────────────────
@@ -233,12 +235,14 @@ class TestMitreMapping:
 
     def test_all_detected_paths_have_mitre_id(self, detector, test_agent):
         """Every detected escalation path has a non-empty MITRE ID."""
-        perms = _perms([
-            "iam:CreatePolicyVersion",
-            "iam:AttachRolePolicy",
-            "sts:AssumeRole",
-            "ssm:StartSession",
-        ])
+        perms = _perms(
+            [
+                "iam:CreatePolicyVersion",
+                "iam:AttachRolePolicy",
+                "sts:AssumeRole",
+                "ssm:StartSession",
+            ]
+        )
         results = detector.detect(test_agent, perms)
         for result in results:
             assert result.mitre_id != ""

@@ -603,12 +603,14 @@ _ESCALATION_PATTERNS: list[_EscalationPattern] = [
     _EscalationPattern(
         technique="PassRole to SageMaker",
         required_actions=frozenset({"iam:PassRole"}),
-        any_of_actions=frozenset({
-            "sagemaker:CreateNotebookInstance",
-            "sagemaker:CreateTrainingJob",
-            "sagemaker:CreateProcessingJob",
-            "sagemaker:CreateModel",
-        }),
+        any_of_actions=frozenset(
+            {
+                "sagemaker:CreateNotebookInstance",
+                "sagemaker:CreateTrainingJob",
+                "sagemaker:CreateProcessingJob",
+                "sagemaker:CreateModel",
+            }
+        ),
         impact=(
             "Pass a high-privilege role to any SageMaker compute resource, gaining "
             "code execution with that role's permissions."
@@ -781,7 +783,9 @@ class EscalationDetector:
                 if match_result is not None:
                     escalation_path = EscalationPath(
                         technique=pattern.technique,
-                        required_permissions=list(pattern.required_actions | pattern.any_of_actions),
+                        required_permissions=list(
+                            pattern.required_actions | pattern.any_of_actions
+                        ),
                         impact=pattern.impact,
                         severity=pattern.severity,
                         mitre_id=pattern.mitre_id,
@@ -923,9 +927,7 @@ class EscalationDetector:
 
     # ─── Helper Methods ───────────────────────────────────────────────────────
 
-    def _filter_allowed(
-        self, permissions: list[EffectivePermission]
-    ) -> list[EffectivePermission]:
+    def _filter_allowed(self, permissions: list[EffectivePermission]) -> list[EffectivePermission]:
         """Filter to only ALLOWED and CONDITIONAL permissions."""
         return [
             p

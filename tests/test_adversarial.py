@@ -11,15 +11,13 @@ bypass attempts.
 
 from __future__ import annotations
 
-import pytest
-
 from aws_agent_identity_guard.attack_paths import AttackPathAnalyzer
 from aws_agent_identity_guard.authorization import (
     AuthorizationConfig,
     AuthorizationEngine,
     AuthorizationMode,
 )
-from aws_agent_identity_guard.escalation_engine import EscalationDetector, EscalationSeverity
+from aws_agent_identity_guard.escalation_engine import EscalationDetector
 from aws_agent_identity_guard.models import (
     AgentIdentity,
     AgentType,
@@ -32,7 +30,6 @@ from aws_agent_identity_guard.models import (
 )
 from aws_agent_identity_guard.policy_engine import PolicyEngine
 from aws_agent_identity_guard.risk_engine import RiskEngine
-
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -57,9 +54,7 @@ def _agent(
 def _perms(actions: list[str]) -> list[EffectivePermission]:
     """Create ALLOWED effective permissions for actions."""
     return [
-        EffectivePermission(
-            action=a, resource="*", effective_effect=EffectiveEffect.ALLOWED
-        )
+        EffectivePermission(action=a, resource="*", effective_effect=EffectiveEffect.ALLOWED)
         for a in actions
     ]
 
@@ -126,8 +121,11 @@ class TestPrivilegeEscalation:
         agent = _agent("esc-1", "EscalationAgent1")
         engine.agent_registry.register(agent)
         request = TransactionRequest(
-            agent_id="esc-1", principal="role", tool="iam-tool",
-            action="iam:CreatePolicyVersion", resource="*",
+            agent_id="esc-1",
+            principal="role",
+            tool="iam-tool",
+            action="iam:CreatePolicyVersion",
+            resource="*",
         )
         decision = engine.authorize(request)
         assert decision.decision == AuthorizationDecisionType.DENY
@@ -138,8 +136,11 @@ class TestPrivilegeEscalation:
         agent = _agent("esc-2", "EscalationAgent2")
         engine.agent_registry.register(agent)
         request = TransactionRequest(
-            agent_id="esc-2", principal="role", tool="iam-tool",
-            action="iam:AttachRolePolicy", resource="*",
+            agent_id="esc-2",
+            principal="role",
+            tool="iam-tool",
+            action="iam:AttachRolePolicy",
+            resource="*",
         )
         decision = engine.authorize(request)
         assert decision.decision == AuthorizationDecisionType.DENY
@@ -150,8 +151,11 @@ class TestPrivilegeEscalation:
         agent = _agent("esc-3", "EscalationAgent3")
         engine.agent_registry.register(agent)
         request = TransactionRequest(
-            agent_id="esc-3", principal="role", tool="lambda-tool",
-            action="iam:PassRole", resource="*",
+            agent_id="esc-3",
+            principal="role",
+            tool="lambda-tool",
+            action="iam:PassRole",
+            resource="*",
         )
         decision = engine.authorize(request)
         assert decision.decision == AuthorizationDecisionType.DENY
@@ -162,8 +166,11 @@ class TestPrivilegeEscalation:
         agent = _agent("esc-4", "EscalationAgent4")
         engine.agent_registry.register(agent)
         request = TransactionRequest(
-            agent_id="esc-4", principal="role", tool="iam-tool",
-            action="iam:UpdateAssumeRolePolicy", resource="*",
+            agent_id="esc-4",
+            principal="role",
+            tool="iam-tool",
+            action="iam:UpdateAssumeRolePolicy",
+            resource="*",
         )
         decision = engine.authorize(request)
         assert decision.decision == AuthorizationDecisionType.DENY
@@ -174,8 +181,11 @@ class TestPrivilegeEscalation:
         agent = _agent("esc-5", "EscalationAgent5")
         engine.agent_registry.register(agent)
         request = TransactionRequest(
-            agent_id="esc-5", principal="role", tool="iam-tool",
-            action="iam:CreateUser", resource="*",
+            agent_id="esc-5",
+            principal="role",
+            tool="iam-tool",
+            action="iam:CreateUser",
+            resource="*",
         )
         decision = engine.authorize(request)
         assert decision.decision == AuthorizationDecisionType.DENY
@@ -184,13 +194,15 @@ class TestPrivilegeEscalation:
         """Escalation detector catches combined dangerous permissions."""
         detector = EscalationDetector()
         agent = _agent("esc-full", "FullEscAgent")
-        perms = _perms([
-            "iam:CreatePolicyVersion",
-            "iam:AttachRolePolicy",
-            "iam:PassRole",
-            "lambda:CreateFunction",
-            "iam:UpdateAssumeRolePolicy",
-        ])
+        perms = _perms(
+            [
+                "iam:CreatePolicyVersion",
+                "iam:AttachRolePolicy",
+                "iam:PassRole",
+                "lambda:CreateFunction",
+                "iam:UpdateAssumeRolePolicy",
+            ]
+        )
         results = detector.detect(agent, perms)
         assert len(results) >= 4
 
@@ -207,7 +219,9 @@ class TestCredentialTheft:
         agent = _agent("cred-1", "CredTheftAgent1", env=Environment.PRODUCTION)
         engine.agent_registry.register(agent)
         request = TransactionRequest(
-            agent_id="cred-1", principal="role", tool="secrets-tool",
+            agent_id="cred-1",
+            principal="role",
+            tool="secrets-tool",
             action="secretsmanager:GetSecretValue",
             resource="arn:aws:secretsmanager:us-east-1:123456789012:secret:api-key",
         )
@@ -243,12 +257,14 @@ class TestCredentialTheft:
         """Combined credential access vectors all get flagged."""
         analyzer = AttackPathAnalyzer()
         agent = _agent("cred-5", "CredTheftAgent5")
-        perms = _perms([
-            "secretsmanager:GetSecretValue",
-            "secretsmanager:ListSecrets",
-            "ssm:GetParameter",
-            "kms:Decrypt",
-        ])
+        perms = _perms(
+            [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:ListSecrets",
+                "ssm:GetParameter",
+                "kms:Decrypt",
+            ]
+        )
         paths = analyzer.analyze(agent, perms)
         assert len(paths) >= 2
 
@@ -265,7 +281,9 @@ class TestCrossAccountAccess:
         agent = _agent("xacct-1", "CrossAccountAgent1")
         engine.agent_registry.register(agent)
         request = TransactionRequest(
-            agent_id="xacct-1", principal="role", tool="cross-tool",
+            agent_id="xacct-1",
+            principal="role",
+            tool="cross-tool",
             action="sts:AssumeRole",
             resource="arn:aws:iam::999888777666:role/AdminRole",
         )
@@ -303,8 +321,11 @@ class TestDestructiveActions:
         agent = _agent("dest-1", "DestructiveAgent1")
         engine.agent_registry.register(agent)
         request = TransactionRequest(
-            agent_id="dest-1", principal="role", tool="s3-tool",
-            action="s3:DeleteBucket", resource="arn:aws:s3:::critical-bucket",
+            agent_id="dest-1",
+            principal="role",
+            tool="s3-tool",
+            action="s3:DeleteBucket",
+            resource="arn:aws:s3:::critical-bucket",
         )
         decision = engine.authorize(request)
         assert decision.decision == AuthorizationDecisionType.DENY
@@ -315,8 +336,11 @@ class TestDestructiveActions:
         agent = _agent("dest-2", "DestructiveAgent2")
         engine.agent_registry.register(agent)
         request = TransactionRequest(
-            agent_id="dest-2", principal="role", tool="ec2-tool",
-            action="ec2:TerminateInstances", resource="*",
+            agent_id="dest-2",
+            principal="role",
+            tool="ec2-tool",
+            action="ec2:TerminateInstances",
+            resource="*",
         )
         decision = engine.authorize(request)
         assert decision.decision == AuthorizationDecisionType.DENY
@@ -327,8 +351,11 @@ class TestDestructiveActions:
         agent = _agent("dest-3", "DestructiveAgent3")
         engine.agent_registry.register(agent)
         request = TransactionRequest(
-            agent_id="dest-3", principal="role", tool="rds-tool",
-            action="rds:DeleteDBInstance", resource="*",
+            agent_id="dest-3",
+            principal="role",
+            tool="rds-tool",
+            action="rds:DeleteDBInstance",
+            resource="*",
         )
         decision = engine.authorize(request)
         assert decision.decision == AuthorizationDecisionType.DENY
@@ -352,12 +379,14 @@ class TestConfusedDeputy:
         """Cross-service exploitation raises risk score."""
         engine = RiskEngine()
         agent = _agent("deputy-2", "ConfusedDeputy2")
-        perms = _perms([
-            "lambda:InvokeFunction",
-            "iam:PassRole",
-            "ecs:RunTask",
-            "sagemaker:CreateNotebookInstance",
-        ])
+        perms = _perms(
+            [
+                "lambda:InvokeFunction",
+                "iam:PassRole",
+                "ecs:RunTask",
+                "sagemaker:CreateNotebookInstance",
+            ]
+        )
         score = engine.score_agent(agent, perms, [])
         assert score.lateral_movement > 0
         assert score.privilege > 0
@@ -414,12 +443,16 @@ class TestDataExfiltration:
         """Multiple data access paths compound risk."""
         engine = RiskEngine()
         agent = _agent("exfil-5", "ExfilAgent5")
-        perms = _perms([
-            "s3:GetObject", "s3:ListBucket",
-            "dynamodb:Scan", "dynamodb:BatchGetItem",
-            "athena:StartQueryExecution",
-            "logs:GetLogEvents",
-        ])
+        perms = _perms(
+            [
+                "s3:GetObject",
+                "s3:ListBucket",
+                "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "athena:StartQueryExecution",
+                "logs:GetLogEvents",
+            ]
+        )
         score = engine.score_agent(agent, perms, [])
         assert score.data_exposure >= 30
 
@@ -444,8 +477,11 @@ class TestPolicyBypass:
         agent = _agent("bypass-1", "BypassAgent1")
         engine.agent_registry.register(agent)
         request = TransactionRequest(
-            agent_id="bypass-1", principal="role", tool="tool",
-            action="iam:PutRolePolicy", resource="*",
+            agent_id="bypass-1",
+            principal="role",
+            tool="tool",
+            action="iam:PutRolePolicy",
+            resource="*",
         )
         decision = engine.authorize(request)
         assert decision.decision == AuthorizationDecisionType.DENY
@@ -454,8 +490,11 @@ class TestPolicyBypass:
         """Requests from unregistered agents are denied (fail-closed)."""
         engine = _authz_engine_with_deny_policy()
         request = TransactionRequest(
-            agent_id="unknown-agent", principal="role", tool="tool",
-            action="s3:GetObject", resource="*",
+            agent_id="unknown-agent",
+            principal="role",
+            tool="tool",
+            action="s3:GetObject",
+            resource="*",
         )
         decision = engine.authorize(request)
         assert decision.decision == AuthorizationDecisionType.DENY
@@ -490,15 +529,19 @@ policies:
             policy_engine=policy_engine,
         )
         agent = _agent(
-            "bypass-4", "BypassAgent4",
+            "bypass-4",
+            "BypassAgent4",
             env=Environment.PRODUCTION,
             classification=DataClassification.SECRET,
         )
         engine.agent_registry.register(agent)
         # Dangerous action should score high enough to auto-deny
         request = TransactionRequest(
-            agent_id="bypass-4", principal="role", tool="tool",
-            action="iam:CreatePolicyVersion", resource="*",
+            agent_id="bypass-4",
+            principal="role",
+            tool="tool",
+            action="iam:CreatePolicyVersion",
+            resource="*",
             data_classification=DataClassification.SECRET,
         )
         decision = engine.authorize(request)
@@ -524,8 +567,11 @@ policies:
         agent = _agent("bypass-5", "BypassAgent5")
         engine.agent_registry.register(agent)
         request = TransactionRequest(
-            agent_id="bypass-5", principal="role", tool="tool",
-            action="s3:GetObject", resource="*",
+            agent_id="bypass-5",
+            principal="role",
+            tool="tool",
+            action="s3:GetObject",
+            resource="*",
         )
         decision = engine.authorize(request)
         assert decision.decision == AuthorizationDecisionType.DENY

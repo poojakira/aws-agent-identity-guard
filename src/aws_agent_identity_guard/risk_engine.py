@@ -25,7 +25,7 @@ Risk thresholds:
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
@@ -330,9 +330,7 @@ class RiskEngine:
             blast_radius_score = self._score_blast_radius(allowed_permissions)
             data_exposure_score = self._score_data_exposure(allowed_permissions)
             persistence_score = self._score_persistence(allowed_permissions)
-            lateral_movement_score = self._score_lateral_movement(
-                allowed_permissions, attack_paths
-            )
+            lateral_movement_score = self._score_lateral_movement(allowed_permissions, attack_paths)
 
             # Environment multiplier
             env_factor = self._environment_factor(agent)
@@ -454,9 +452,7 @@ class RiskEngine:
             lateral_movement_score = self._score_lateral_movement(single_perm, [])
 
             # Data classification boost
-            classification_boost = self._data_classification_boost(
-                transaction.data_classification
-            )
+            classification_boost = self._data_classification_boost(transaction.data_classification)
             sensitivity_score = min(100, sensitivity_score + classification_boost)
 
             env_factor = self._environment_factor(agent)
@@ -757,7 +753,9 @@ class RiskEngine:
             score += 20
 
         # Event-based persistence (CloudWatch Events, Lambda triggers)
-        event_actions = {a for a in actions if a.startswith("events:") or a.startswith("scheduler:")}
+        event_actions = {
+            a for a in actions if a.startswith("events:") or a.startswith("scheduler:")
+        }
         if event_actions:
             score += min(15, len(event_actions) * 5)
 
@@ -805,7 +803,9 @@ class RiskEngine:
             path_bonus = min(25, len(attack_paths) * 5)
             # Weight by average composite score of paths
             avg_composite = sum(p.composite_score for p in attack_paths) / len(attack_paths)
-            path_bonus = int(path_bonus * (avg_composite / 100.0)) if avg_composite > 0 else path_bonus
+            path_bonus = (
+                int(path_bonus * (avg_composite / 100.0)) if avg_composite > 0 else path_bonus
+            )
             score += path_bonus
 
         return min(100, score)
@@ -874,8 +874,7 @@ class RiskEngine:
         overall = max(0.0, min(100.0, overall))
 
         logger.debug(
-            "Composite score: weighted_sum=%.2f, env_factor=%.2f, "
-            "behavior_mod=%.2f, final=%.2f",
+            "Composite score: weighted_sum=%.2f, env_factor=%.2f, " "behavior_mod=%.2f, final=%.2f",
             weighted_sum,
             environment_factor,
             behavior_modifier,
@@ -886,9 +885,7 @@ class RiskEngine:
 
     # ─── Helper Methods ───────────────────────────────────────────────────────
 
-    def _filter_allowed(
-        self, permissions: list[EffectivePermission]
-    ) -> list[EffectivePermission]:
+    def _filter_allowed(self, permissions: list[EffectivePermission]) -> list[EffectivePermission]:
         """
         Filter to only ALLOWED and CONDITIONAL permissions for risk scoring.
 

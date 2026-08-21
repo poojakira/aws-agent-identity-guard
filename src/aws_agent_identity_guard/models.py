@@ -56,7 +56,7 @@ class DataClassification(str, Enum):
     PUBLIC = "PUBLIC"
     INTERNAL = "INTERNAL"
     CONFIDENTIAL = "CONFIDENTIAL"
-    SECRET = "SECRET"
+    SECRET = "SECRET"  # noqa: S105
     REGULATED = "REGULATED"
 
 
@@ -647,9 +647,7 @@ class TransactionRequest:
             tool=data.get("tool", ""),
             action=data["action"],
             resource=data["resource"],
-            data_classification=DataClassification(
-                data.get("data_classification", "INTERNAL")
-            ),
+            data_classification=DataClassification(data.get("data_classification", "INTERNAL")),
             context=data.get("context", {}),
             request_id=data.get("request_id", _generate_uuid()),
             timestamp=_deserialize_datetime(data.get("timestamp")) or _now_utc(),
@@ -896,9 +894,7 @@ class DriftEvent:
             removed_permissions=[
                 EffectivePermission.from_dict(p) for p in data.get("removed_permissions", [])
             ],
-            new_attack_paths=[
-                AttackPath.from_dict(ap) for ap in data.get("new_attack_paths", [])
-            ],
+            new_attack_paths=[AttackPath.from_dict(ap) for ap in data.get("new_attack_paths", [])],
         )
 
 

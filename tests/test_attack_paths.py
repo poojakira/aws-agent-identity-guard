@@ -15,13 +15,11 @@ from aws_agent_identity_guard.attack_paths import AttackPathAnalyzer
 from aws_agent_identity_guard.models import (
     AgentIdentity,
     AgentType,
-    AttackPath,
     DataClassification,
     EffectiveEffect,
     EffectivePermission,
     Environment,
 )
-
 
 # ─── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -69,10 +67,7 @@ class TestRoleChaining:
         paths = analyzer.analyze(base_agent, perms)
         assert len(paths) > 0
         # At least one path should involve role assumption
-        assume_paths = [
-            p for p in paths
-            if any("AssumeRole" in s.action for s in p.steps)
-        ]
+        assume_paths = [p for p in paths if any("AssumeRole" in s.action for s in p.steps)]
         assert len(assume_paths) > 0
 
     def test_assume_role_with_saml_detected(self, analyzer, base_agent):
@@ -91,10 +86,7 @@ class TestRoleChaining:
         """Without any AssumeRole variant, no role chaining paths are found."""
         perms = _perms(["s3:GetObject", "s3:PutObject"])
         paths = analyzer.analyze(base_agent, perms)
-        assume_paths = [
-            p for p in paths
-            if any("AssumeRole" in s.action for s in p.steps)
-        ]
+        assume_paths = [p for p in paths if any("AssumeRole" in s.action for s in p.steps)]
         assert len(assume_paths) == 0
 
 
@@ -110,10 +102,7 @@ class TestPassRoleExploitation:
         paths = analyzer.analyze(base_agent, perms)
         assert len(paths) > 0
         # Should find a PassRole path
-        passrole_paths = [
-            p for p in paths
-            if any("PassRole" in s.action for s in p.steps)
-        ]
+        passrole_paths = [p for p in paths if any("PassRole" in s.action for s in p.steps)]
         assert len(passrole_paths) > 0
 
     def test_passrole_alone_limited(self, analyzer, base_agent):
@@ -138,20 +127,14 @@ class TestDataExfiltration:
         perms = _perms(["s3:GetObject", "s3:ListBucket", "s3:GetBucketPolicy"])
         paths = analyzer.analyze(base_agent, perms)
         # Should detect data exfiltration paths
-        exfil_paths = [
-            p for p in paths
-            if any("s3:" in s.action.lower() for s in p.steps)
-        ]
+        exfil_paths = [p for p in paths if any("s3:" in s.action.lower() for s in p.steps)]
         assert len(exfil_paths) > 0
 
     def test_dynamodb_scan_exfiltration(self, analyzer, base_agent):
         """DynamoDB Scan with wildcard resource is a data exfiltration path."""
         perms = _perms(["dynamodb:Scan", "dynamodb:GetItem"])
         paths = analyzer.analyze(base_agent, perms)
-        exfil_paths = [
-            p for p in paths
-            if any("dynamodb" in s.action.lower() for s in p.steps)
-        ]
+        exfil_paths = [p for p in paths if any("dynamodb" in s.action.lower() for s in p.steps)]
         assert len(exfil_paths) > 0
 
 
@@ -165,10 +148,7 @@ class TestCredentialTheft:
         """secretsmanager:GetSecretValue is flagged as credential theft path."""
         perms = _perms(["secretsmanager:GetSecretValue", "secretsmanager:ListSecrets"])
         paths = analyzer.analyze(base_agent, perms)
-        cred_paths = [
-            p for p in paths
-            if any("secret" in s.action.lower() for s in p.steps)
-        ]
+        cred_paths = [p for p in paths if any("secret" in s.action.lower() for s in p.steps)]
         assert len(cred_paths) > 0
 
     def test_ssm_parameter_access_detected(self, analyzer, base_agent):
@@ -186,13 +166,15 @@ class TestPathRanking:
 
     def test_paths_sorted_descending_by_score(self, analyzer, base_agent):
         """Results are sorted by composite_score descending."""
-        perms = _perms([
-            "sts:AssumeRole",
-            "iam:PassRole",
-            "lambda:CreateFunction",
-            "s3:GetObject",
-            "secretsmanager:GetSecretValue",
-        ])
+        perms = _perms(
+            [
+                "sts:AssumeRole",
+                "iam:PassRole",
+                "lambda:CreateFunction",
+                "s3:GetObject",
+                "secretsmanager:GetSecretValue",
+            ]
+        )
         paths = analyzer.analyze(base_agent, perms)
         if len(paths) >= 2:
             for i in range(len(paths) - 1):

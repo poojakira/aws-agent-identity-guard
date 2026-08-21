@@ -25,7 +25,6 @@ Paths are ranked by composite score (highest risk first).
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from aws_agent_identity_guard.models import (
     AgentIdentity,
@@ -132,9 +131,7 @@ class AttackPathAnalyzer:
 
     # ─── Path Discovery Methods ───────────────────────────────────────────────
 
-    def _find_role_chaining_paths(
-        self, permissions: list[EffectivePermission]
-    ) -> list[AttackPath]:
+    def _find_role_chaining_paths(self, permissions: list[EffectivePermission]) -> list[AttackPath]:
         """
         Find role-chaining attack paths (Agent -> AssumeRole -> Role B -> ...).
 
@@ -210,9 +207,7 @@ class AttackPathAnalyzer:
         logger.debug("Found %d role-chaining paths", len(paths))
         return paths
 
-    def _find_passrole_paths(
-        self, permissions: list[EffectivePermission]
-    ) -> list[AttackPath]:
+    def _find_passrole_paths(self, permissions: list[EffectivePermission]) -> list[AttackPath]:
         """
         Find PassRole exploitation paths (Agent -> PassRole -> Service -> privilege).
 
@@ -232,9 +227,7 @@ class AttackPathAnalyzer:
         if "iam:PassRole" not in actions:
             return paths
 
-        passrole_resources = self._find_resources_for_actions(
-            permissions, {"iam:PassRole"}
-        )
+        passrole_resources = self._find_resources_for_actions(permissions, {"iam:PassRole"})
 
         # Services that can receive a passed role
         compute_services = {
@@ -306,7 +299,12 @@ class AttackPathAnalyzer:
             ),
         }
 
-        for service_action, (service_name, description, likelihood, impact) in compute_services.items():
+        for service_action, (
+            service_name,
+            description,
+            likelihood,
+            impact,
+        ) in compute_services.items():
             if service_action in actions:
                 for role_resource in passrole_resources:
                     steps = [
@@ -385,8 +383,7 @@ class AttackPathAnalyzer:
                     likelihood=0.8 if is_wildcard else 0.6,
                     impact=0.8 if is_wildcard else 0.6,
                     description=(
-                        f"Agent -> S3 access ({self._short_arn(resource)}) -> "
-                        "Data exfiltration"
+                        f"Agent -> S3 access ({self._short_arn(resource)}) -> " "Data exfiltration"
                     ),
                 )
                 paths.append(path)
@@ -566,8 +563,7 @@ class AttackPathAnalyzer:
                     likelihood=0.7,
                     impact=impact,
                     description=(
-                        f"Agent -> KMS ({self._short_arn(resource)}) -> "
-                        "Decrypt sensitive data"
+                        f"Agent -> KMS ({self._short_arn(resource)}) -> " "Decrypt sensitive data"
                     ),
                 )
                 paths.append(path)
@@ -737,9 +733,7 @@ class AttackPathAnalyzer:
         logger.debug("Found %d lateral movement paths", len(paths))
         return paths
 
-    def _find_persistence_paths(
-        self, permissions: list[EffectivePermission]
-    ) -> list[AttackPath]:
+    def _find_persistence_paths(self, permissions: list[EffectivePermission]) -> list[AttackPath]:
         """
         Find persistence paths (Agent -> CreateRole/CreateUser -> backdoor access).
 
@@ -792,7 +786,9 @@ class AttackPathAnalyzer:
                 steps=steps,
                 likelihood=0.8,
                 impact=0.95,
-                description="Agent -> Create IAM user -> Attach admin policy -> Persistent backdoor",
+                description=(
+                    "Agent -> Create IAM user -> Attach admin policy" " -> Persistent backdoor"
+                ),
             )
             paths.append(path)
 
@@ -886,7 +882,9 @@ class AttackPathAnalyzer:
                 steps=steps,
                 likelihood=0.7,
                 impact=0.8,
-                description="Agent -> Lambda create + add permission -> Externally-invocable backdoor",
+                description=(
+                    "Agent -> Lambda create + add permission" " -> Externally-invocable backdoor"
+                ),
             )
             paths.append(path)
 
@@ -1071,9 +1069,7 @@ class AttackPathAnalyzer:
 
     # ─── Helper Methods ───────────────────────────────────────────────────────
 
-    def _filter_allowed(
-        self, permissions: list[EffectivePermission]
-    ) -> list[EffectivePermission]:
+    def _filter_allowed(self, permissions: list[EffectivePermission]) -> list[EffectivePermission]:
         """Filter to only ALLOWED and CONDITIONAL permissions."""
         return [
             p

@@ -381,7 +381,7 @@ class TestSageMakerFullAccessPolicy:
         assert len(aig013) >= 4
 
     def test_passrole_with_condition_not_flagged_by_aig004(self):
-        """The PassRole statement HAS PassedToService condition  -  AIG004 should NOT fire for it."""
+        """The PassRole statement HAS PassedToService condition - AIG004 should NOT fire for it."""
         findings = scan_policy_document(self.SAGEMAKER_FULL_ACCESS_POLICY)
         aig004 = [f for f in findings if f.rule_id == "AIG004"]
         # Statement index 3 is PassRole with condition  -  should not appear

@@ -43,17 +43,18 @@ import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from pathlib import Path
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from aws_agent_identity_guard.models import (
-    AgentIdentity,
-    Environment,
-    RiskScore,
-    TransactionRequest,
-)
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from aws_agent_identity_guard.models import (
+        AgentIdentity,
+        RiskScore,
+        TransactionRequest,
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -326,9 +327,7 @@ class PolicyEngine:
             try:
                 rules = self._parse_policy_file(policy_file)
                 new_rules.extend(rules)
-                logger.info(
-                    "Loaded %d rules from %s", len(rules), policy_file.name
-                )
+                logger.info("Loaded %d rules from %s", len(rules), policy_file.name)
             except Exception as exc:
                 logger.error(
                     "Failed to load policy file %s: %s",
@@ -438,9 +437,7 @@ class PolicyEngine:
 
         # Phase 2: Check require_approval
         matched_approvals = [
-            r.name
-            for r in approval_rules
-            if self._match_rule(r, request, agent, context)
+            r.name for r in approval_rules if self._match_rule(r, request, agent, context)
         ]
         if matched_approvals:
             explanation = (
@@ -461,9 +458,7 @@ class PolicyEngine:
 
         # Phase 3: Check step_up
         matched_step_ups = [
-            r.name
-            for r in step_up_rules
-            if self._match_rule(r, request, agent, context)
+            r.name for r in step_up_rules if self._match_rule(r, request, agent, context)
         ]
         if matched_step_ups:
             explanation = (
@@ -484,9 +479,7 @@ class PolicyEngine:
 
         # Phase 4: Check explicit allows
         matched_allows = [
-            r.name
-            for r in allow_rules
-            if self._match_rule(r, request, agent, context)
+            r.name for r in allow_rules if self._match_rule(r, request, agent, context)
         ]
         if matched_allows:
             explanation = (
@@ -506,9 +499,7 @@ class PolicyEngine:
             )
 
         # Phase 5: No rule matched, default DENY
-        explanation = (
-            "No policy rule matched the request; fail-closed default applies"
-        )
+        explanation = "No policy rule matched the request; fail-closed default applies"
         logger.info(
             "Policy default DENY for agent=%s action=%s (no matching rules)",
             request.agent_id,
@@ -586,33 +577,24 @@ class PolicyEngine:
             for list_field in ("actions", "resources", "agents", "environments"):
                 if list_field in policy:
                     if not isinstance(policy[list_field], list):
-                        errors.append(
-                            f"{prefix}: '{list_field}' must be a list"
-                        )
+                        errors.append(f"{prefix}: '{list_field}' must be a list")
                     elif not policy[list_field]:
-                        errors.append(
-                            f"{prefix}: '{list_field}' cannot be an empty list"
-                        )
+                        errors.append(f"{prefix}: '{list_field}' cannot be an empty list")
 
             # Conditions validation
             if "conditions" in policy:
                 if not isinstance(policy["conditions"], dict):
                     errors.append(f"{prefix}: 'conditions' must be a mapping")
                 else:
-                    self._validate_conditions(
-                        policy["conditions"], f"{prefix}.conditions", errors
-                    )
+                    self._validate_conditions(policy["conditions"], f"{prefix}.conditions", errors)
 
             # Priority validation
-            if "priority" in policy:
-                if not isinstance(policy["priority"], int):
-                    errors.append(f"{prefix}: 'priority' must be an integer")
+            if "priority" in policy and not isinstance(policy["priority"], int):
+                errors.append(f"{prefix}: 'priority' must be an integer")
 
         return errors
 
-    def diff_policies(
-        self, old_version: PolicyVersion, new_version: PolicyVersion
-    ) -> PolicyDiff:
+    def diff_policies(self, old_version: PolicyVersion, new_version: PolicyVersion) -> PolicyDiff:
         """
         Compute the difference between two policy versions.
 
@@ -643,24 +625,18 @@ class PolicyEngine:
         # Risk assessment
         risk_factors: list[str] = []
         if removed:
-            deny_removed = [
-                n for n in removed
-                if old_rules_by_name[n].effect == PolicyEffect.DENY
-            ]
+            deny_removed = [n for n in removed if old_rules_by_name[n].effect == PolicyEffect.DENY]
             if deny_removed:
                 risk_factors.append(
                     f"CRITICAL: {len(deny_removed)} DENY rule(s) removed: "
                     f"{', '.join(deny_removed)}"
                 )
             else:
-                risk_factors.append(
-                    f"WARNING: {len(removed)} rule(s) removed"
-                )
+                risk_factors.append(f"WARNING: {len(removed)} rule(s) removed")
 
         if modified:
             deny_modified = [
-                n for n in modified
-                if old_rules_by_name[n].effect == PolicyEffect.DENY
+                n for n in modified if old_rules_by_name[n].effect == PolicyEffect.DENY
             ]
             if deny_modified:
                 risk_factors.append(
@@ -669,16 +645,13 @@ class PolicyEngine:
                 )
 
         if added:
-            allow_added = [
-                n for n in added
-                if new_rules_by_name[n].effect == PolicyEffect.ALLOW
-            ]
+            allow_added = [n for n in added if new_rules_by_name[n].effect == PolicyEffect.ALLOW]
             if allow_added:
-                risk_factors.append(
-                    f"MEDIUM: {len(allow_added)} new ALLOW rule(s) added"
-                )
+                risk_factors.append(f"MEDIUM: {len(allow_added)} new ALLOW rule(s) added")
 
-        risk_assessment = "; ".join(risk_factors) if risk_factors else "LOW: No risky changes detected"
+        risk_assessment = (
+            "; ".join(risk_factors) if risk_factors else "LOW: No risky changes detected"
+        )
 
         return PolicyDiff(
             added_rules=added,
@@ -687,9 +660,7 @@ class PolicyEngine:
             risk_assessment=risk_assessment,
         )
 
-    def test_policy(
-        self, policy_yaml: str, test_cases: list[TestCase]
-    ) -> TestResult:
+    def test_policy(self, policy_yaml: str, test_cases: list[TestCase]) -> TestResult:
         """
         Run test cases against a policy to verify expected behavior.
 
@@ -714,21 +685,21 @@ class PolicyEngine:
             result = TestResult(total=len(test_cases))
 
             for test_case in test_cases:
-                decision = self.evaluate(
-                    test_case.request, test_case.agent, test_case.risk_score
-                )
+                decision = self.evaluate(test_case.request, test_case.agent, test_case.risk_score)
 
                 if decision.effect == test_case.expected_effect:
                     result.passed += 1
                 else:
                     result.failed += 1
-                    result.failures.append({
-                        "test_name": test_case.name,
-                        "expected": test_case.expected_effect.value,
-                        "actual": decision.effect.value,
-                        "matched_rules": decision.matched_rules,
-                        "explanation": decision.explanation,
-                    })
+                    result.failures.append(
+                        {
+                            "test_name": test_case.name,
+                            "expected": test_case.expected_effect.value,
+                            "actual": decision.effect.value,
+                            "matched_rules": decision.matched_rules,
+                            "explanation": decision.explanation,
+                        }
+                    )
 
             return result
 
@@ -783,15 +754,9 @@ class PolicyEngine:
             return False
 
         # Check conditions
-        if rule.conditions:
-            if not self._evaluate_conditions(rule.conditions, context):
-                return False
+        return not rule.conditions or self._evaluate_conditions(rule.conditions, context)
 
-        return True
-
-    def _evaluate_conditions(
-        self, conditions: dict[str, Any], context: dict[str, Any]
-    ) -> bool:
+    def _evaluate_conditions(self, conditions: dict[str, Any], context: dict[str, Any]) -> bool:
         """
         Evaluate all conditions in a rule against the evaluation context.
 
@@ -821,9 +786,7 @@ class PolicyEngine:
 
             elif condition_name == "data_classification_in":
                 classifications = (
-                    condition_value
-                    if isinstance(condition_value, list)
-                    else [condition_value]
+                    condition_value if isinstance(condition_value, list) else [condition_value]
                 )
                 if context.get("data_classification", "").upper() not in [
                     c.upper() for c in classifications
@@ -840,13 +803,9 @@ class PolicyEngine:
 
             elif condition_name == "agent_type_in":
                 agent_types = (
-                    condition_value
-                    if isinstance(condition_value, list)
-                    else [condition_value]
+                    condition_value if isinstance(condition_value, list) else [condition_value]
                 )
-                if context.get("agent_type", "").upper() not in [
-                    t.upper() for t in agent_types
-                ]:
+                if context.get("agent_type", "").upper() not in [t.upper() for t in agent_types]:
                     return False
 
             elif condition_name == "require_tag":
@@ -939,13 +898,11 @@ class PolicyEngine:
         Raises:
             ValueError: If the file structure is invalid.
         """
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
         return self._parse_policy_yaml(content, source=str(file_path))
 
-    def _parse_policy_yaml(
-        self, yaml_content: str, source: str = "<string>"
-    ) -> list[PolicyRule]:
+    def _parse_policy_yaml(self, yaml_content: str, source: str = "<string>") -> list[PolicyRule]:
         """
         Parse YAML policy content into PolicyRule objects.
 
@@ -965,30 +922,20 @@ class PolicyEngine:
             raise ValueError(f"Invalid YAML in {source}: {exc}") from exc
 
         if not isinstance(data, dict):
-            raise ValueError(
-                f"Policy file {source} must contain a YAML mapping at top level"
-            )
+            raise ValueError(f"Policy file {source} must contain a YAML mapping at top level")
 
         policies = data.get("policies", [])
         if not isinstance(policies, list):
-            raise ValueError(
-                f"'policies' in {source} must be a list"
-            )
+            raise ValueError(f"'policies' in {source} must be a list")
 
         rules: list[PolicyRule] = []
         for idx, policy_data in enumerate(policies):
             if not isinstance(policy_data, dict):
-                raise ValueError(
-                    f"policies[{idx}] in {source} must be a mapping"
-                )
+                raise ValueError(f"policies[{idx}] in {source} must be a mapping")
             if "name" not in policy_data:
-                raise ValueError(
-                    f"policies[{idx}] in {source} is missing required field 'name'"
-                )
+                raise ValueError(f"policies[{idx}] in {source} is missing required field 'name'")
             if "effect" not in policy_data:
-                raise ValueError(
-                    f"policies[{idx}] in {source} is missing required field 'effect'"
-                )
+                raise ValueError(f"policies[{idx}] in {source} is missing required field 'effect'")
 
             try:
                 rule = PolicyRule.from_dict(policy_data)
@@ -1013,11 +960,11 @@ class PolicyEngine:
         """
         for policy_file in policy_files:
             try:
-                with open(policy_file, "r", encoding="utf-8") as f:
+                with open(policy_file, encoding="utf-8") as f:
                     data = yaml.safe_load(f)
                 if isinstance(data, dict) and "version" in data:
                     return str(data["version"])
-            except Exception:
+            except Exception:  # noqa: S112
                 continue
         return "1.0.0"
 
@@ -1052,14 +999,10 @@ class PolicyEngine:
                 )
 
             if key in ("risk_score_above", "risk_score_below"):
-                if not isinstance(value, (int, float)):
-                    errors.append(
-                        f"{prefix}.{key}: must be a number, got {type(value).__name__}"
-                    )
+                if not isinstance(value, int | float):
+                    errors.append(f"{prefix}.{key}: must be a number, got {type(value).__name__}")
                 elif not (0 <= value <= 100):
-                    errors.append(
-                        f"{prefix}.{key}: must be between 0 and 100, got {value}"
-                    )
+                    errors.append(f"{prefix}.{key}: must be between 0 and 100, got {value}")
 
             if key == "time_window":
                 if not isinstance(value, dict):

@@ -138,10 +138,7 @@ class AlignmentReport:
     def has_critical(self) -> bool:
         """Check if any finding is CRITICAL severity."""
         all_findings = (
-            self.over_privileged
-            + self.unused
-            + self.dangerous_unrelated
-            + self.missing_required
+            self.over_privileged + self.unused + self.dangerous_unrelated + self.missing_required
         )
         return any(f.severity == Severity.CRITICAL for f in all_findings)
 
@@ -390,7 +387,6 @@ def _severity_for_danger_category(category: str) -> Severity:
     return Severity.MEDIUM
 
 
-
 # ---------------------------------------------------------------------------
 # Intent Alignment Analyzer
 # ---------------------------------------------------------------------------
@@ -473,23 +469,16 @@ class IntentAlignmentAnalyzer:
 
         # Filter to only ALLOWED permissions for analysis
         allowed_permissions = [
-            p for p in effective_permissions
-            if p.effective_effect == EffectiveEffect.ALLOWED
+            p for p in effective_permissions if p.effective_effect == EffectiveEffect.ALLOWED
         ]
 
         declared_capabilities = agent.declared_capabilities
 
         # Run all detection methods
-        over_privileged = self._detect_over_privilege(
-            declared_capabilities, allowed_permissions
-        )
-        unused = self._detect_unused_permissions(
-            agent, allowed_permissions, usage_data=None
-        )
+        over_privileged = self._detect_over_privilege(declared_capabilities, allowed_permissions)
+        unused = self._detect_unused_permissions(agent, allowed_permissions, usage_data=None)
         dangerous = self._detect_dangerous_unrelated(agent, allowed_permissions)
-        missing = self._detect_missing_permissions(
-            declared_capabilities, allowed_permissions
-        )
+        missing = self._detect_missing_permissions(declared_capabilities, allowed_permissions)
 
         # Calculate alignment score
         alignment_score = self._calculate_alignment_score(
@@ -866,9 +855,7 @@ class IntentAlignmentAnalyzer:
 
                 if service not in service_actions:
                     service_actions[service] = []
-                service_actions[service].append(
-                    {"action": action, "resource": resource}
-                )
+                service_actions[service].append({"action": action, "resource": resource})
 
         # Build statements grouped by service
         for service, perms in sorted(service_actions.items()):
@@ -932,9 +919,7 @@ class IntentAlignmentAnalyzer:
     # Private Helper Methods
     # -----------------------------------------------------------------------
 
-    def _action_is_justified(
-        self, action: str, justified_actions: set[str]
-    ) -> bool:
+    def _action_is_justified(self, action: str, justified_actions: set[str]) -> bool:
         """Check if an action is covered by the justified actions set."""
         if action in justified_actions:
             return True

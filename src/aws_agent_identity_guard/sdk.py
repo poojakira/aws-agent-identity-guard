@@ -15,7 +15,10 @@ import time
 import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Any, Callable, Optional
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 import requests
 import requests.adapters
@@ -136,13 +139,13 @@ class AuthorizationError(GuardError):
     pass
 
 
-class ConnectionError(GuardError):
+class ConnectionError(GuardError):  # noqa: A001
     """Raised when the guard service is unreachable."""
 
     pass
 
 
-class TimeoutError(GuardError):
+class TimeoutError(GuardError):  # noqa: A001
     """Raised when a request to the guard service times out."""
 
     pass
@@ -156,12 +159,12 @@ class TimeoutError(GuardError):
 class _Transaction:
     """Context object for guard transactions."""
 
-    def __init__(self, guard: "AgentIdentityGuard", agent: str, action: str, resource: str):
+    def __init__(self, guard: AgentIdentityGuard, agent: str, action: str, resource: str):
         self._guard = guard
         self.agent = agent
         self.action = action
         self.resource = resource
-        self.decision: Optional[Decision] = None
+        self.decision: Decision | None = None
         self.correlation_id: str = str(uuid.uuid4())
 
     @property
@@ -192,7 +195,7 @@ class AgentIdentityGuard:
     def __init__(
         self,
         endpoint: str = "http://localhost:8000",
-        api_key: Optional[str] = None,
+        api_key: str | None = None,
         timeout: float = 5.0,
         fail_open: bool = False,
     ) -> None:
@@ -240,8 +243,8 @@ class AgentIdentityGuard:
         self,
         method: str,
         path: str,
-        json_body: Optional[dict] = None,
-        params: Optional[dict] = None,
+        json_body: dict | None = None,
+        params: dict | None = None,
     ) -> dict:
         """
         Execute an HTTP request with exponential backoff retry logic.
@@ -249,7 +252,7 @@ class AgentIdentityGuard:
         Thread-safe via the internal lock on session usage.
         """
         url = f"{self._endpoint}{path}"
-        last_exception: Optional[Exception] = None
+        last_exception: Exception | None = None
 
         for attempt in range(self._MAX_RETRIES):
             try:
@@ -292,7 +295,7 @@ class AgentIdentityGuard:
 
                 return response.json()
 
-            except requests.exceptions.Timeout as exc:
+            except requests.exceptions.Timeout:
                 last_exception = TimeoutError(
                     f"Request timed out after {self._timeout}s (attempt {attempt + 1})"
                 )
@@ -341,9 +344,9 @@ class AgentIdentityGuard:
         self,
         method: str,
         path: str,
-        json_body: Optional[dict] = None,
-        params: Optional[dict] = None,
-        fail_open_default: Optional[dict] = None,
+        json_body: dict | None = None,
+        params: dict | None = None,
+        fail_open_default: dict | None = None,
     ) -> dict:
         """
         Request wrapper respecting fail_open semantics.
@@ -369,12 +372,12 @@ class AgentIdentityGuard:
     def authorize(
         self,
         agent: str,
-        tool: Optional[str] = None,
-        action: Optional[str] = None,
-        resource: Optional[str] = None,
-        principal: Optional[str] = None,
-        data_classification: Optional[str] = None,
-        context: Optional[dict] = None,
+        tool: str | None = None,
+        action: str | None = None,
+        resource: str | None = None,
+        principal: str | None = None,
+        data_classification: str | None = None,
+        context: dict | None = None,
     ) -> Decision:
         """
         Request an authorization decision for an agent action.
@@ -445,7 +448,7 @@ class AgentIdentityGuard:
         environment: str,
         purpose: str,
         iam_role_arn: str,
-        declared_capabilities: Optional[list] = None,
+        declared_capabilities: list | None = None,
         data_classification: str = "INTERNAL",
     ) -> AgentInfo:
         """
@@ -704,10 +707,10 @@ class AgentIdentityGuard:
     def protect(
         self,
         agent: str,
-        action: Optional[str] = None,
-        tool: Optional[str] = None,
-        resource: Optional[str] = None,
-        data_classification: Optional[str] = None,
+        action: str | None = None,
+        tool: str | None = None,
+        resource: str | None = None,
+        data_classification: str | None = None,
     ) -> Callable:
         """
         Decorator that enforces authorization before function execution.
@@ -785,7 +788,7 @@ class AgentIdentityGuard:
 
         try:
             txn.decision = self.authorize(agent=agent, action=action, resource=resource)
-        except (ConnectionError, TimeoutError) as exc:
+        except (ConnectionError, TimeoutError):
             if self._fail_open:
                 txn.decision = Decision(
                     decision="ALLOW",
@@ -802,7 +805,8 @@ class AgentIdentityGuard:
             yield txn
         finally:
             logger.debug(
-                "Transaction complete: agent=%s action=%s resource=%s decision=%s correlation_id=%s",
+                "Transaction complete: agent=%s action=%s resource=%s"
+                " decision=%s correlation_id=%s",
                 agent,
                 action,
                 resource,
@@ -819,7 +823,7 @@ class AgentIdentityGuard:
         with self._lock:
             self._session.close()
 
-    def __enter__(self) -> "AgentIdentityGuard":
+    def __enter__(self) -> AgentIdentityGuard:
         return self
 
     def __exit__(self, *args: Any) -> None:

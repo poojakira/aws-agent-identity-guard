@@ -20,15 +20,13 @@ from aws_agent_identity_guard.authorization import (
 from aws_agent_identity_guard.models import (
     AgentIdentity,
     AgentType,
-    AuditEvent,
     AuthorizationDecisionType,
     DataClassification,
     Environment,
     TransactionRequest,
 )
-from aws_agent_identity_guard.policy_engine import PolicyEffect, PolicyEngine, PolicyRule
+from aws_agent_identity_guard.policy_engine import PolicyEngine
 from aws_agent_identity_guard.risk_engine import RiskEngine
-
 
 # ─── Fixtures ─────────────────────────────────────────────────────────────────
 
