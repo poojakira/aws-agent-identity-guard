@@ -3,15 +3,19 @@
 from aws_agent_identity_guard.scanner import scan_policy_document, scan_trust_policy
 from aws_agent_identity_guard.sdk import (
     AgentIdentityGuard,
-    Decision,
     AgentInfo,
-    PermissionInfo,
-    AttackPathInfo,
-    RiskScoreInfo,
     ApprovalInfo,
-    GuardError,
+    AttackPathInfo,
     AuthorizationError,
+    Decision,
+    GuardError,
+    PermissionInfo,
+    RiskScoreInfo,
+)
+from aws_agent_identity_guard.sdk import (
     ConnectionError as GuardConnectionError,
+)
+from aws_agent_identity_guard.sdk import (
     TimeoutError as GuardTimeoutError,
 )
 

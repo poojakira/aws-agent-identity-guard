@@ -33,21 +33,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from aws_agent_identity_guard.approval import ApprovalManager, ApprovalPolicy
+from aws_agent_identity_guard.approval import ApprovalManager, ApprovalPolicy  # noqa: F401
 from aws_agent_identity_guard.authorization import (
     AgentRegistry,
     AuthorizationConfig,
     AuthorizationEngine,
     AuthorizationMode,
-    LatencyTracker,
+    LatencyTracker,  # noqa: F401
 )
 from aws_agent_identity_guard.models import (
     AgentIdentity,
     AgentType,
-    ApprovalStatus,
+    ApprovalStatus,  # noqa: F401
     DataClassification,
     Environment,
-    RiskScore,
+    RiskScore,  # noqa: F401
     TransactionRequest,
 )
 from aws_agent_identity_guard.policy_engine import PolicyEngine
@@ -114,12 +114,8 @@ class RegisterAgentRequest(BaseModel):
     purpose: str = Field(default="", description="Agent's intended function")
     description: str = Field(default="", description="Extended description")
     iam_role_arn: str | None = Field(default=None, description="Bound IAM role ARN")
-    data_classification: str = Field(
-        default="INTERNAL", description="Data sensitivity level"
-    )
-    declared_capabilities: list[str] = Field(
-        default_factory=list, description="Capability strings"
-    )
+    data_classification: str = Field(default="INTERNAL", description="Data sensitivity level")
+    declared_capabilities: list[str] = Field(default_factory=list, description="Capability strings")
     tags: dict[str, str] = Field(default_factory=dict, description="Metadata tags")
 
     class Config:
@@ -293,8 +289,7 @@ async def lifespan(app: FastAPI):
     """Application lifespan handler for startup/shutdown."""
     state = get_app_state()
     logger.info(
-        "AWS Agent Identity Guard API starting: "
-        "mode=%s, policy_rules=%d, registered_agents=%d",
+        "AWS Agent Identity Guard API starting: " "mode=%s, policy_rules=%d, registered_agents=%d",
         state.authorization_engine.config.mode.value,
         state.policy_engine.rule_count,
         state.agent_registry.count,
@@ -479,7 +474,7 @@ async def authorize_transaction(body: AuthorizeRequest) -> AuthorizeResponse:
             context=body.context,
         )
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=f"Invalid request: {exc}")
+        raise HTTPException(status_code=400, detail=f"Invalid request: {exc}") from exc
 
     # Execute authorization
     decision = state.authorization_engine.authorize(transaction)
@@ -570,7 +565,7 @@ async def register_agent(body: RegisterAgentRequest) -> AgentResponse:
             tags=body.tags,
         )
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=f"Invalid agent data: {exc}")
+        raise HTTPException(status_code=400, detail=f"Invalid agent data: {exc}") from exc
 
     state.agent_registry.register(agent)
     logger.info("Registered new agent: %s (%s)", agent.name, agent.agent_id)
@@ -595,8 +590,7 @@ async def get_agent_permissions(agent_id: str) -> PermissionResponse:
     # In a full implementation, this would call EffectivePermissionAnalyzer
     # For now, return declared capabilities as a permissions representation
     permissions = [
-        {"action": cap, "resource": "*", "effect": "ALLOWED"}
-        for cap in agent.declared_capabilities
+        {"action": cap, "resource": "*", "effect": "ALLOWED"} for cap in agent.declared_capabilities
     ]
 
     return PermissionResponse(
@@ -654,7 +648,7 @@ async def request_approval(body: ApprovalRequestBody) -> ApprovalResponse:
             ttl_seconds=body.ttl_seconds,
         )
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     return _approval_to_response(approval)
 
@@ -675,7 +669,7 @@ async def check_approval_status(request_id: str) -> ApprovalResponse:
     except KeyError:
         raise HTTPException(
             status_code=404, detail=f"Approval request '{request_id}' not found"
-        )
+        ) from None
 
     return _approval_to_response(approval)
 
@@ -700,11 +694,11 @@ async def approve_request(request_id: str, body: ApprovalActionBody) -> Approval
     except KeyError:
         raise HTTPException(
             status_code=404, detail=f"Approval request '{request_id}' not found"
-        )
+        ) from None
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except PermissionError as exc:
-        raise HTTPException(status_code=403, detail=str(exc))
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
 
     return _approval_to_response(approval)
 
@@ -729,11 +723,11 @@ async def deny_request(request_id: str, body: ApprovalActionBody) -> ApprovalRes
     except KeyError:
         raise HTTPException(
             status_code=404, detail=f"Approval request '{request_id}' not found"
-        )
+        ) from None
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except PermissionError as exc:
-        raise HTTPException(status_code=403, detail=str(exc))
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
 
     return _approval_to_response(approval)
 
