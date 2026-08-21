@@ -4,12 +4,12 @@ aws_agent_identity_guard/risk_engine.py
 Multidimensional risk scoring engine for AI agent authorization decisions.
 
 Evaluates agent identities and transaction requests across six risk dimensions:
-  • Privilege level — dangerous IAM actions (iam:*, sts:AssumeRole, PassRole)
-  • Sensitivity — data classification and access to secrets/KMS
-  • Blast radius — wildcard resources, cross-account, service breadth
-  • Data exposure — S3 public access, DynamoDB scan, logs access
-  • Persistence — ability to create roles, policies, users, backdoors
-  • Lateral movement — lambda invoke, assume-role chains, SSM sessions
+  • Privilege level  --  dangerous IAM actions (iam:*, sts:AssumeRole, PassRole)
+  • Sensitivity  --  data classification and access to secrets/KMS
+  • Blast radius  --  wildcard resources, cross-account, service breadth
+  • Data exposure  --  S3 public access, DynamoDB scan, logs access
+  • Persistence  --  ability to create roles, policies, users, backdoors
+  • Lateral movement  --  lambda invoke, assume-role chains, SSM sessions
 
 Each dimension produces an independent 0-100 score. An environment multiplier
 (production=1.5, staging=1.2, development=0.8) is applied to the weighted

@@ -364,7 +364,7 @@ _ESCALATION_PATTERNS: list[_EscalationPattern] = [
             "Lambda code signing. Monitor for function code changes."
         ),
         description=(
-            "Does not require PassRole — exploits whatever role the existing Lambda "
+            "Does not require PassRole  --  exploits whatever role the existing Lambda "
             "already has. Particularly dangerous for functions with broad permissions."
         ),
     ),
@@ -402,7 +402,7 @@ _ESCALATION_PATTERNS: list[_EscalationPattern] = [
             "Glue Studio. Monitor for endpoint configuration changes."
         ),
         description=(
-            "Does not require PassRole — uses the existing endpoint's role. Adding "
+            "Does not require PassRole  --  uses the existing endpoint's role. Adding "
             "an SSH key provides persistent shell access."
         ),
     ),
@@ -765,7 +765,7 @@ class EscalationDetector:
         # Filter to allowed permissions
         allowed = self._filter_allowed(effective_permissions)
         if not allowed:
-            logger.info("No allowed permissions — no escalation paths possible")
+            logger.info("No allowed permissions  --  no escalation paths possible")
             return []
 
         # Extract the set of available actions

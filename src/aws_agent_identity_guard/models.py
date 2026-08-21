@@ -404,7 +404,7 @@ class AgentCapability:
     """
     Declares a specific capability an agent is authorized to exercise.
 
-    Used for capability-based access control beyond IAM — tracks what services,
+    Used for capability-based access control beyond IAM  --  tracks what services,
     data stores, and external endpoints an agent may interact with.
 
     Attributes:

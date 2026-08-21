@@ -136,7 +136,7 @@ def _condition_applies(conditions: dict[str, Any], context: dict[str, Any]) -> b
                 if if_exists:
                     # IfExists: condition is satisfied if key is missing
                     continue
-                # Cannot evaluate — return None (CONDITIONAL)
+                # Cannot evaluate  --  return None (CONDITIONAL)
                 return None
 
             # Evaluate based on operator
@@ -168,7 +168,7 @@ def _condition_applies(conditions: dict[str, Any], context: dict[str, Any]) -> b
                 if context_str not in condition_values:
                     return False
             elif base_op == "ipaddress":
-                # Simplified IP matching — production would use ipaddress module
+                # Simplified IP matching  --  production would use ipaddress module
                 if context_str not in condition_values:
                     return None  # Cannot fully evaluate without CIDR logic
             elif base_op == "bool":
@@ -201,7 +201,7 @@ def _condition_applies(conditions: dict[str, Any], context: dict[str, Any]) -> b
                     if expect_null != is_null:
                         return False
             else:
-                # Unknown operator — cannot evaluate
+                # Unknown operator  --  cannot evaluate
                 logger.warning("Unknown condition operator: %s", operator)
                 return None
 
@@ -471,9 +471,9 @@ class EffectivePermissionAnalyzer:
                 perms = self._evaluate_statement(statement, PolicySource.SCP)
                 scp_allows.extend(p for p in perms if p.effect == PermissionEffect.ALLOW)
 
-        # If no SCP allows exist, this means FullAWSAccess is not present — deny all
+        # If no SCP allows exist, this means FullAWSAccess is not present  --  deny all
         if not scp_allows:
-            logger.warning("No SCP allows found — all permissions will be denied")
+            logger.warning("No SCP allows found  --  all permissions will be denied")
             return []
 
         # Intersect: keep only permissions covered by SCP allows
@@ -650,12 +650,12 @@ class EffectivePermissionAnalyzer:
             if perm.effect != PermissionEffect.DENY:
                 continue
             if _action_matches(perm.action, action) and _resource_matches(perm.resource, resource):
-                # Check if the deny has conditions — if so, it may not always apply
+                # Check if the deny has conditions  --  if so, it may not always apply
                 if not perm.conditions:
                     return True
                 # Deny with conditions: still counts as explicit deny
                 # (conditions on deny make it conditional, but we flag it as denied
-                # for safety — the deny may or may not fire depending on context)
+                # for safety  --  the deny may or may not fire depending on context)
                 return True
 
         return False
@@ -808,13 +808,13 @@ class EffectivePermissionAnalyzer:
                     ),
                 )
             elif cond_result is None:
-                # Deny has conditions we can't evaluate — flag as conditional
+                # Deny has conditions we can't evaluate  --  flag as conditional
                 reasons.append(
-                    f"Conditional DENY from {deny.source.value} — "
+                    f"Conditional DENY from {deny.source.value}  --  "
                     f"conditions could not be fully evaluated"
                 )
 
-        # Step 3: Check allows — must pass through all intersection layers
+        # Step 3: Check allows  --  must pass through all intersection layers
         identity_allows = [p for p in all_allows if p.source == PolicySource.IDENTITY_POLICY]
         resource_allows = [p for p in all_allows if p.source == PolicySource.RESOURCE_POLICY]
         boundary_allows = [p for p in all_allows if p.source == PolicySource.PERMISSION_BOUNDARY]
@@ -1012,7 +1012,7 @@ class EffectivePermissionAnalyzer:
             # Check if this specific action was ever used
             action_lower = perm.action.lower()
 
-            # Handle wildcards in the permission — can't definitively say unused
+            # Handle wildcards in the permission  --  can't definitively say unused
             if "*" in perm.action:
                 # For wildcard permissions, check if ANY matching action was used
                 any_used = any(
@@ -1026,7 +1026,7 @@ class EffectivePermissionAnalyzer:
                         contributing_policies=perm.contributing_policies,
                         conditions_required=perm.conditions_required,
                         evaluation_reason=(
-                            f"Wildcard permission {perm.action} on {perm.resource} — "
+                            f"Wildcard permission {perm.action} on {perm.resource}  --  "
                             f"no matching actions found in CloudTrail events."
                         ),
                     ))

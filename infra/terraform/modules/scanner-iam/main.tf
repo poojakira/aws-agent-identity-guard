@@ -68,7 +68,7 @@ data "aws_iam_policy_document" "scanner_permissions" {
       "iam:ListUserTags",
     ]
     resources = ["*"]
-    # NOTE: IAM is a global service — region conditions do NOT apply.
+    # NOTE: IAM is a global service  --  region conditions do NOT apply.
     # Resource-level restriction is not possible for iam:List*/Get* actions
     # because they operate on account-wide resources.
     # The scope is inherently limited to the account containing this role.
@@ -137,7 +137,7 @@ resource "aws_cloudwatch_log_group" "scanner" {
 
 output "scanner_role_arn" {
   value       = aws_iam_role.scanner.arn
-  description = "ARN of the IAM scanner role — provide to CI as AWS_ROLE_ARN."
+  description = "ARN of the IAM scanner role  --  provide to CI as AWS_ROLE_ARN."
 }
 
 output "scanner_policy_arn" {

@@ -6,13 +6,13 @@ Attack-path analysis engine for AI agent identities.
 Discovers and ranks potential attack chains available to an agent based on its
 effective permissions. Identifies multi-step escalation paths including:
 
-  • Role chaining — Agent -> AssumeRole -> Role B -> further privilege
-  • PassRole exploitation — Agent -> PassRole -> Lambda/ECS -> escalated access
-  • Data exfiltration — Agent -> S3/DynamoDB/Athena -> sensitive data
-  • Credential theft — Agent -> SecretsManager/SSM/KMS -> harvested credentials
-  • Lateral movement — Agent -> Lambda/SSM/ECS -> pivot to other services
-  • Persistence — Agent -> CreateRole/CreateUser/EventBridge -> backdoor access
-  • Confused deputy — Cross-service exploitation via misconfigured trust
+  • Role chaining  --  Agent -> AssumeRole -> Role B -> further privilege
+  • PassRole exploitation  --  Agent -> PassRole -> Lambda/ECS -> escalated access
+  • Data exfiltration  --  Agent -> S3/DynamoDB/Athena -> sensitive data
+  • Credential theft  --  Agent -> SecretsManager/SSM/KMS -> harvested credentials
+  • Lateral movement  --  Agent -> Lambda/SSM/ECS -> pivot to other services
+  • Persistence  --  Agent -> CreateRole/CreateUser/EventBridge -> backdoor access
+  • Confused deputy  --  Cross-service exploitation via misconfigured trust
 
 Each path is scored with:
   • likelihood (0.0-1.0): probability of successful exploitation
@@ -94,7 +94,7 @@ class AttackPathAnalyzer:
         # Filter to allowed permissions only
         allowed = self._filter_allowed(effective_permissions)
         if not allowed:
-            logger.info("No allowed permissions — no attack paths possible")
+            logger.info("No allowed permissions  --  no attack paths possible")
             return []
 
         all_paths: list[AttackPath] = []
