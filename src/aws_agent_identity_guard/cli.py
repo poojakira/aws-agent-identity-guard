@@ -197,6 +197,14 @@ def main(argv: list[str] | None = None) -> int:
             "for each finding. Outputs ready-to-apply infrastructure fixes."
         ),
     )
+    parser.add_argument(
+        "--enforce",
+        action="store_true",
+        help=(
+            "Enforce mode: fail on incomplete scans (truncated, errors) in addition to "
+            "high/critical findings. Use in CI/CD gates to prevent partial scans from passing."
+        ),
+    )
     args = parser.parse_args(argv)
 
     # ── Live scan mode ────────────────────────────────────────────────────────
@@ -231,6 +239,11 @@ def main(argv: list[str] | None = None) -> int:
             report_dict["summary"].get("critical", 0) + report_dict["summary"].get("high", 0) > 0
         )
 
+        # Enforce mode: fail on incomplete scans
+        scan_complete = report_dict.get("scan_complete", True)
+        has_errors = len(report_dict.get("errors", [])) > 0
+        enforce_fail = args.enforce and (not scan_complete or has_errors)
+
         if args.format == "json":
             output_text = json.dumps(report_dict, indent=2, default=str)
         elif args.format == "sarif":
@@ -251,7 +264,12 @@ def main(argv: list[str] | None = None) -> int:
             output_text = json.dumps(_build_sarif(sarif_path, sarif_findings), indent=2)
         else:
             _print_live_text(report_dict)
-            return 1 if has_high else 0
+            if enforce_fail:
+                if not scan_complete:
+                    print(f"ENFORCE FAIL: Incomplete scan - {report_dict.get('completeness_reason', 'unknown reason')}")
+                if has_errors:
+                    print(f"ENFORCE FAIL: Scan errors - {report_dict['errors']}")
+            return 1 if (has_high or enforce_fail) else 0
 
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -260,7 +278,7 @@ def main(argv: list[str] | None = None) -> int:
         else:
             print(output_text)
 
-        return 1 if has_high else 0
+        return 1 if (has_high or enforce_fail) else 0
 
     # ── Static analysis mode ──────────────────────────────────────────────────
     if args.policy is None:

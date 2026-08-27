@@ -358,7 +358,7 @@ class LiveAccountScanner:
                 )
             )
 
-        return roles
+        return roles, was_truncated, total_discovered
 
     def _enumerate_users(self) -> list[UserSummary]:
         """List all IAM users in the account."""
