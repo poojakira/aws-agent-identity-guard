@@ -213,6 +213,13 @@ To re-verify after changes:
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests/ -q
 ```
 
+
+## Additional Documentation
+
+- [INCIDENT_RUNBOOK.md](INCIDENT_RUNBOOK.md) - incident response for false positives and escalation patterns
+- [docs/PERFORMANCE_BASELINE.md](docs/PERFORMANCE_BASELINE.md) - scan performance baselines and regression gates
+- [enchmarks/perf_gate.py](benchmarks/perf_gate.py) - CI performance gate (p95 < 10ms, >1000 policies/sec)
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

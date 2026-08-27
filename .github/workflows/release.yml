@@ -1,0 +1,159 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  id-token: write # Required for Sigstore signing and trusted publishing
+  attestations: write
+
+jobs:
+  build:
+    name: Build distribution packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools
+        run: pip install build==1.2.1
+
+      - name: Build wheel and sdist
+        run: python -m build
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 5
+
+  sbom:
+    name: Generate CycloneDX SBOM
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install CycloneDX tooling
+        run: pip install cyclonedx-bom==4.5.0
+
+      - name: Generate SBOM
+        run: |
+          cyclonedx-py environment \
+            --output sbom.cdx.json \
+            --format json \
+            --schema-version 1.5
+
+      - name: Generate source SBOM from requirements
+        run: |
+          cyclonedx-py requirements \
+            --input-file requirements-dev.txt \
+            --output sbom-dev.cdx.json \
+            --format json \
+            --schema-version 1.5 || true
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: "*.cdx.json"
+          retention-days: 5
+
+  sign:
+    name: Sign with Sigstore and create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build, sbom]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Download SBOM
+        uses: actions/download-artifact@v4
+        with:
+          name: sbom
+          path: sbom/
+
+      - name: Install Sigstore
+        run: pip install sigstore==3.1.0
+
+      - name: Sign distribution packages
+        run: |
+          for file in dist/*; do
+            sigstore sign "$file"
+          done
+
+      - name: Sign SBOM
+        run: |
+          for file in sbom/*.cdx.json; do
+            sigstore sign "$file"
+          done
+
+      - name: Generate attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: "dist/*"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*
+            dist/*.sigstore.json
+            sbom/*.cdx.json
+            sbom/*.sigstore.json
+          body: |
+            ## Verification
+
+            All artifacts are signed with [Sigstore](https://www.sigstore.dev/).
+
+            ```bash
+            pip install sigstore
+            sigstore verify identity \
+              --cert-identity "https://github.com/${{ github.repository }}/.github/workflows/release.yml@${{ github.ref }}" \
+              --cert-oidc-issuer "https://token.actions.githubusercontent.com" \
+              <artifact>
+            ```
+
+            ## SBOM
+
+            CycloneDX SBOM is attached as `sbom.cdx.json`.
+
+  publish:
+    name: Publish to PyPI (trusted publisher)
+    runs-on: ubuntu-latest
+    needs: sign
+    environment:
+      name: pypi
+      url: https://pypi.org/p/aws-agent-identity-guard
+    permissions:
+      id-token: write # Required for trusted publishing
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          print-hash: true
