@@ -15,26 +15,22 @@ import pytest
 # Ensure the source is importable
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from aws_agent_identity_guard import scan_policy
-from aws_agent_identity_guard.scanner import scan_policy as scanner_scan_policy
+# The public API exposes scan_policy_document; alias it as scan_policy for these tests.
+from aws_agent_identity_guard import scan_policy_document as scan_policy
+from aws_agent_identity_guard.scanner import (
+    scan_policy_document as scanner_scan_policy,
+)
 
 # Attempt to import remediation module (may not exist in all versions)
 try:
-    from aws_agent_identity_guard import remediate
-    HAS_REMEDIATE = True
-except ImportError:
-    try:
-        from aws_agent_identity_guard.remediate import generate_remediation
-        HAS_REMEDIATE = True
-    except ImportError:
-        HAS_REMEDIATE = False
+    from aws_agent_identity_guard import remediate  # noqa: F401
 
-# Attempt to import rules module
-try:
-    from aws_agent_identity_guard.rules import get_rules, evaluate_rule
-    HAS_RULES = True
+    HAS_REMEDIATE = hasattr(remediate, "generate_remediations")
 except ImportError:
-    HAS_RULES = False
+    HAS_REMEDIATE = False
+
+# Rules are defined as data/patterns inside scanner.py, not a separate rules API.
+HAS_RULES = False
 
 
 # ===========================================================================
@@ -472,21 +468,15 @@ class TestRemediateOutput:
         }
         findings = scan_policy(policy)
         if findings:
-            try:
-                result = remediate.generate_remediation(findings[0])
-                assert result is not None
-                assert isinstance(result, (str, dict))
-            except AttributeError:
-                result = generate_remediation(findings[0])
-                assert result is not None
+            result = remediate.generate_remediations(findings)
+            assert result is not None
+            assert isinstance(result, (list, dict))
 
     def test_remediate_empty_findings(self):
         """Remediation with no findings should handle gracefully."""
-        try:
-            result = remediate.generate_remediation(None)
-            # Should return None or empty
-        except (AttributeError, TypeError, ValueError):
-            pass
+        result = remediate.generate_remediations([])
+        assert result is not None
+        assert len(result) == 0 if hasattr(result, "__len__") else True
 
     def test_remediate_multiple_findings(self):
         """Generate remediation for multiple findings."""
@@ -498,12 +488,8 @@ class TestRemediateOutput:
             ],
         }
         findings = scan_policy(policy)
-        for finding in findings:
-            try:
-                result = remediate.generate_remediation(finding)
-                assert result is not None
-            except (AttributeError, TypeError):
-                pass
+        result = remediate.generate_remediations(findings)
+        assert result is not None
 
 
 # ===========================================================================

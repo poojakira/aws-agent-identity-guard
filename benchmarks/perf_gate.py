@@ -92,19 +92,12 @@ def generate_policy(num_statements: int = 5) -> dict:
 
 def run_benchmark(num_policies: int = 500) -> dict:
     """Run the performance benchmark and return results."""
-    # Import the scanner - adjust import path as needed
+    # Import the scanner (public API exposes scan_policy_document)
     try:
-        from aws_agent_identity_guard import scan_policy
+        from aws_agent_identity_guard import scan_policy_document as scan_policy
     except ImportError:
-        try:
-            from aws_agent_identity_guard.scanner import scan_policy
-        except ImportError:
-            # Fallback: try to find the module in the project
-            sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
-            try:
-                from aws_agent_identity_guard import scan_policy
-            except ImportError:
-                from aws_agent_identity_guard.scanner import scan_policy
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+        from aws_agent_identity_guard import scan_policy_document as scan_policy
 
     # Generate policies
     random.seed(42)  # Reproducible benchmarks
