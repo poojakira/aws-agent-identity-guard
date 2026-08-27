@@ -17,7 +17,7 @@ def _pkg_version() -> str:
 def _load_json(path: Path) -> dict:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError) as exc:
         raise SystemExit(f"failed to read policy JSON: {exc}") from exc
     if not isinstance(data, dict):
         raise SystemExit("policy JSON must be an object")

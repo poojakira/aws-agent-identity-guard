@@ -173,6 +173,46 @@ Some developer workstations load unrelated pytest plugins globally. To run this 
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests -q
 ```
 
+## Known Limitations
+
+- **Static analysis only.** This tool reads IAM policy JSON and produces findings. It does not intercept API calls, enforce runtime deny decisions, or act as a policy enforcement point. There is no "fail-closed" behavior because it is not a runtime system.
+- **No semantic understanding of Condition keys.** The scanner checks for the *presence* of specific Condition keys (e.g., `iam:PassedToService`, `aws:SourceArn`) but does not evaluate whether the condition values are logically sufficient to mitigate a risk.
+- **Single-policy scope.** Each invocation analyzes one policy document in isolation. Cross-policy interactions (e.g., a permissive identity policy constrained by an SCP or permission boundary) are not considered.
+- **Action pattern matching is prefix-based.** Wildcard detection uses prefix/fnmatch logic. Unusual action name formats or future AWS service namespaces may not be covered until rules are updated.
+- **No AWS API calls in default mode.** The tool cannot resolve resource ARNs, check whether a role actually exists, or determine effective permissions. Use IAM Access Analyzer or CloudTrail for runtime validation.
+- **Trust policy analysis requires explicit invocation.** `scan_trust_policy()` must be called separately; it is not triggered by passing a standard identity policy to `scan_policy_document()`.
+- **Large policies may produce many findings.** A policy with 200+ actions in a single statement will trigger multiple overlapping rules. Findings are not deduplicated across rules by design — each rule surfaces a distinct risk vector.
+
+## Failure Semantics
+
+This tool is a static linter. It reads a file, analyzes it, and exits. There is no persistent process, no daemon, no network listener, and no fail-open/fail-closed runtime behavior.
+
+| Exit Code | Meaning | When It Happens |
+|-----------|---------|-----------------|
+| **0** | Clean scan | No critical or high-severity findings were detected. The policy may still have medium/low findings. |
+| **1** | Findings detected | At least one critical or high-severity finding exists. In `--enforce` mode with `--live-scan`, also returned when the scan was incomplete or encountered errors. |
+| **2** | Input/CLI error | The input file does not exist, is not valid JSON, is not a JSON object, cannot be decoded as UTF-8, or the CLI was invoked with invalid arguments. The tool prints a diagnostic message to stderr/stdout and exits immediately. |
+
+**Design rationale:** Exit code 2 signals "the tool could not do its job" — the input was unusable. Exit code 1 signals "the tool did its job and found problems." CI pipelines should treat exit 2 as an infrastructure failure (fix the input), and exit 1 as a policy gate (fix the policy or accept the risk).
+
+**No fail-closed behavior:** Because this is not a runtime gatekeeper, there is no concept of "fail closed." If the tool cannot parse the input, it exits 2 and produces no findings — it does not block or allow anything. Whether a CI pipeline treats exit 2 as a blocking failure is a pipeline-configuration decision, not a tool decision.
+
+## Verification
+
+| Field | Value |
+|-------|-------|
+| Tested commit | `ee090fda4a20b27874da96b30ea1eb073dd8ac11` |
+| Environment | Python 3.12, Windows 11, pytest 8.x |
+| Last verified | 2026-08-27 |
+| Test command | `python -m pytest tests/ -q` |
+| Coverage | All 25 rules have positive/negative test cases; failure modes tested in `tests/test_failure_modes.py` |
+
+To re-verify after changes:
+
+```bash
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests/ -q
+```
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
