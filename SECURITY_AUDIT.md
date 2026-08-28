@@ -49,7 +49,7 @@ The tool only emits `text` and `json` output. GitHub Code Scanning (GHAS) and ma
 
 ### SEC-04 · LOW — `bandit` run scope in CI was limited to a subdirectory
 
-The `security` job ran `bandit -r src/aws_agent_identity_guard -ll`. This is correct for the existing code; no change needed. Confirmed: no bandit findings in the codebase (no `subprocess`, `eval`, `exec`, `pickle`, `yaml.load`, `tempfile` without `mkstemp`, or shell-injection patterns present).
+The `security` job ran `bandit -r src/ -ll`. This is correct for the existing code; no change needed. Confirmed: no bandit findings in the codebase (no `subprocess`, `eval`, `exec`, `pickle`, `yaml.load`, `tempfile` without `mkstemp`, or shell-injection patterns present).
 
 **Status:** No change needed. Noted for record.
 

@@ -41,7 +41,7 @@ pip-audit --skip-editable
 
 1. Add a constant or helper in `scanner.py` if needed.
 2. Add the rule logic in `scan_policy_document()` or `scan_trust_policy()`.
-3. Use the next available rule ID (`AIG-NNN` for identity policies, `AIG-TP-NNN` for trust policies).
+3. Use the next available rule ID (`AIGNNN` for identity policies, `AIG-TP001` format for trust policies).
 4. Add a test in `tests/test_scanner.py` with at least one triggering fixture and one non-triggering fixture.
 5. Document the rule in `SECURITY_AUDIT.md` under "New Rules Added."
 

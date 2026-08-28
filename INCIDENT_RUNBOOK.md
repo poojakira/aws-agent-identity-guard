@@ -9,7 +9,7 @@ This runbook covers operational incidents related to the IAM identity guard tool
 1. [False Positive in Production CI Gate](#1-false-positive-in-production-ci-gate)
 2. [New Privilege Escalation Pattern Discovered](#2-new-privilege-escalation-pattern-discovered)
 3. [Live Scanner Rate Limiting by AWS](#3-live-scanner-rate-limiting-by-aws)
-4. [Remediation Template Generates Broken Terraform](#4-remediation-template-generates-broken-terraform)
+4. [Misleading Remediation Suggestion](#4-misleading-remediation-suggestion)
 
 ---
 
@@ -39,16 +39,11 @@ This runbook covers operational incidents related to the IAM identity guard tool
    - Check if it's a Deny statement being incorrectly evaluated.
 
 3. **Temporary bypass (if deployment is urgent):**
-   ```yaml
-   # Add inline suppression to the policy annotation
-   # In your CI config:
-   identity-guard scan --suppress RULE-ID --reason "FP: conditions restrict to org only"
-   ```
 
-   Or set the environment variable:
-   ```bash
-   export IDENTITY_GUARD_SUPPRESS="RULE-042,RULE-017"
-   ```
+   The scanner has no suppression flag. To unblock an urgent deploy, gate the
+   scan step in CI behind a manual approval, or run the scan in a non-blocking
+   (advisory) job so the exit code does not fail the pipeline. Re-enable the
+   blocking gate as soon as the finding is triaged.
 
 4. **Document the bypass** in your team's incident channel with:
    - The policy ARN or file path
@@ -60,11 +55,13 @@ This runbook covers operational incidents related to the IAM identity guard tool
 
 1. **Reproduce locally:**
    ```bash
-   identity-guard scan --policy-file ./the-policy.json --verbose
+   aws-agent-identity-guard ./the-policy.json --format json
    ```
 
 2. **Check rule logic:**
-   - Review the rule definition in `src/aws_agent_identity_guard/rules/`
+   - Review the rule logic inline in `src/aws_agent_identity_guard/scanner.py`
+     (rules are implemented in `scan_policy_document()` / `scan_trust_policy()`
+     with IDs like `AIG002`; there is no separate `rules/` directory).
    - Determine if the rule accounts for Condition blocks
    - Check if the rule handles `NotAction`/`NotResource` correctly
 
@@ -105,8 +102,8 @@ This runbook covers operational incidents related to the IAM identity guard tool
 
 1. **Assess exposure:**
    ```bash
-   # Scan all policies for the new pattern manually
-   identity-guard scan --live --profile prod-readonly | grep -i "PassRole\|CreatePolicy\|AssumeRole"
+   # Scan all roles in the account/region for the new pattern
+   AWS_PROFILE=prod-readonly aws-agent-identity-guard --live-scan --format json | grep -i "PassRole\|CreatePolicy\|AssumeRole"
    ```
 
 2. **Document the escalation path:**
@@ -118,37 +115,38 @@ This runbook covers operational incidents related to the IAM identity guard tool
 
 ### Developing the New Rule (< 24 hours)
 
-1. **Create the rule definition:**
+1. **Add the rule logic:**
    ```python
-   # src/aws_agent_identity_guard/rules/new_rule.py
-   RULE = {
-       "id": "RULE-026",
-       "name": "privilege-escalation-via-<technique>",
-       "severity": "CRITICAL",
-       "description": "Detects <technique> privilege escalation pattern",
-       "actions": ["iam:<action1>", "iam:<action2>"],
-       "condition": "all_present",  # or "any_present"
-       "resource": "*",
-   }
+   # src/aws_agent_identity_guard/scanner.py
+   # Rules are implemented inline inside scan_policy_document() (or
+   # scan_trust_policy() for trust-policy checks). Add a new check with the
+   # next available AIG ID, e.g. AIG022:
+   #
+   #   findings.append(Finding(
+   #       rule_id="AIG022",
+   #       severity="CRITICAL",
+   #       message="Detects <technique> privilege escalation pattern",
+   #       ...
+   #   ))
    ```
 
 2. **Add test cases:**
    ```python
-   # tests/test_new_escalation.py
+   # tests/test_scanner.py
    def test_detects_new_escalation():
-       policy = { ... }  # The vulnerable pattern
-       findings = scan_policy(policy)
-       assert any(f["rule_id"] == "RULE-026" for f in findings)
+       document = { ... }  # The vulnerable pattern
+       findings = scan_policy_document(document)
+       assert any(f["rule_id"] == "AIG022" for f in findings)
 
    def test_no_false_positive_on_safe_variant():
-       policy = { ... }  # Similar but safe pattern
-       findings = scan_policy(policy)
-       assert not any(f["rule_id"] == "RULE-026" for f in findings)
+       document = { ... }  # Similar but safe pattern
+       findings = scan_policy_document(document)
+       assert not any(f["rule_id"] == "AIG022" for f in findings)
    ```
 
 3. **Run the full test suite:**
    ```bash
-   pytest --cov --cov-fail-under=90
+   pytest tests/ -v
    ```
 
 4. **Release a patch version immediately:**
@@ -182,15 +180,15 @@ This runbook covers operational incidents related to the IAM identity guard tool
 1. **Confirm throttling:**
    ```bash
    # Check for throttling errors in output
-   identity-guard scan --live --profile prod-readonly 2>&1 | grep -i "throttl\|rate"
+   AWS_PROFILE=prod-readonly aws-agent-identity-guard --live-scan --format json 2>&1 | grep -i "throttl\|rate"
    ```
 
 2. **Check AWS Service Health Dashboard** for IAM API issues.
 
-3. **Reduce scan parallelism:**
+3. **Scope the scan to reduce API volume:**
    ```bash
-   # Lower concurrency
-   identity-guard scan --live --max-concurrent 2 --retry-delay 5
+   # Scan a single role instead of the whole account
+   aws-agent-identity-guard --live-scan --role-name my-agent-role --format json
    ```
 
 ### Mitigation (< 1 hour)
@@ -205,15 +203,15 @@ This runbook covers operational incidents related to the IAM identity guard tool
    ```
 
 2. **Reduce API call volume:**
-   - Use `--scope` to limit to specific accounts/OUs.
-   - Cache policy documents that haven't changed (check `UpdateDate`).
-   - Use `iam:GetAccountAuthorizationDetails` instead of per-policy calls.
+   - Use `--role-name` to scan one role at a time instead of the whole account.
+   - Scan exported policy JSON files statically instead of live where possible.
+   - Space out live scans rather than running them back-to-back.
 
-3. **Switch to cached/offline mode temporarily:**
+3. **Switch to static/offline mode temporarily:**
    ```bash
-   # Export policies first, then scan locally
-   identity-guard export --live --output policies/
-   identity-guard scan --policy-dir policies/
+   # Save role/policy documents to JSON via the AWS CLI, then scan them statically
+   aws iam get-role-policy --role-name my-role --policy-name inline > policy.json
+   aws-agent-identity-guard policy.json --format json
    ```
 
 ### Long-term Fixes
@@ -238,106 +236,73 @@ aws cloudwatch get-metric-statistics \
 
 ---
 
-## 4. Remediation Template Generates Broken Terraform
+## 4. Misleading Remediation Suggestion
 
 ### Symptoms
 
-- Auto-generated remediation Terraform fails `terraform plan` or `terraform apply`.
-- Syntax errors, invalid resource references, or incompatible provider versions.
-- Teams apply remediation and break their infrastructure.
+- A `--remediate` suggestion is misleading, incomplete, or wrong for a finding.
+- A team member misreads a suggestion as an executable script and tries to apply it.
+- The suggested action does not actually resolve the flagged rule.
 
 ### Severity
 
-**High** — Can cause production infrastructure issues if applied without review.
+**Medium** — `--remediate` only prints human-readable suggestions to stdout; it
+does not generate or apply infrastructure code. The risk is a human acting on a
+misleading suggestion, not the tool mutating infrastructure.
 
 ### Immediate Response (< 30 minutes)
 
-1. **Stop automated remediation pipelines:**
+1. **Clarify what `--remediate` does:**
    ```bash
-   # Disable auto-apply in CI if configured
-   # Set environment variable to block auto-remediation
-   export IDENTITY_GUARD_REMEDIATE=dry-run
+   # --remediate appends text remediation guidance to the findings output.
+   # It does NOT write Terraform, and it does NOT apply any changes.
+   aws-agent-identity-guard policy.json --remediate
    ```
+   Ensure no downstream job treats this text output as an applyable artifact.
 
-2. **Identify affected outputs:**
-   ```bash
-   # Check recently generated remediations
-   find ./remediation-output/ -name "*.tf" -newer /tmp/last-known-good -exec terraform validate {} \;
-   ```
-
-3. **Notify teams** that have recently applied generated Terraform.
+2. **Notify teams** that may have acted on a misleading suggestion.
 
 ### Diagnosis
 
-1. **Validate the template locally:**
+1. **Reproduce the suggestion locally:**
    ```bash
-   # Generate remediation for the failing policy
-   identity-guard remediate --policy-file failing-policy.json --output /tmp/fix.tf
-
-   # Validate
-   cd /tmp && terraform init && terraform validate
+   aws-agent-identity-guard failing-policy.json --remediate --format text
    ```
 
 2. **Common issues:**
 
    | Symptom | Likely Cause | Fix |
    |---------|-------------|-----|
-   | `Invalid resource type` | Wrong AWS provider version assumed | Pin provider version in template |
-   | `Reference to undeclared resource` | Template references resources not in state | Add data sources or variables |
-   | `Invalid argument` | API changed, argument renamed/removed | Update template to current provider schema |
-   | `Cycle detected` | Circular dependency in generated resources | Restructure resource ordering |
-   | HCL syntax error | Template engine bug | Fix Jinja/string formatting in remediate.py |
+   | Suggestion too generic | Rule emits a static remediation string | Tighten the message in `scanner.py` |
+   | Suggestion doesn't match finding | Wrong branch in the remediation text | Correct the per-rule message in `scanner.py` |
+   | Missing remediation text | Rule has no remediation guidance | Add guidance to the rule in `scanner.py` |
 
-3. **Check the template engine:**
+3. **Check the remediation text:**
    ```bash
-   # Review remediate.py for the failing pattern
-   grep -n "def generate" src/aws_agent_identity_guard/remediate.py
+   # Remediation strings are defined inline alongside the rules in scanner.py
+   grep -n "REMEDIATION" src/aws_agent_identity_guard/scanner.py
    ```
 
 ### Resolution
 
-1. **Fix the template:**
-   ```python
-   # Common fix: ensure provider compatibility
-   # In remediate.py, add provider version constraint
-   PROVIDER_BLOCK = """
-   terraform {
-     required_providers {
-       aws = {
-         source  = "hashicorp/aws"
-         version = ">= 5.0, < 6.0"
-       }
-     }
-   }
-   """
-   ```
+1. **Fix the remediation message** in `src/aws_agent_identity_guard/scanner.py`
+   next to the rule that emits it.
 
-2. **Add validation to the remediation pipeline:**
-   ```bash
-   # In CI, always validate before applying
-   identity-guard remediate --policy-file $POLICY --output /tmp/fix.tf
-   cd /tmp && terraform init -backend=false && terraform validate
-   ```
-
-3. **Add regression test:**
+2. **Add a regression test:**
    ```python
-   def test_remediation_produces_valid_terraform():
-       policy = { ... }
-       findings = scan_policy(policy)
-       for finding in findings:
-           tf_output = generate_remediation(finding, format="terraform")
-           # Validate HCL syntax at minimum
-           assert "resource" in tf_output or "data" in tf_output
-           assert tf_output.count("{") == tf_output.count("}")
+   # tests/test_scanner.py
+   def test_remediation_text_present_for_finding():
+       document = { ... }
+       findings = scan_policy_document(document)
+       assert findings  # at least one finding
+       # --remediate output is rendered by the CLI from these findings
    ```
 
 ### Prevention
 
-- Always run `terraform validate` on generated output in CI.
-- Pin the AWS provider version in all templates.
-- Maintain a test matrix of Terraform versions (1.5, 1.6, 1.7+).
-- Add a `--dry-run` flag that shows the remediation without writing files.
-- Consider generating OpenTofu-compatible output as well.
+- Keep remediation strings specific and tied to the exact rule that fires.
+- Add tests that assert findings are produced for known-bad fixtures.
+- Make clear in docs that `--remediate` output is advisory text, not runnable code.
 
 ---
 

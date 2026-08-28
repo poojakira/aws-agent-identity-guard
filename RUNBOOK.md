@@ -320,7 +320,7 @@ aws-agent-identity-guard policy.json --remediate
 
 | Rule Range | Category | What It Checks |
 |------------|----------|---------------|
-| AIG001–AIG018 | Identity Policy | Permission scope, wildcards, escalation paths, blast radius |
+| AIG001–AIG021 | Identity Policy | Permission scope, wildcards, escalation paths, blast radius |
 | AIG-TP001–AIG-TP003 | Trust Policy | Who can assume the role (principals, conditions) |
 | AIG-PB001 | Permission Boundary | Whether high-risk roles have boundaries applied |
 
@@ -513,7 +513,7 @@ Update pinned version after testing new rules in a non-blocking mode first.
 
 ### Adding Custom Rules
 
-The tool currently ships with 22 built-in rules. Custom rule extensions are not yet supported — file an issue at https://github.com/poojakira/aws-agent-identity-guard/issues if you need custom rules.
+The tool currently ships with 25 built-in rules. Custom rule extensions are not yet supported — file an issue at https://github.com/poojakira/aws-agent-identity-guard/issues if you need custom rules.
 
 ### Checking for New Releases
 
