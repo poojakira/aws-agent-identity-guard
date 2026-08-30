@@ -17,9 +17,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 # The public API exposes scan_policy_document; alias it as scan_policy for these tests.
 from aws_agent_identity_guard import scan_policy_document as scan_policy
-from aws_agent_identity_guard.scanner import (
-    scan_policy_document as scanner_scan_policy,
-)
 
 # Attempt to import remediation module (may not exist in all versions)
 try:
@@ -31,6 +28,17 @@ except ImportError:
 
 # Rules are defined as data/patterns inside scanner.py, not a separate rules API.
 HAS_RULES = False
+
+
+# Placeholders so the (skipped) rules-module tests below resolve at import time.
+# These are never invoked because the guarding tests are skipped when HAS_RULES
+# is False, which is always the case for the current public API.
+def get_rules():  # pragma: no cover - skipped tests only
+    raise NotImplementedError("rules module not available")
+
+
+def evaluate_rule(rule, statement):  # pragma: no cover - skipped tests only
+    raise NotImplementedError("rules module not available")
 
 
 # ===========================================================================
@@ -137,11 +145,7 @@ class TestDenyOnlyPolicies:
                     "Effect": "Deny",
                     "Action": "*",
                     "Resource": "*",
-                    "Condition": {
-                        "StringNotEquals": {
-                            "aws:RequestedRegion": "us-east-1"
-                        }
-                    },
+                    "Condition": {"StringNotEquals": {"aws:RequestedRegion": "us-east-1"}},
                 }
             ],
         }
@@ -313,11 +317,13 @@ class TestLargePolicy:
     def test_100_statements(self):
         statements = []
         for i in range(100):
-            statements.append({
-                "Effect": "Allow" if i % 3 != 0 else "Deny",
-                "Action": f"s3:Action{i}",
-                "Resource": f"arn:aws:s3:::bucket-{i}/*",
-            })
+            statements.append(
+                {
+                    "Effect": "Allow" if i % 3 != 0 else "Deny",
+                    "Action": f"s3:Action{i}",
+                    "Resource": f"arn:aws:s3:::bucket-{i}/*",
+                }
+            )
         policy = {"Version": "2012-10-17", "Statement": statements}
         findings = scan_policy(policy)
         assert isinstance(findings, list)
@@ -327,11 +333,13 @@ class TestLargePolicy:
         for i in range(100):
             action = "*" if i % 10 == 0 else f"ec2:Action{i}"
             resource = "*" if i % 20 == 0 else f"arn:aws:ec2:::resource-{i}"
-            statements.append({
-                "Effect": "Allow",
-                "Action": action,
-                "Resource": resource,
-            })
+            statements.append(
+                {
+                    "Effect": "Allow",
+                    "Action": action,
+                    "Resource": resource,
+                }
+            )
         policy = {"Version": "2012-10-17", "Statement": statements}
         findings = scan_policy(policy)
         assert isinstance(findings, list)
@@ -470,7 +478,7 @@ class TestRemediateOutput:
         if findings:
             result = remediate.generate_remediations(findings)
             assert result is not None
-            assert isinstance(result, (list, dict))
+            assert isinstance(result, list | dict)
 
     def test_remediate_empty_findings(self):
         """Remediation with no findings should handle gracefully."""
@@ -834,4 +842,4 @@ class TestRulesModule:
         rules = get_rules()
         if rules:
             result = evaluate_rule(rules[0], safe_statement)
-            assert isinstance(result, (bool, dict, list, type(None)))
+            assert isinstance(result, bool | dict | list | type(None))

@@ -10,10 +10,8 @@ str(condition) approach produced, then asserts the new behaviour is correct.
 Run with: pytest tests/test_condition_structural.py -v
 """
 
-import pytest
 from aws_agent_identity_guard import scan_policy_document, scan_trust_policy
 from aws_agent_identity_guard.scanner import _condition_has_key, _condition_has_key_any
-
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Unit tests for _condition_has_key helper
@@ -97,32 +95,40 @@ class TestAIG004PassRoleConditionParsing:
 
     def test_passrole_without_condition_fires(self):
         """Basic: PassRole with no condition → AIG004."""
-        findings = scan_policy_document({
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "iam:PassRole",
-                "Resource": "*",
-            }]
-        })
-        assert any(f.rule_id == "AIG004" for f in findings), (
-            "AIG004 must fire for PassRole with no condition"
+        findings = scan_policy_document(
+            {
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": "iam:PassRole",
+                        "Resource": "*",
+                    }
+                ]
+            }
         )
+        assert any(
+            f.rule_id == "AIG004" for f in findings
+        ), "AIG004 must fire for PassRole with no condition"
 
     def test_passrole_with_correct_condition_no_finding(self):
         """PassRole with proper PassedToService → no AIG004."""
-        findings = scan_policy_document({
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "iam:PassRole",
-                "Resource": "*",
-                "Condition": {
-                    "StringEquals": {"iam:PassedToService": "bedrock.amazonaws.com"}
-                },
-            }]
-        })
-        assert not any(f.rule_id == "AIG004" for f in findings), (
-            "AIG004 must NOT fire when iam:PassedToService is present"
+        findings = scan_policy_document(
+            {
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": "iam:PassRole",
+                        "Resource": "*",
+                        "Condition": {
+                            "StringEquals": {"iam:PassedToService": "bedrock.amazonaws.com"}
+                        },
+                    }
+                ]
+            }
         )
+        assert not any(
+            f.rule_id == "AIG004" for f in findings
+        ), "AIG004 must NOT fire when iam:PassedToService is present"
 
     def test_passrole_with_lowercase_condition_key_no_finding(self):
         """
@@ -132,16 +138,20 @@ class TestAIG004PassRoleConditionParsing:
 
         New behaviour: case-insensitive structural match → no AIG004.
         """
-        findings = scan_policy_document({
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "iam:PassRole",
-                "Resource": "*",
-                "Condition": {
-                    "StringEquals": {"iam:passedtoservice": "bedrock.amazonaws.com"}
-                },
-            }]
-        })
+        findings = scan_policy_document(
+            {
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": "iam:PassRole",
+                        "Resource": "*",
+                        "Condition": {
+                            "StringEquals": {"iam:passedtoservice": "bedrock.amazonaws.com"}
+                        },
+                    }
+                ]
+            }
+        )
         assert not any(f.rule_id == "AIG004" for f in findings), (
             "AIG004 must NOT fire when iam:passedtoservice (lowercase) is present — "
             "IAM condition keys are case-insensitive"
@@ -155,16 +165,20 @@ class TestAIG004PassRoleConditionParsing:
 
         New behaviour: exact key match only → AIG004 fires correctly.
         """
-        findings = scan_policy_document({
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "iam:PassRole",
-                "Resource": "*",
-                "Condition": {
-                    "StringEquals": {"iam:PassedToServiceAccount": "123456789012"}
-                },
-            }]
-        })
+        findings = scan_policy_document(
+            {
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": "iam:PassRole",
+                        "Resource": "*",
+                        "Condition": {
+                            "StringEquals": {"iam:PassedToServiceAccount": "123456789012"}
+                        },
+                    }
+                ]
+            }
+        )
         assert any(f.rule_id == "AIG004" for f in findings), (
             "AIG004 MUST fire — 'iam:PassedToServiceAccount' is not the same as "
             "'iam:PassedToService'. Old str() check had a false-negative here."
@@ -181,70 +195,86 @@ class TestAIG002PartialWildcards:
 
     def test_iam_star_role_star_fires(self):
         """'iam:*Role*' expands to cover iam:PassRole, iam:CreateRole, etc."""
-        findings = scan_policy_document({
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "iam:*Role*",
-                "Resource": "*",
-            }]
-        })
-        assert any(f.rule_id == "AIG002" for f in findings), (
-            "AIG002 must fire for 'iam:*Role*' — covers iam:PassRole (privilege escalation)"
+        findings = scan_policy_document(
+            {
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": "iam:*Role*",
+                        "Resource": "*",
+                    }
+                ]
+            }
         )
+        assert any(
+            f.rule_id == "AIG002" for f in findings
+        ), "AIG002 must fire for 'iam:*Role*' — covers iam:PassRole (privilege escalation)"
 
     def test_s3_get_star_fires(self):
         """'s3:Get*' expands to cover s3:GetObject (sensitive data)."""
-        findings = scan_policy_document({
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "s3:Get*",
-                "Resource": "*",
-            }]
-        })
-        assert any(f.rule_id == "AIG002" for f in findings), (
-            "AIG002 must fire for 's3:Get*' — covers s3:GetObject (sensitive data access)"
+        findings = scan_policy_document(
+            {
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": "s3:Get*",
+                        "Resource": "*",
+                    }
+                ]
+            }
         )
+        assert any(
+            f.rule_id == "AIG002" for f in findings
+        ), "AIG002 must fire for 's3:Get*' — covers s3:GetObject (sensitive data access)"
 
     def test_bedrock_star_agent_star_fires(self):
         """'bedrock:*Agent*' expands to cover bedrock:CreateAgent, UpdateAgent."""
-        findings = scan_policy_document({
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "bedrock:*Agent*",
-                "Resource": "*",
-            }]
-        })
-        assert any(f.rule_id == "AIG002" for f in findings), (
-            "AIG002 must fire for 'bedrock:*Agent*' — covers agent control-plane actions"
+        findings = scan_policy_document(
+            {
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": "bedrock:*Agent*",
+                        "Resource": "*",
+                    }
+                ]
+            }
         )
+        assert any(
+            f.rule_id == "AIG002" for f in findings
+        ), "AIG002 must fire for 'bedrock:*Agent*' — covers agent control-plane actions"
 
     def test_ec2_describe_star_does_not_fire(self):
         """'ec2:Describe*' is read-only and does not cover any dangerous action."""
-        findings = scan_policy_document({
-            "Statement": [{
-                "Effect": "Allow",
-                "Action": "ec2:Describe*",
-                "Resource": "*",
-            }]
-        })
+        findings = scan_policy_document(
+            {
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": "ec2:Describe*",
+                        "Resource": "*",
+                    }
+                ]
+            }
+        )
         # ec2:Describe* is read-only, should not trigger AIG002
         aig002 = [f for f in findings if f.rule_id == "AIG002"]
-        assert not aig002, (
-            f"AIG002 must NOT fire for 'ec2:Describe*' — read-only actions. Got: {aig002}"
-        )
+        assert (
+            not aig002
+        ), f"AIG002 must NOT fire for 'ec2:Describe*' — read-only actions. Got: {aig002}"
 
     def test_explicit_star_still_fires(self):
         """Existing behaviour: bare '*' still fires AIG002."""
-        findings = scan_policy_document({
-            "Statement": [{"Effect": "Allow", "Action": "*", "Resource": "*"}]
-        })
+        findings = scan_policy_document(
+            {"Statement": [{"Effect": "Allow", "Action": "*", "Resource": "*"}]}
+        )
         assert any(f.rule_id == "AIG002" for f in findings)
 
     def test_service_star_still_fires(self):
         """Existing behaviour: 'iam:*' still fires AIG002."""
-        findings = scan_policy_document({
-            "Statement": [{"Effect": "Allow", "Action": "iam:*", "Resource": "*"}]
-        })
+        findings = scan_policy_document(
+            {"Statement": [{"Effect": "Allow", "Action": "iam:*", "Resource": "*"}]}
+        )
         assert any(f.rule_id == "AIG002" for f in findings)
 
 
@@ -258,12 +288,14 @@ class TestTrustPolicyConditionParsing:
 
     def _cross_account_trust(self, condition: dict) -> dict:
         return {
-            "Statement": [{
-                "Effect": "Allow",
-                "Principal": {"AWS": "arn:aws:iam::999999999999:root"},
-                "Action": "sts:AssumeRole",
-                "Condition": condition,
-            }]
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "arn:aws:iam::999999999999:root"},
+                    "Action": "sts:AssumeRole",
+                    "Condition": condition,
+                }
+            ]
         }
 
     def test_tp002_fires_without_external_id(self):
@@ -271,32 +303,36 @@ class TestTrustPolicyConditionParsing:
         assert any(f.rule_id == "AIG-TP002" for f in findings)
 
     def test_tp002_no_finding_with_external_id(self):
-        findings = scan_trust_policy(self._cross_account_trust({
-            "StringEquals": {"sts:ExternalId": "shared-secret-abc123"}
-        }))
+        findings = scan_trust_policy(
+            self._cross_account_trust({"StringEquals": {"sts:ExternalId": "shared-secret-abc123"}})
+        )
         assert not any(f.rule_id == "AIG-TP002" for f in findings)
 
     def test_tp002_no_finding_with_lowercase_externalid_key(self):
         """Case-insensitive: 'sts:externalid' must match 'sts:ExternalId'."""
-        findings = scan_trust_policy(self._cross_account_trust({
-            "StringEquals": {"sts:externalid": "shared-secret"}
-        }))
+        findings = scan_trust_policy(
+            self._cross_account_trust({"StringEquals": {"sts:externalid": "shared-secret"}})
+        )
         assert not any(f.rule_id == "AIG-TP002" for f in findings), (
             "TP002 must NOT fire — 'sts:externalid' (lowercase) is the same "
             "condition key as 'sts:ExternalId' (IAM keys are case-insensitive)"
         )
 
     def test_tp003_no_finding_with_source_arn(self):
-        findings = scan_trust_policy(self._cross_account_trust({
-            "ArnLike": {"aws:SourceArn": "arn:aws:lambda:us-east-1:999:function:myFn"}
-        }))
+        findings = scan_trust_policy(
+            self._cross_account_trust(
+                {"ArnLike": {"aws:SourceArn": "arn:aws:lambda:us-east-1:999:function:myFn"}}
+            )
+        )
         assert not any(f.rule_id == "AIG-TP003" for f in findings)
 
     def test_tp003_no_finding_with_lowercase_source_arn(self):
         """'aws:sourceArn' (lowercase) must match 'aws:SourceArn' lookup."""
-        findings = scan_trust_policy(self._cross_account_trust({
-            "ArnLike": {"aws:sourceArn": "arn:aws:lambda:us-east-1:999:function:myFn"}
-        }))
-        assert not any(f.rule_id == "AIG-TP003" for f in findings), (
-            "TP003 must NOT fire — 'aws:sourceArn' equals 'aws:SourceArn' case-insensitively"
+        findings = scan_trust_policy(
+            self._cross_account_trust(
+                {"ArnLike": {"aws:sourceArn": "arn:aws:lambda:us-east-1:999:function:myFn"}}
+            )
         )
+        assert not any(
+            f.rule_id == "AIG-TP003" for f in findings
+        ), "TP003 must NOT fire — 'aws:sourceArn' equals 'aws:SourceArn' case-insensitively"

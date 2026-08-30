@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 import pytest
 
@@ -32,9 +32,7 @@ class TestEnforceMode:
         # Create a mock policy file for static analysis (complete scan)
         policy = {
             "Version": "2012-10-17",
-            "Statement": [
-                {"Effect": "Allow", "Action": "s3:GetObject", "Resource": "*"}
-            ],
+            "Statement": [{"Effect": "Allow", "Action": "s3:GetObject", "Resource": "*"}],
         }
         policy_file = tmp_path / "test_policy.json"
         policy_file.write_text(json.dumps(policy))
@@ -53,7 +51,9 @@ class TestEnforceMode:
                 {
                     "Effect": "Allow",
                     "Action": "bedrock:InvokeModel",
-                    "Resource": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku*",
+                    "Resource": (
+                        "arn:aws:bedrock:us-east-1::foundation-model/" "anthropic.claude-3-haiku*"
+                    ),
                     "Condition": {"StringEquals": {"aws:RequestedRegion": "us-east-1"}},
                 }
             ],
@@ -70,7 +70,7 @@ class TestIncompleteScanDetection:
 
     def test_scan_report_has_completeness_fields(self):
         """Scan report should include scan_complete, roles_discovered, completeness_reason."""
-        from aws_agent_identity_guard.live_scanner import LiveAccountScanner, AccountScanReport
+        from aws_agent_identity_guard.live_scanner import AccountScanReport
 
         # Verify the dataclass has the expected fields
         report = AccountScanReport(
@@ -96,12 +96,13 @@ class TestIncompleteScanDetection:
         # Use moto to mock AWS instead of complex MagicMock
         import boto3
         from moto import mock_aws
+
         from aws_agent_identity_guard.live_scanner import LiveAccountScanner
 
         with mock_aws():
             # Create IAM client and set up test roles
             iam = boto3.client("iam", region_name="us-east-1")
-            
+
             # Create 600 roles (more than default max_roles=500)
             for i in range(600):
                 role_name = f"test-role-{i}"
@@ -135,7 +136,6 @@ class TestNoHTTPProxy:
 
     def test_no_http_proxy_in_repo(self):
         """This is a static analyzer - no HTTP proxy exists."""
-        import os
 
         repo_root = Path(__file__).parent.parent
         # Verify no proxy-related files exist

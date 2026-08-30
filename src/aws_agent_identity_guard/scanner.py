@@ -427,10 +427,9 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
             )
 
         # ─── AIG004: PassRole without PassedToService ────────────────────────
-        if (
-            any(_matches_any(a, {"iam:PassRole", "iam:passrole"}) for a in actions)
-            and not _condition_has_key(condition, "iam:PassedToService")
-        ):
+        if any(
+            _matches_any(a, {"iam:PassRole", "iam:passrole"}) for a in actions
+        ) and not _condition_has_key(condition, "iam:PassedToService"):
             findings.append(
                 Finding(
                     "AIG004",

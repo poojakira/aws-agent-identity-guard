@@ -12,13 +12,11 @@ without crashing or producing misleading output.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 
 from aws_agent_identity_guard import scan_policy_document
 from aws_agent_identity_guard.cli import main
-
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # INVALID JSON INPUT
@@ -165,9 +163,7 @@ class TestMalformedPolicy:
 
     def test_statement_missing_action_and_notaction(self):
         """Statement without Action or NotAction should not crash."""
-        findings = scan_policy_document(
-            {"Statement": [{"Effect": "Allow", "Resource": "*"}]}
-        )
+        findings = scan_policy_document({"Statement": [{"Effect": "Allow", "Resource": "*"}]})
         assert isinstance(findings, list)
 
     def test_statement_missing_resource(self):

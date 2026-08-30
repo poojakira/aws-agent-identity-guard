@@ -266,7 +266,8 @@ def main(argv: list[str] | None = None) -> int:
             _print_live_text(report_dict)
             if enforce_fail:
                 if not scan_complete:
-                    print(f"ENFORCE FAIL: Incomplete scan - {report_dict.get('completeness_reason', 'unknown reason')}")
+                    reason = report_dict.get("completeness_reason", "unknown reason")
+                    print(f"ENFORCE FAIL: Incomplete scan - {reason}")
                 if has_errors:
                     print(f"ENFORCE FAIL: Scan errors - {report_dict['errors']}")
             return 1 if (has_high or enforce_fail) else 0
