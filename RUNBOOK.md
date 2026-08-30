@@ -222,14 +222,20 @@ aws-agent-identity-guard policy.json --format json
   "findings": [
     {
       "rule_id": "AIG002",
-      "severity": "CRITICAL",
-      "message": "Wildcard action detected...",
-      "location": {"statement_index": 0}
+      "severity": "critical",
+      "message": "Agent policy grants wildcard service or full-account actions...",
+      "remediation": "Scope actions to the exact APIs the agent tool calls...",
+      "statement_index": 0
     }
-  ],
-  "summary": {"critical": 1, "high": 1, "medium": 0, "total": 2}
+  ]
 }
 ```
+
+> The JSON output is a single object with a top-level `findings` array. Each
+> finding carries `rule_id`, `severity` (lowercase: `critical`/`high`/`medium`),
+> `message`, `remediation`, and `statement_index` (may be `null` for
+> policy-wide/kill-chain rules). Severity counts are shown in the human-readable
+> `text` output, not embedded in the JSON.
 
 ### SARIF output (for GitHub Advanced Security / Code Scanning)
 
