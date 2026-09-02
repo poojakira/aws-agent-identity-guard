@@ -15,7 +15,7 @@ def _pkg_version() -> str:
     return __version__
 
 
-def _exit_input_error(message: str) -> "SystemExit":
+def _exit_input_error(message: str) -> SystemExit:
     """Build a SystemExit that prints a diagnostic AND exits with code 2.
 
     The documented Failure Semantics (README / RUNBOOK) promise exit code 2 for
@@ -326,7 +326,7 @@ def main(argv: list[str] | None = None) -> int:
         remediations = generate_remediations(findings, resource_name=role_name)
         if remediations:
             print("\n" + "=" * 70)
-            print("GENERATED REMEDIATIONS (AI-Powered Infrastructure Automation)")
+            print("GENERATED REMEDIATIONS (deterministic IaC templates)")
             print("=" * 70)
             for r in remediations:
                 print(f"\n--- Fix for {', '.join(r.findings_addressed)} ---")

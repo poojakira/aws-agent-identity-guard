@@ -203,12 +203,18 @@ aws-agent-identity-guard policy.json
 
 **Expected output:**
 ```
-[CRITICAL] AIG002: Wildcard action detected — Statement 0 grants "s3:*"
-[HIGH]     AIG003: Wildcard resource — Statement 0 uses "Resource": "*"
-────────────────────────────────────────
-2 findings (1 critical, 1 high, 0 medium)
-Exit code: 1
+CRITICAL AIG002 statement=0: Agent policy grants wildcard service or full-account actions. An autonomous agent with '*' can do anything including deleting the account's entire infrastructure.
+  remediation: Scope actions to the exact APIs the agent tool calls. Use service-level wildcards only in dev environments with a permission boundary as a safety net.
+HIGH AIG003 statement=0: Agent policy grants access to all resources in the account. Combined with tool-execution actions, this means the agent can invoke any Lambda, read any secret, or run tasks anywhere.
+  remediation: Bind permissions to specific ARNs or use resource tags and conditions (aws:ResourceTag) to limit blast radius.
 ```
+
+> The text format is `SEVERITY RULE_ID statement=N: <message>` followed by an
+> indented `remediation:` line, one block per finding. Policy-wide kill-chain
+> rules (AIG019–AIG021) omit the `statement=N` suffix. There is no summary
+> count line in text mode — severity counts are derivable from the findings,
+> and the process exit code (0/1/2) is the machine-readable signal for CI.
+> A clean policy prints `PASS: no high-risk agent IAM findings`.
 
 ### JSON output (for programmatic consumption)
 
@@ -247,8 +253,23 @@ Upload `results.sarif` to GitHub Code Scanning or any SARIF-compatible viewer.
 
 ### Scan multiple files
 
+The CLI analyzes one policy document per invocation. To scan several files,
+loop over them in your shell (each run has its own exit code):
+
 ```bash
-aws-agent-identity-guard deploy/role-a.json deploy/role-b.json --format json
+# bash
+for f in deploy/*.json; do
+  echo "== $f =="
+  aws-agent-identity-guard "$f" --format json || exit_code=$?
+done
+```
+
+```powershell
+# PowerShell
+Get-ChildItem deploy\*.json | ForEach-Object {
+  Write-Host "== $($_.Name) =="
+  aws-agent-identity-guard $_.FullName --format json
+}
 ```
 
 ---
@@ -294,14 +315,39 @@ Generate remediation suggestions for findings:
 aws-agent-identity-guard policy.json --remediate
 ```
 
-**Expected output:**
-```
-[CRITICAL] AIG002: Wildcard action detected — Statement 0 grants "s3:*"
-  → REMEDIATION: Replace "s3:*" with specific actions: s3:GetObject, s3:PutObject
-    Scope Resource to specific bucket ARN: arn:aws:s3:::my-bucket/*
+The findings are printed first (same text format as a normal scan), followed
+by a generated remediation section. Remediations are produced from
+deterministic templates keyed on rule ID (currently AIG004, AIG006/AIG016,
+and dangerous-action findings) — not every rule has an auto-generated fix.
 
-[HIGH] AIG003: Wildcard resource — Statement 0 uses "Resource": "*"
-  → REMEDIATION: Replace "Resource": "*" with specific resource ARNs
+**Expected output (abridged):**
+```
+CRITICAL AIG004 statement=0: iam:PassRole without iam:PassedToService condition. ...
+  remediation: Add a Condition: {StringEquals: {iam:PassedToService: 'bedrock.amazonaws.com'}} ...
+...
+
+======================================================================
+GENERATED REMEDIATIONS (deterministic IaC templates)
+======================================================================
+
+--- Fix for AIG004 ---
+Explanation: Scoped iam:PassRole to only pass roles to bedrock.amazonaws.com. ...
+
+Terraform HCL:
+resource "aws_iam_role_policy" "agent_wildcard_passrole_scoped" {
+  name = "passrole-scoped-to-service"
+  role = aws_iam_role.agent_wildcard.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid    = "PassRoleToSpecificService"
+      Effect = "Allow"
+      Action = "iam:PassRole"
+      Resource = "arn:aws:iam::*:role/agent_wildcard-execution"
+      Condition = { StringEquals = { "iam:PassedToService" = "bedrock.amazonaws.com" } }
+    }]
+  })
+}
 ```
 
 ---

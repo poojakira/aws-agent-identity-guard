@@ -1,15 +1,16 @@
 """
 aws_agent_identity_guard/remediate.py
 ────────────────────────────────────────────────────────────────────────────────
-AI-Powered Infrastructure Automation: Automated remediation generator.
+Deterministic IaC remediation generator.
 
-Takes scanner findings and produces ready-to-apply IaC fixes:
+Takes scanner findings and produces ready-to-apply IaC fixes from
+rule-keyed templates (no ML/LLM involved — output is fully deterministic):
 - Terraform HCL for IAM policy/role corrections
 - CloudFormation YAML snippets
 - Raw IAM policy JSON (fixed version)
 
 This bridges the gap between "we found a problem" and "here's the fix" —
-turning a security scanner into an infrastructure automation tool.
+turning a security scanner into an infrastructure automation aid.
 
 No external AI service required. Uses rule-based templates with context
 injection. Zero cost, zero network calls, zero API keys.
@@ -187,9 +188,9 @@ def generate_remediations(
 ) -> list[Remediation]:
     """Generate IaC remediation code from scanner findings.
 
-    This is the core "AI-Powered Infrastructure Automation" function.
-    It takes findings and produces ready-to-apply Terraform HCL,
-    CloudFormation YAML, and fixed policy JSON.
+    This is the core deterministic remediation generator. It takes findings
+    and produces ready-to-apply Terraform HCL, CloudFormation YAML, and fixed
+    policy JSON from rule-keyed templates (no ML/LLM involved).
 
     Parameters
     ----------
