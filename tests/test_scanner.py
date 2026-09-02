@@ -12,7 +12,7 @@ import pytest
 from aws_agent_identity_guard import scan_policy_document, scan_trust_policy
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# ORIGINAL RULES (AIG001–AIG007)
+# ORIGINAL RULES (AIG001-AIG007)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
@@ -60,6 +60,78 @@ class TestAIG001NotActionNotResource:
             }
         )
         assert not any(f.rule_id == "AIG001" for f in findings)
+
+    def test_not_action_allow_is_critical(self):
+        """NotAction + Allow grants everything-except, so AIG001 must be CRITICAL.
+
+        A NotAction with Allow is functionally a wildcard grant whose complement
+        includes privilege-escalation and audit-tampering actions.
+        """
+        findings = scan_policy_document(
+            {
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "NotAction": "s3:GetObject",
+                        "Resource": "*",
+                    }
+                ]
+            }
+        )
+        aig001 = [f for f in findings if f.rule_id == "AIG001"]
+        assert aig001, "Expected AIG001 to fire on NotAction+Allow"
+        assert aig001[0].severity == "critical"
+
+    def test_not_action_complement_fires_per_action_critical_rules(self):
+        """REGRESSION (false-negative): `Allow NotAction:[s3:GetObject]` grants
+        EVERYTHING except s3:GetObject - including iam:PassRole (AIG004),
+        privilege-escalation actions (AIG005) and audit-tampering (AIG011).
+
+        The old extraction fed the NotAction list into per-action exact-match
+        checks as if those were the *granted* actions, so these critical rules
+        silently never fired. They must fire now.
+        """
+        findings = scan_policy_document(
+            {
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "NotAction": "s3:GetObject",
+                        "Resource": "*",
+                    }
+                ]
+            }
+        )
+        rule_ids = {f.rule_id for f in findings}
+        assert "AIG004" in rule_ids, "PassRole (in complement) must be flagged"
+        assert "AIG005" in rule_ids, "priv-esc actions (in complement) must be flagged"
+        assert "AIG011" in rule_ids, "anti-forensics actions (in complement) must be flagged"
+
+    def test_not_action_does_not_flag_excluded_actions(self):
+        """The NotAction list itself is EXCLUDED, so `NotAction: iam:*` must NOT
+        surface iam privilege-escalation via AIG005 (iam actions are denied),
+        while still flagging non-excluded dangerous actions like anti-forensics.
+
+        This proves we treat NotAction as an exclusion set, not a grant list.
+        """
+        findings = scan_policy_document(
+            {
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "NotAction": "iam:*",
+                        "Resource": "*",
+                    }
+                ]
+            }
+        )
+        # No iam:* action should be reported as a granted privilege action.
+        iam_priv = [f for f in findings if f.rule_id == "AIG005" and "'iam:" in f.message]
+        assert not iam_priv, f"iam:* is excluded, must not fire AIG005 on iam actions: {iam_priv}"
+        # But non-excluded dangerous actions (e.g. cloudtrail:StopLogging) still fire.
+        assert any(
+            f.rule_id == "AIG011" for f in findings
+        ), "anti-forensics actions are NOT excluded by NotAction:iam:*, must still fire AIG011"
 
 
 class TestAIG002WildcardActions:
@@ -179,7 +251,7 @@ class TestAIG005PrivilegeEscalation:
     """AIG005: IAM privilege-management actions in agent policies."""
 
     def test_iam_star_fires(self):
-        """iam:* triggers AIG002 (wildcard action) — the broader catch-all."""
+        """iam:* triggers AIG002 (wildcard action) - the broader catch-all."""
         findings = scan_policy_document(
             {
                 "Statement": [
@@ -206,6 +278,40 @@ class TestAIG005PrivilegeEscalation:
             }
         )
         assert any(f.rule_id == "AIG005" for f in findings)
+
+    @pytest.mark.parametrize(
+        "action",
+        [
+            "iam:CreateAccessKey",
+            "iam:CreateLoginProfile",
+            "iam:UpdateLoginProfile",
+            "iam:PutGroupPolicy",
+            "iam:AttachGroupPolicy",
+        ],
+    )
+    def test_additional_priv_esc_vectors_fire(self, action):
+        """Well-known IAM privilege-escalation actions must all fire AIG005 as critical.
+
+        These are standard escalation vectors:
+        - CreateAccessKey / CreateLoginProfile / UpdateLoginProfile mint new
+          credentials for a principal the agent can influence.
+        - PutGroupPolicy / AttachGroupPolicy escalate via a group the agent's
+          principal belongs to.
+        """
+        findings = scan_policy_document(
+            {
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": action,
+                        "Resource": "*",
+                    }
+                ]
+            }
+        )
+        aig005 = [f for f in findings if f.rule_id == "AIG005"]
+        assert aig005, f"Expected AIG005 for {action}, got {[f.rule_id for f in findings]}"
+        assert aig005[0].severity == "critical"
 
     def test_read_only_iam_does_not_fire(self):
         findings = scan_policy_document(
@@ -289,7 +395,7 @@ class TestAIG007SensitiveDataAccess:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# NEW RULES (AIG008–AIG018) — Agent-specific escalation patterns
+# NEW RULES (AIG008-AIG018) - Agent-specific escalation patterns
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
@@ -373,7 +479,7 @@ class TestAIG009SageMakerControlPlane:
         assert any(f.rule_id == "AIG009" for f in findings)
 
     def test_invoke_endpoint_does_not_fire(self):
-        """Runtime invocation is fine — the agent needs to call the model."""
+        """Runtime invocation is fine - the agent needs to call the model."""
         findings = scan_policy_document(
             {
                 "Statement": [
@@ -737,7 +843,7 @@ class TestAIG018DatabaseFullAccess:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# TRUST POLICY RULES (AIG-TP001–TP003)
+# TRUST POLICY RULES (AIG-TP001-TP003)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
@@ -836,7 +942,7 @@ class TestTrustPolicyRules:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# INTEGRATION TESTS — Realistic Agent Policies
+# INTEGRATION TESTS - Realistic Agent Policies
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
@@ -919,7 +1025,7 @@ class TestRealisticAgentPolicies:
         assert "AIG013" in rule_ids  # No conditions + Resource: *
 
     def test_deny_statements_are_ignored(self):
-        """Deny statements should not generate findings — they restrict, not grant."""
+        """Deny statements should not generate findings - they restrict, not grant."""
         findings = scan_policy_document(
             {
                 "Statement": [

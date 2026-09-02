@@ -196,3 +196,100 @@ def test_report_has_required_fields():
     assert not missing, f"Report missing keys: {missing}"
     assert report["roles_scanned"] >= 1
     assert "total" in report["summary"]
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# AIG-PB001: permission-boundary presence check.
+#
+# WHY THESE LIVE (moto) TESTS AND NOT STATIC ONES:
+# AIG-PB001 is NOT emitted by the static scanner (scan_policy_document). It is
+# a *configuration*-level rule generated only in live-scan mode inside
+# LiveAccountScanner._scan_role() - see
+#   src/aws_agent_identity_guard/live_scanner.py:416-434
+# It fires when a role has one or more high/critical findings AND the role has
+# NO permissions boundary attached. A static policy dict carries no notion of a
+# role-level permissions boundary, so the rule cannot be triggered on a static
+# document. These tests therefore exercise the real trigger path via moto.
+#
+# NOTE ON THE moto CODE PATH:
+# These tests use scan_role_by_name(), which reads the role via iam.get_role().
+# moto populates PermissionsBoundary on get_role() but (as of moto 5.x) does NOT
+# populate it on the list_roles() paginator used by the full-account scan. Using
+# scan_role_by_name() lets the negative test faithfully assert the
+# boundary-present branch - see live_scanner.py:309-338 for both code paths.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+@mock_aws
+def test_aig_pb001_fires_for_highrisk_role_without_boundary():
+    """A role with high/critical findings and NO permissions boundary fires AIG-PB001."""
+    sess = _session()
+    iam = sess.client("iam")
+    iam.create_role(
+        RoleName="highrisk-no-boundary",
+        AssumeRolePolicyDocument=_trust({"Service": "bedrock.amazonaws.com"}),
+    )
+    # Wildcard policy => guaranteed critical finding (AIG002), no boundary attached.
+    iam.put_role_policy(
+        RoleName="highrisk-no-boundary",
+        PolicyName="too-broad",
+        PolicyDocument=_policy(["*"], ["*"]),
+    )
+
+    findings = LiveAccountScanner(session=sess).scan_role_by_name("highrisk-no-boundary")
+    pb_findings = [f for f in findings if f["rule_id"] == "AIG-PB001"]
+    assert pb_findings, (
+        f"Expected AIG-PB001 for high-risk role without boundary, "
+        f"got rule IDs: {sorted({f['rule_id'] for f in findings})}"
+    )
+    assert pb_findings[0]["severity"] == "medium"
+    assert pb_findings[0]["source"] == "configuration"
+
+
+@mock_aws
+def test_aig_pb001_does_not_fire_when_boundary_present():
+    """The SAME high-risk policy with a permissions boundary attached must NOT fire AIG-PB001."""
+    sess = _session()
+    iam = sess.client("iam")
+
+    # Create a managed policy to serve as the permissions boundary.
+    boundary = iam.create_policy(
+        PolicyName="agent-boundary",
+        PolicyDocument=json.dumps(
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": ["bedrock:InvokeModel"],
+                        "Resource": "*",
+                    }
+                ],
+            }
+        ),
+    )
+    boundary_arn = boundary["Policy"]["Arn"]
+
+    iam.create_role(
+        RoleName="highrisk-with-boundary",
+        AssumeRolePolicyDocument=_trust({"Service": "bedrock.amazonaws.com"}),
+        PermissionsBoundary=boundary_arn,
+    )
+    # Identical wildcard policy => still has critical findings ...
+    iam.put_role_policy(
+        RoleName="highrisk-with-boundary",
+        PolicyName="too-broad",
+        PolicyDocument=_policy(["*"], ["*"]),
+    )
+
+    findings = LiveAccountScanner(session=sess).scan_role_by_name("highrisk-with-boundary")
+
+    # Sanity: the role still has a high/critical finding (so the ONLY reason
+    # AIG-PB001 would be suppressed is the presence of the boundary).
+    high_crit = [f for f in findings if f["severity"] in ("high", "critical")]
+    assert high_crit, "Expected the wildcard policy to still produce high/critical findings"
+
+    pb_findings = [f for f in findings if f["rule_id"] == "AIG-PB001"]
+    assert (
+        not pb_findings
+    ), f"AIG-PB001 must NOT fire when a permissions boundary is attached, got: {pb_findings}"

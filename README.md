@@ -102,11 +102,11 @@ jobs:
 
 | Rule | Severity | Pattern |
 |------|----------|---------|
-| AIG001 | HIGH | NotAction/NotResource in agent policies |
-| AIG002 | CRITICAL | Wildcard service prefix (`bedrock:*`, `s3:*`) |
+| AIG001 | HIGH / CRITICAL | NotAction/NotResource in agent policies (escalates to CRITICAL for `NotAction`+`Allow`, a wildcard-equivalent grant) |
+| AIG002 | CRITICAL | Wildcard service prefix (`bedrock:*`, `s3:*`), including the `NotAction`+`Allow` complement |
 | AIG003 | HIGH | `Resource: "*"` - unbounded blast radius |
-| AIG004 | CRITICAL | `iam:PassRole` without `iam:PassedToService` condition |
-| AIG005 | CRITICAL | Privilege-management actions (iam:*, policy modification) |
+| AIG004 | CRITICAL | `iam:PassRole` without `iam:PassedToService` condition (also evaluated on the `NotAction`+`Allow` complement) |
+| AIG005 | CRITICAL | Privilege-management / escalation actions (iam:*, policy modification, `CreateAccessKey`, `Create`/`UpdateLoginProfile`, `Put`/`AttachGroupPolicy`) |
 | AIG006 | HIGH | Tool execution (Lambda, SSM, ECS, Bedrock) without resource scoping |
 | AIG007 | MEDIUM | Sensitive data access without ABAC tags |
 | AIG008 | CRITICAL | Bedrock control-plane, agent can modify itself |
