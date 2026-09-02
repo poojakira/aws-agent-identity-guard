@@ -100,6 +100,8 @@ jobs:
 
 ## What It Catches: 25 rules
 
+24 rules run in static file-scan mode; AIG-PB001 additionally runs in `--live-scan` mode (it needs role metadata from the AWS API). All 25 rule IDs are emitted by the code and covered by tests.
+
 | Rule | Severity | Pattern |
 |------|----------|---------|
 | AIG001 | HIGH / CRITICAL | NotAction/NotResource in agent policies (escalates to CRITICAL for `NotAction`+`Allow`, a wildcard-equivalent grant) |
@@ -126,7 +128,7 @@ jobs:
 | AIG-TP001 | CRITICAL | Wildcard principal (`*`) in trust policy |
 | AIG-TP002 | HIGH | Cross-account trust without `sts:ExternalId` |
 | AIG-TP003 | HIGH | Cross-account trust without `aws:SourceArn` |
-| AIG-PB001 | MEDIUM | Role with critical findings but no permission boundary |
+| AIG-PB001 | MEDIUM | Role with critical findings but no permission boundary (emitted only in `--live-scan` mode, where role metadata is available) |
 
 ## Live Account Scanning
 
@@ -201,11 +203,13 @@ This tool is a static linter. It reads a file, analyzes it, and exits. There is 
 
 | Field | Value |
 |-------|-------|
-| Tested commit | `ee090fda4a20b27874da96b30ea1eb073dd8ac11` |
-| Environment | Python 3.12, Windows 11, pytest 8.x |
-| Last verified | 2026-08-27 |
+| Environment | Python 3.12.10, Windows 11, pytest 9.1.1 |
+| Last verified | 2026-09-02 |
 | Test command | `python -m pytest tests/ -q` |
-| Coverage | All 25 rules have positive/negative test cases; failure modes tested in `tests/test_failure_modes.py` |
+| Test result | 230 passed, 3 skipped (skips: optional `rules` extension module not present) |
+| Rule coverage | All 25 emitted rule IDs (AIG001–AIG021, AIG-TP001–TP003, AIG-PB001) are referenced by positive/negative tests; parser edge cases fuzzed in `tests/test_iam_parser_fuzz.py` (Hypothesis), failure modes in `tests/test_failure_modes.py` |
+| SARIF | Output validated against SARIF 2.1.0 MUST-level invariants in `tests/test_cli_output.py` |
+| Lint/format | `ruff==0.8.4 check src tests` and `ruff format --check src tests` clean |
 
 To re-verify after changes:
 
