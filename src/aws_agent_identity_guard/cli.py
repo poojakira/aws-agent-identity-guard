@@ -287,9 +287,21 @@ def main(argv: list[str] | None = None) -> int:
 
     findings = scan_policy_document(_load_json(args.policy))
     if args.format == "json":
-        print(json.dumps({"findings": [f.to_dict() for f in findings]}, indent=2))
+        output_text = json.dumps({"findings": [f.to_dict() for f in findings]}, indent=2)
     elif args.format == "sarif":
-        print(json.dumps(_build_sarif(args.policy, findings), indent=2))
+        output_text = json.dumps(_build_sarif(args.policy, findings), indent=2)
+    else:
+        output_text = None
+
+    if output_text is not None:
+        # Honor --output for machine-readable formats so the documented CI
+        # integration (write results.sarif, then upload-sarif) actually works.
+        if args.output:
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(output_text, encoding="utf-8")
+            print(f"Written to {args.output}")
+        else:
+            print(output_text)
     else:
         _print_text(findings)
 

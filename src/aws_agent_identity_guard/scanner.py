@@ -225,7 +225,9 @@ def _condition_has_key(condition: dict[str, Any], target_key: str) -> bool:
     """
     if not condition or not isinstance(condition, dict):
         return False
-    target_lower = target_key.lower()
+    # Use casefold() rather than lower() for Unicode-correct, symmetric
+    # case-insensitive comparison (e.g. German 'ß' folds to 'ss').
+    target_lower = target_key.casefold()
     # Determine if this is a tag-namespace prefix lookup.
     # AWS tag condition keys use the form "aws:PrincipalTag/key-name".
     # When the caller checks for "aws:PrincipalTag" we must match both
@@ -235,7 +237,7 @@ def _condition_has_key(condition: dict[str, Any], target_key: str) -> bool:
         if not isinstance(key_value_map, dict):
             continue
         for condition_key in key_value_map:
-            ck_lower = condition_key.lower()
+            ck_lower = condition_key.casefold()
             # Exact case-insensitive match
             if ck_lower == target_lower:
                 return True

@@ -13,7 +13,6 @@ attackers may craft policies to trigger parser edge cases.
 """
 from __future__ import annotations
 
-import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
@@ -116,7 +115,13 @@ def test_as_list_always_returns_list(value: object) -> None:
 # ---------------------------------------------------------------------------
 
 
-@given(st.text(min_size=1), st.text(min_size=1))
+@given(
+    st.text(
+        alphabet="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:/-_",
+        min_size=1,
+    ),
+    st.text(min_size=1),
+)
 @settings(max_examples=300, suppress_health_check=[HealthCheck.too_slow])
 def test_condition_has_key_case_insensitive(k: str, v: str) -> None:
     """_condition_has_key must return the same result regardless of the
@@ -124,6 +129,13 @@ def test_condition_has_key_case_insensitive(k: str, v: str) -> None:
 
     This guards against regressions where a case-normalisation step is
     accidentally dropped from one code path.
+
+    The key strategy is constrained to the ASCII alphabet that real IAM
+    condition keys use (service prefixes such as ``aws:``/``iam:``, plus
+    ``/``-delimited tag suffixes). AWS condition-key case-insensitivity is
+    defined over ASCII; feeding arbitrary Unicode would test an impossible
+    property, since ``str.upper()``/``str.lower()`` are not invertible for
+    characters like the German ``ß`` or the Turkish dotless ``ı``.
     """
     condition = {"StringEquals": {k: "val"}}
     result_upper = _condition_has_key(condition, k.upper())
