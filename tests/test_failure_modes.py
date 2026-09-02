@@ -26,51 +26,55 @@ from aws_agent_identity_guard.cli import main
 class TestInvalidJsonInput:
     """CLI should exit 2 when the file contains invalid JSON."""
 
-    def test_truncated_json(self, tmp_path):
-        """Truncated JSON (missing closing brace) → SystemExit."""
+    def test_truncated_json(self, tmp_path, capsys):
+        """Truncated JSON (missing closing brace) → SystemExit code 2."""
         bad_file = tmp_path / "truncated.json"
         bad_file.write_text('{"Statement": [{"Effect": "Allow"', encoding="utf-8")
 
         with pytest.raises(SystemExit) as exc_info:
             main([str(bad_file)])
-        # SystemExit with a string message (from _load_json)
-        assert "failed to read policy JSON" in str(exc_info.value)
+        assert exc_info.value.code == 2
+        assert "failed to read policy JSON" in capsys.readouterr().err
 
-    def test_completely_invalid_json(self, tmp_path):
-        """Random text that is not JSON at all → SystemExit."""
+    def test_completely_invalid_json(self, tmp_path, capsys):
+        """Random text that is not JSON at all → SystemExit code 2."""
         bad_file = tmp_path / "garbage.json"
         bad_file.write_text("this is not json at all!!!", encoding="utf-8")
 
         with pytest.raises(SystemExit) as exc_info:
             main([str(bad_file)])
-        assert "failed to read policy JSON" in str(exc_info.value)
+        assert exc_info.value.code == 2
+        assert "failed to read policy JSON" in capsys.readouterr().err
 
-    def test_json_array_not_object(self, tmp_path):
-        """JSON array instead of object → SystemExit."""
+    def test_json_array_not_object(self, tmp_path, capsys):
+        """JSON array instead of object → SystemExit code 2."""
         bad_file = tmp_path / "array.json"
         bad_file.write_text('[{"Statement": []}]', encoding="utf-8")
 
         with pytest.raises(SystemExit) as exc_info:
             main([str(bad_file)])
-        assert "policy JSON must be an object" in str(exc_info.value)
+        assert exc_info.value.code == 2
+        assert "policy JSON must be an object" in capsys.readouterr().err
 
-    def test_json_scalar(self, tmp_path):
-        """JSON scalar (string) instead of object → SystemExit."""
+    def test_json_scalar(self, tmp_path, capsys):
+        """JSON scalar (string) instead of object → SystemExit code 2."""
         bad_file = tmp_path / "scalar.json"
         bad_file.write_text('"just a string"', encoding="utf-8")
 
         with pytest.raises(SystemExit) as exc_info:
             main([str(bad_file)])
-        assert "policy JSON must be an object" in str(exc_info.value)
+        assert exc_info.value.code == 2
+        assert "policy JSON must be an object" in capsys.readouterr().err
 
-    def test_empty_file(self, tmp_path):
-        """Empty file (zero bytes) → SystemExit."""
+    def test_empty_file(self, tmp_path, capsys):
+        """Empty file (zero bytes) → SystemExit code 2."""
         bad_file = tmp_path / "empty.json"
         bad_file.write_text("", encoding="utf-8")
 
         with pytest.raises(SystemExit) as exc_info:
             main([str(bad_file)])
-        assert "failed to read policy JSON" in str(exc_info.value)
+        assert exc_info.value.code == 2
+        assert "failed to read policy JSON" in capsys.readouterr().err
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -81,19 +85,21 @@ class TestInvalidJsonInput:
 class TestMissingFile:
     """CLI should exit 2 when the policy file does not exist."""
 
-    def test_nonexistent_file(self, tmp_path):
-        """Path to a file that does not exist → SystemExit."""
+    def test_nonexistent_file(self, tmp_path, capsys):
+        """Path to a file that does not exist → SystemExit code 2."""
         missing = tmp_path / "does_not_exist.json"
 
         with pytest.raises(SystemExit) as exc_info:
             main([str(missing)])
-        assert "failed to read policy JSON" in str(exc_info.value)
+        assert exc_info.value.code == 2
+        assert "failed to read policy JSON" in capsys.readouterr().err
 
-    def test_directory_instead_of_file(self, tmp_path):
-        """Passing a directory path instead of a file → SystemExit."""
+    def test_directory_instead_of_file(self, tmp_path, capsys):
+        """Passing a directory path instead of a file → SystemExit code 2."""
         with pytest.raises(SystemExit) as exc_info:
             main([str(tmp_path)])
-        assert "failed to read policy JSON" in str(exc_info.value)
+        assert exc_info.value.code == 2
+        assert "failed to read policy JSON" in capsys.readouterr().err
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -245,8 +251,8 @@ class TestLargePolicyDocument:
 class TestNonUtf8Content:
     """Files with non-UTF8 encoding should cause SystemExit (cannot decode)."""
 
-    def test_latin1_encoded_file(self, tmp_path):
-        """File encoded in Latin-1 with non-ASCII bytes → SystemExit."""
+    def test_latin1_encoded_file(self, tmp_path, capsys):
+        """File encoded in Latin-1 with non-ASCII bytes → SystemExit code 2."""
         bad_file = tmp_path / "latin1.json"
         # Write bytes that are valid Latin-1 but invalid UTF-8
         content = b'{"Statement": [{"Effect": "Allow", "Action": "s3:Get\xff\xfe"}]}'
@@ -254,23 +260,26 @@ class TestNonUtf8Content:
 
         with pytest.raises(SystemExit) as exc_info:
             main([str(bad_file)])
-        assert "failed to read policy JSON" in str(exc_info.value)
+        assert exc_info.value.code == 2
+        assert "failed to read policy JSON" in capsys.readouterr().err
 
-    def test_null_bytes_in_file(self, tmp_path):
-        """File containing null bytes → SystemExit (invalid JSON)."""
+    def test_null_bytes_in_file(self, tmp_path, capsys):
+        """File containing null bytes → SystemExit code 2 (invalid JSON)."""
         bad_file = tmp_path / "nullbytes.json"
         content = b'{"Statement": [\x00\x00]}'
         bad_file.write_bytes(content)
 
         with pytest.raises(SystemExit) as exc_info:
             main([str(bad_file)])
-        assert "failed to read policy JSON" in str(exc_info.value)
+        assert exc_info.value.code == 2
+        assert "failed to read policy JSON" in capsys.readouterr().err
 
-    def test_binary_file(self, tmp_path):
-        """Completely binary file → SystemExit."""
+    def test_binary_file(self, tmp_path, capsys):
+        """Completely binary file → SystemExit code 2."""
         bad_file = tmp_path / "binary.json"
         bad_file.write_bytes(bytes(range(256)))
 
         with pytest.raises(SystemExit) as exc_info:
             main([str(bad_file)])
-        assert "failed to read policy JSON" in str(exc_info.value)
+        assert exc_info.value.code == 2
+        assert "failed to read policy JSON" in capsys.readouterr().err

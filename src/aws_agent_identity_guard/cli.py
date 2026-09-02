@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from .scanner import Finding, scan_policy_document
@@ -14,13 +15,25 @@ def _pkg_version() -> str:
     return __version__
 
 
+def _exit_input_error(message: str) -> "SystemExit":
+    """Build a SystemExit that prints a diagnostic AND exits with code 2.
+
+    The documented Failure Semantics (README / RUNBOOK) promise exit code 2 for
+    unusable input (missing file, invalid JSON, non-object JSON). Raising
+    ``SystemExit`` with a *string* prints the string but exits with code 1, which
+    silently violated that contract. We print to stderr and set code=2 explicitly.
+    """
+    print(message, file=sys.stderr)
+    return SystemExit(2)
+
+
 def _load_json(path: Path) -> dict:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError, UnicodeDecodeError) as exc:
-        raise SystemExit(f"failed to read policy JSON: {exc}") from exc
+        raise _exit_input_error(f"failed to read policy JSON: {exc}") from exc
     if not isinstance(data, dict):
-        raise SystemExit("policy JSON must be an object")
+        raise _exit_input_error("policy JSON must be an object")
     return data
 
 
