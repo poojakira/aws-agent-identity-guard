@@ -5,6 +5,7 @@ invocation documented in the README's CI integration) silently printed to
 stdout instead of writing the requested file, which broke the
 `github/codeql-action/upload-sarif` step in the documented workflow.
 """
+
 from __future__ import annotations
 
 import json

@@ -11,6 +11,7 @@ Why this matters: IAM policies in the wild have non-standard shapes. Teams
 copy-paste from Stack Overflow, Terraform generates unusual structures, and
 attackers may craft policies to trigger parser edge cases.
 """
+
 from __future__ import annotations
 
 from hypothesis import HealthCheck, given, settings
@@ -57,9 +58,9 @@ def test_scan_policy_never_crashes(value: object) -> None:
     try:
         result = scan_policy_document(value)  # type: ignore[arg-type]
         # If we get here, input was accepted — result must be a list.
-        assert isinstance(result, list), (
-            f"scan_policy_document returned {type(result).__name__} instead of list"
-        )
+        assert isinstance(
+            result, list
+        ), f"scan_policy_document returned {type(result).__name__} instead of list"
     except TypeError:
         # Expected: the function documents that non-dict input raises TypeError.
         pass
@@ -80,9 +81,9 @@ def test_scan_trust_never_crashes(value: object) -> None:
     """
     try:
         result = scan_trust_policy(value)  # type: ignore[arg-type]
-        assert isinstance(result, list), (
-            f"scan_trust_policy returned {type(result).__name__} instead of list"
-        )
+        assert isinstance(
+            result, list
+        ), f"scan_trust_policy returned {type(result).__name__} instead of list"
     except TypeError:
         pass
 
@@ -101,13 +102,11 @@ def test_as_list_always_returns_list(value: object) -> None:
     assume they are iterating over strings.
     """
     result = _as_list(value)
-    assert isinstance(result, list), (
-        f"_as_list returned {type(result).__name__}, expected list"
-    )
+    assert isinstance(result, list), f"_as_list returned {type(result).__name__}, expected list"
     for item in result:
-        assert isinstance(item, str), (
-            f"_as_list produced non-str element {item!r} (type {type(item).__name__})"
-        )
+        assert isinstance(
+            item, str
+        ), f"_as_list produced non-str element {item!r} (type {type(item).__name__})"
 
 
 # ---------------------------------------------------------------------------
@@ -141,14 +140,13 @@ def test_condition_has_key_case_insensitive(k: str, v: str) -> None:
     result_upper = _condition_has_key(condition, k.upper())
     result_lower = _condition_has_key(condition, k.lower())
     assert result_upper == result_lower, (
-        f"Case-insensitive mismatch for key {k!r}: "
-        f"upper={result_upper}, lower={result_lower}"
+        f"Case-insensitive mismatch for key {k!r}: " f"upper={result_upper}, lower={result_lower}"
     )
     # Also: a key that IS in the condition must always return True regardless
     # of how we capitalise the lookup.
-    assert result_lower is True, (
-        f"_condition_has_key returned False for key {k!r} that is present in condition"
-    )
+    assert (
+        result_lower is True
+    ), f"_condition_has_key returned False for key {k!r} that is present in condition"
 
 
 # ---------------------------------------------------------------------------
@@ -170,9 +168,7 @@ def test_statements_with_unicode_keys(d: dict[str, str]) -> None:
     # _statements must return a list; every item must be a dict.
     assert isinstance(result, list)
     for item in result:
-        assert isinstance(item, dict), (
-            f"_statements returned a non-dict item: {item!r}"
-        )
+        assert isinstance(item, dict), f"_statements returned a non-dict item: {item!r}"
 
 
 # ---------------------------------------------------------------------------
@@ -191,16 +187,16 @@ def test_wildcard_action_string_not_list() -> None:
         "Statement": [
             {
                 "Effect": "Allow",
-                "Action": "*",       # string, not list
+                "Action": "*",  # string, not list
                 "Resource": "*",
             }
         ]
     }
     findings = scan_policy_document(policy)
     rule_ids = [f.rule_id for f in findings]
-    assert "AIG002" in rule_ids, (
-        f"Expected AIG002 for wildcard string Action, got rule IDs: {rule_ids}"
-    )
+    assert (
+        "AIG002" in rule_ids
+    ), f"Expected AIG002 for wildcard string Action, got rule IDs: {rule_ids}"
 
 
 # ---------------------------------------------------------------------------
@@ -226,9 +222,7 @@ def test_nested_notaction_fires_aig001() -> None:
     }
     findings = scan_policy_document(policy)
     rule_ids = [f.rule_id for f in findings]
-    assert "AIG001" in rule_ids, (
-        f"Expected AIG001 for NotAction list, got rule IDs: {rule_ids}"
-    )
+    assert "AIG001" in rule_ids, f"Expected AIG001 for NotAction list, got rule IDs: {rule_ids}"
 
 
 # ---------------------------------------------------------------------------
@@ -254,6 +248,4 @@ def test_deny_statement_not_scanned() -> None:
         ]
     }
     findings = scan_policy_document(policy)
-    assert findings == [], (
-        f"Expected no findings for Deny statement, got: {findings}"
-    )
+    assert findings == [], f"Expected no findings for Deny statement, got: {findings}"
