@@ -4,6 +4,8 @@ __pycache__/
 .ruff_cache/
 .venv/
 .venv-audit/
+.venv-verify/
+.hypothesis/
 dist/
 build/
 *.egg-info/

@@ -204,7 +204,7 @@ This tool is a static linter. It reads a file, analyzes it, and exits. There is 
 | Field | Value |
 |-------|-------|
 | Environment | Python 3.12.10, Windows 11, pytest 9.1.1 |
-| Last verified | 2026-09-02 |
+| Last verified | 2026-09-03 |
 | Test command | `python -m pytest tests/ -q` |
 | Test result | 230 passed, 3 skipped (skips: optional `rules` extension module not present) |
 | Rule coverage | All 25 emitted rule IDs (AIG001–AIG021, AIG-TP001–TP003, AIG-PB001) are referenced by positive/negative tests; parser edge cases fuzzed in `tests/test_iam_parser_fuzz.py` (Hypothesis), failure modes in `tests/test_failure_modes.py` |
