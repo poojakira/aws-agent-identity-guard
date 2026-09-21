@@ -1001,11 +1001,20 @@ def _scan_killchain_combinations(document: dict[str, Any]) -> list[Finding]:
 def scan_trust_policy(document: dict[str, Any]) -> list[Finding]:
     """Scan an IAM role trust policy (AssumeRolePolicyDocument) for agent identity risks.
 
+    These are static heuristics. Trust-policy risk depends on caller/account context and on
+    service-specific condition-key support, so findings are review signals rather than proof
+    that a role is exploitable.
+
     Rules
     -----
-    AIG-TP001  CRITICAL  Wildcard principal - any AWS identity can assume this role.
-    AIG-TP002  HIGH      Cross-account trust without sts:ExternalId (confused-deputy).
-    AIG-TP003  HIGH      Cross-account trust without aws:SourceArn (lateral-movement).
+    AIG-TP001  CRITICAL/HIGH  Wildcard principal. CRITICAL without conditions; HIGH when
+                             conditions exist because this scanner does not prove they are
+                             sufficient.
+    AIG-TP002  MEDIUM         AWS principal trust without sts:ExternalId. Advisory for
+                             third-party/shared-service delegation; ExternalId is not a
+                             universal requirement for every cross-account role.
+    AIG-TP003  MEDIUM         AWS service principal without source-scoping conditions
+                             (aws:SourceArn/SourceAccount/SourceOrg*), where supported.
     """
     if not isinstance(document, dict):
         raise TypeError(f"trust policy document must be a dict, got {type(document).__name__}")
@@ -1019,65 +1028,90 @@ def scan_trust_policy(document: dict[str, Any]) -> list[Finding]:
         principal = statement.get("Principal")
         condition = statement.get("Condition") or {}
 
-        # Flatten principals into a simple list for analysis
         principals_flat: list[str] = []
+        service_principals: list[str] = []
         if isinstance(principal, str):
             principals_flat = [principal]
         elif isinstance(principal, dict):
-            for v in principal.values():
-                principals_flat.extend(_as_list(v))
+            for key, value in principal.items():
+                values = _as_list(value)
+                principals_flat.extend(values)
+                if str(key).lower() == "service":
+                    service_principals.extend(values)
         elif isinstance(principal, list):
             principals_flat = [str(p) for p in principal]
 
-        # AIG-TP001: Wildcard principal
+        # AIG-TP001: wildcard principal. AWS documents Principal "*" as all principals,
+        # but a Condition block can narrow the effective trust. Static analysis cannot
+        # prove that an arbitrary Condition is sufficient, so lower severity when one exists.
         if principal == "*" or "*" in principals_flat:
+            has_conditions = bool(condition)
             findings.append(
                 Finding(
                     "AIG-TP001",
-                    "critical",
-                    "Trust policy grants AssumeRole to wildcard principal '*'. "
-                    "Any AWS identity - or unauthenticated caller via "
-                    "cognito-identity - can assume this agent role.",
-                    "Replace '*' with the specific service principal "
-                    "(e.g., bedrock.amazonaws.com) or account ARN that "
-                    "legitimately invokes this agent.",
+                    "high" if has_conditions else "critical",
+                    "Trust policy uses wildcard Principal '*'. This broadens trust to all "
+                    "principals that satisfy the statement conditions. "
+                    + (
+                        "A Condition block is present, but this scanner does not prove that it "
+                        "safely constrains the wildcard."
+                        if has_conditions
+                        else "No Condition block is present to constrain the wildcard."
+                    ),
+                    "Prefer an explicit principal. If a wildcard is intentional, restrict it "
+                    "with documented condition keys appropriate to the identity/service and "
+                    "validate the effective trust with IAM Access Analyzer.",
                     index,
                 )
             )
 
-        # Identify cross-account principals for TP002/TP003
-        cross_account_arns = [p for p in principals_flat if p.startswith("arn:aws:iam::")]
-        if cross_account_arns:
-            # AIG-TP002: Missing ExternalId
-            if not _condition_has_key(condition, "sts:ExternalId"):
-                findings.append(
-                    Finding(
-                        "AIG-TP002",
-                        "high",
-                        f"Cross-account trust to {cross_account_arns} without "
-                        "sts:ExternalId condition. Any resource in the trusted "
-                        "account can assume this role (confused-deputy).",
-                        "Add Condition: {StringEquals: {sts:ExternalId: '<shared-secret>'}}. "
-                        "Generate a cryptographically random ExternalId per trust relationship.",
-                        index,
-                    )
+        # AIG-TP002: ExternalId is specifically intended for third-party delegated
+        # AssumeRole confused-deputy scenarios. Static policy JSON does not tell us whether
+        # an AWS principal is same-account, organization-owned, or a multi-tenant third party,
+        # so this remains a MEDIUM advisory rather than a universal HIGH finding.
+        aws_principals = [p for p in principals_flat if p.startswith("arn:aws:iam::")]
+        if aws_principals and not _condition_has_key(condition, "sts:ExternalId"):
+            findings.append(
+                Finding(
+                    "AIG-TP002",
+                    "medium",
+                    f"AWS-principal trust to {aws_principals} has no sts:ExternalId condition. "
+                    "ExternalId is recommended when a third party assumes roles for multiple "
+                    "customers, but it is not required for every same-account or cross-account "
+                    "trust relationship.",
+                    "If this principal belongs to a third-party/shared service, require the "
+                    "provider's unique sts:ExternalId. Otherwise document the trust model and "
+                    "use the condition keys appropriate to your account/organization boundary.",
+                    index,
                 )
+            )
 
-            # AIG-TP003: Missing SourceArn (aws:SourceArn, case-insensitive structural check)
-            if not _condition_has_key(condition, "aws:SourceArn"):
-                findings.append(
-                    Finding(
-                        "AIG-TP003",
-                        "high",
-                        f"Cross-account trust to {cross_account_arns} without "
-                        "aws:SourceArn condition. Without source-ARN pinning, "
-                        "any resource in the trusted account can trigger "
-                        "role assumption for lateral movement.",
-                        "Add ArnLike condition on aws:SourceArn scoped to the "
-                        "specific resource (Lambda function, ECS task, etc.) "
-                        "that should assume this role.",
-                        index,
-                    )
+        # AIG-TP003: aws:SourceArn/SourceAccount/SourceOrg* are cross-service confused-deputy
+        # controls for AWS service principals. They are not a generic requirement for ordinary
+        # AWS account/role principals, and support varies by service.
+        service_principals = [
+            p for p in service_principals if isinstance(p, str) and p.endswith(".amazonaws.com")
+        ]
+        has_source_scope = (
+            _condition_has_key(condition, "aws:SourceArn")
+            or _condition_has_key(condition, "aws:SourceAccount")
+            or _condition_has_key(condition, "aws:SourceOrgID")
+            or _condition_has_key(condition, "aws:SourceOrgPaths")
+        )
+        if service_principals and not has_source_scope:
+            findings.append(
+                Finding(
+                    "AIG-TP003",
+                    "medium",
+                    f"AWS service-principal trust to {service_principals} has no "
+                    "aws:SourceArn, aws:SourceAccount, aws:SourceOrgID, or "
+                    "aws:SourceOrgPaths condition. Where the service supports these keys, "
+                    "source scoping reduces cross-service confused-deputy risk.",
+                    "Check the trusted service's documentation. Where supported, constrain the "
+                    "trust with the most specific aws:SourceArn or an appropriate "
+                    "aws:SourceAccount/aws:SourceOrg* condition.",
+                    index,
                 )
+            )
 
     return findings
