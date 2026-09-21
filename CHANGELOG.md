@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Trust-policy rules now distinguish third-party `sts:ExternalId` guidance from cross-service `aws:SourceArn`/`aws:SourceAccount` guidance. `AIG-TP002` and `AIG-TP003` are scoped MEDIUM advisories rather than universal HIGH findings.
+- Wildcard-principal messaging now acknowledges that a `Condition` block can constrain `Principal: "*"`; static analysis does not claim arbitrary conditions are sufficient.
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
