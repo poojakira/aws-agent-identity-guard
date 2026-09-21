@@ -89,9 +89,9 @@
 
 | Threat | Mitigated? | Notes |
 |--------|-----------|-------|
-| Very large policy document exhausts memory | Partially | No explicit file-size limit. Practical risk is low (IAM policies are capped at 6 KB by AWS). |
+| Very large policy document exhausts memory | Partially | No explicit file-size limit. AWS IAM documents are subject to service quotas, but those limits vary by policy type; local files should still be treated as untrusted input. |
 | Live scan enumerates excessive roles | Mitigated | `max_roles=500` safety cap in `LiveAccountScanner`. |
-| AWS API throttling during live scan | Handled | Boto3 retries with exponential backoff by default. `ClientError` exceptions are caught and logged; scan continues. |
+| AWS API throttling during live scan | Handled | Retry behavior depends on the configured Botocore retry mode. `ClientError` exceptions are caught and logged; operators should configure retry policy and account for incomplete scans. |
 
 ### E — Elevation of Privilege
 
