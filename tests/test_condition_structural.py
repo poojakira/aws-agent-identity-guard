@@ -298,6 +298,18 @@ class TestTrustPolicyConditionParsing:
             ]
         }
 
+    def _service_trust(self, condition: dict) -> dict:
+        return {
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {"Service": "bedrock.amazonaws.com"},
+                    "Action": "sts:AssumeRole",
+                    "Condition": condition,
+                }
+            ]
+        }
+
     def test_tp002_fires_without_external_id(self):
         findings = scan_trust_policy(self._cross_account_trust({}))
         assert any(f.rule_id == "AIG-TP002" for f in findings)
@@ -320,7 +332,7 @@ class TestTrustPolicyConditionParsing:
 
     def test_tp003_no_finding_with_source_arn(self):
         findings = scan_trust_policy(
-            self._cross_account_trust(
+            self._service_trust(
                 {"ArnLike": {"aws:SourceArn": "arn:aws:lambda:us-east-1:999:function:myFn"}}
             )
         )
@@ -329,7 +341,7 @@ class TestTrustPolicyConditionParsing:
     def test_tp003_no_finding_with_lowercase_source_arn(self):
         """'aws:sourceArn' (lowercase) must match 'aws:SourceArn' lookup."""
         findings = scan_trust_policy(
-            self._cross_account_trust(
+            self._service_trust(
                 {"ArnLike": {"aws:sourceArn": "arn:aws:lambda:us-east-1:999:function:myFn"}}
             )
         )
