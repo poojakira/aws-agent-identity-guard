@@ -1,5 +1,7 @@
 # AWS Agent Identity Guard
 
+> Quantitative résumé and portfolio claims are reconciled in [`VERIFIED_METRICS.md`](VERIFIED_METRICS.md).
+
 Static IAM policy checks for AWS roles used by AI agents and tool executors.
 
 AI agents and tool executors can turn overbroad cloud permissions into real actions: invoking Lambda functions, assuming roles, changing Bedrock/SageMaker control-plane resources, reading secrets, or disabling audit trails. `aws-agent-identity-guard` checks IAM policy JSON for these agent-specific risk patterns before deployment.
