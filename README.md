@@ -1,6 +1,7 @@
 # AWS Agent Identity Guard
 
 > Quantitative résumé and portfolio claims are reconciled in [`VERIFIED_METRICS.md`](VERIFIED_METRICS.md).
+> Resume-specific proof for 25 rule IDs, 230 tests, and the CI performance gates is in [`RESUME_EVIDENCE.md`](RESUME_EVIDENCE.md).
 
 Static IAM policy checks for AWS roles used by AI agents and tool executors.
 
