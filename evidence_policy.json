@@ -17,23 +17,23 @@
     },
     {
       "rule_id": "AIG-TP002",
-      "severity": "high",
+      "severity": "medium",
       "category": "trust_policy",
-      "description": "Cross-account trust statement is missing sts:ExternalId condition. Enables confused-deputy attacks.",
+      "description": "AWS-principal trust has no sts:ExternalId. Review whether this is third-party/shared-service delegation; ExternalId is not universally required for every cross-account trust.",
       "mitre_attack": "T1548",
       "cwe": "CWE-639",
-      "remediation": "Add StringEquals condition on sts:ExternalId with a non-guessable shared secret.",
-      "test_function": "test_trust_policy_cross_account_missing_external_id_is_high"
+      "remediation": "For third-party delegated access, require the provider's unique sts:ExternalId; otherwise document the intended trust boundary.",
+      "test_function": "test_cross_account_missing_external_id"
     },
     {
       "rule_id": "AIG-TP003",
-      "severity": "high",
+      "severity": "medium",
       "category": "trust_policy",
-      "description": "Cross-account trust statement is missing aws:SourceArn condition. Any resource in the trusted account can trigger assumption.",
+      "description": "AWS service-principal trust lacks source-scoping conditions such as aws:SourceArn or aws:SourceAccount. These controls mitigate cross-service confused-deputy risk where supported.",
       "mitre_attack": "T1548",
       "cwe": "CWE-639",
-      "remediation": "Add ArnLike or StringEquals condition on aws:SourceArn scoped to a specific resource ARN.",
-      "test_function": "test_trust_policy_cross_account_missing_source_arn_is_high"
+      "remediation": "Check the trusted service documentation and, where supported, add the most specific aws:SourceArn or appropriate aws:SourceAccount/aws:SourceOrg* condition.",
+      "test_function": "test_service_principal_missing_source_scope_is_advisory"
     }
   ],
   "ci_hardening": {
