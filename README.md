@@ -1,5 +1,7 @@
 # AWS Agent Identity Guard
 
+**Repository owner & maintainer:** Pooja Kiran ([@poojakira](https://github.com/poojakira)) — I review changes, verify public claims, and maintain the repository record.
+
 > Quantitative résumé and portfolio claims are reconciled in [`VERIFIED_METRICS.md`](VERIFIED_METRICS.md).
 > Resume-specific proof for 25 rule IDs, 230 tests, and the CI performance gates is in [`RESUME_EVIDENCE.md`](RESUME_EVIDENCE.md).
 
