@@ -128,9 +128,9 @@ jobs:
 | AIG019 | CRITICAL | Credential-harvest plus lateral-movement permission combination |
 | AIG020 | HIGH | Credential-harvest plus cloud-metadata reachability pattern |
 | AIG021 | CRITICAL | Combined credential-harvest, metadata, and lateral-movement chain in one identity |
-| AIG-TP001 | CRITICAL | Wildcard principal (`*`) in trust policy |
-| AIG-TP002 | HIGH | Cross-account trust without `sts:ExternalId` |
-| AIG-TP003 | HIGH | Cross-account trust without `aws:SourceArn` |
+| AIG-TP001 | CRITICAL / HIGH | Wildcard principal (`*`); severity is lower when a Condition block exists because static analysis cannot prove its sufficiency |
+| AIG-TP002 | MEDIUM | AWS-principal trust without `sts:ExternalId`; advisory for third-party/shared-service delegation, not a universal cross-account requirement |
+| AIG-TP003 | MEDIUM | AWS service-principal trust without `aws:SourceArn` / `aws:SourceAccount` / `aws:SourceOrg*` scoping where supported |
 | AIG-PB001 | MEDIUM | Role with critical findings but no permission boundary (emitted only in `--live-scan` mode, where role metadata is available) |
 
 ## Live Account Scanning
@@ -183,6 +183,7 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests -q
 - **Static analysis only.** This tool reads IAM policy JSON and produces findings. It does not intercept API calls, enforce runtime deny decisions, or act as a policy enforcement point. There is no "fail-closed" behavior because it is not a runtime system.
 - **No semantic understanding of Condition keys.** The scanner checks for the *presence* of specific Condition keys (e.g., `iam:PassedToService`, `aws:SourceArn`) but does not evaluate whether the condition values are logically sufficient to mitigate a risk.
 - **Single-policy scope.** Each invocation analyzes one policy document in isolation. Cross-policy interactions (e.g., a permissive identity policy constrained by an SCP or permission boundary) are not considered.
+- **Trust-policy context is incomplete in static mode.** The scanner cannot infer whether an AWS principal is same-account, organization-owned, or a third party. `AIG-TP002` is therefore an advisory. `AIG-TP003` is limited to AWS service principals and only recommends source-scoping keys where that service supports them.
 - **Action pattern matching is prefix-based.** Wildcard detection uses prefix/fnmatch logic. Unusual action name formats or future AWS service namespaces may not be covered until rules are updated.
 - **No AWS API calls in default mode.** The tool cannot resolve resource ARNs, check whether a role actually exists, or determine effective permissions. Use IAM Access Analyzer or CloudTrail for runtime validation.
 - **Trust policy analysis requires explicit invocation.** `scan_trust_policy()` must be called separately; it is not triggered by passing a standard identity policy to `scan_policy_document()`.
