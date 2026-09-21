@@ -880,7 +880,7 @@ class TestTrustPolicyRules:
         )
         assert any(f.rule_id == "AIG-TP002" for f in findings)
 
-    def test_cross_account_missing_source_arn(self):
+    def test_aws_principal_does_not_trigger_service_source_scope_rule(self):
         findings = scan_trust_policy(
             {
                 "Version": "2012-10-17",
@@ -895,7 +895,7 @@ class TestTrustPolicyRules:
             }
         )
         assert "AIG-TP002" not in {f.rule_id for f in findings}
-        assert any(f.rule_id == "AIG-TP003" for f in findings)
+        assert "AIG-TP003" not in {f.rule_id for f in findings}
 
     def test_well_formed_cross_account_passes(self):
         findings = scan_trust_policy(
@@ -919,8 +919,8 @@ class TestTrustPolicyRules:
         tp_findings = [f for f in findings if f.rule_id.startswith("AIG-TP")]
         assert tp_findings == []
 
-    def test_service_principal_does_not_trigger_cross_account(self):
-        """Service principals (e.g., bedrock.amazonaws.com) are not cross-account."""
+    def test_service_principal_missing_source_scope_is_advisory(self):
+        """Service principals should trigger TP003 when supported source scoping is absent."""
         findings = scan_trust_policy(
             {
                 "Version": "2012-10-17",
@@ -933,8 +933,8 @@ class TestTrustPolicyRules:
                 ],
             }
         )
-        # Service principal should not trigger TP002 or TP003
-        assert not any(f.rule_id in ("AIG-TP002", "AIG-TP003") for f in findings)
+        assert not any(f.rule_id == "AIG-TP002" for f in findings)
+        assert any(f.rule_id == "AIG-TP003" and f.severity == "medium" for f in findings)
 
     def test_malformed_input_raises_type_error(self):
         with pytest.raises(TypeError, match="trust policy document must be a dict"):
