@@ -23,7 +23,19 @@ The implementation lives in `src/aws_agent_identity_guard/scanner.py` and `src/a
 
 ### 230 passing tests
 
-The verified test snapshot records **230 passed, 3 skipped**. Coverage includes positive/negative rule cases, parser edge cases and Hypothesis fuzzing, SARIF output validation, and failure-mode tests.
+Fresh current-head proof:
+
+- GitHub Actions run: https://github.com/poojakira/aws-agent-identity-guard/actions/runs/35637577557
+- Python 3.11 test job: `106458771376`
+- Head commit: `e95fc426e326e1ce9d2ffe03c39cc7d203631f15`
+
+The workflow emits a machine-readable JUnit-derived summary and fails if the documented count drifts:
+
+```text
+PYTEST_EVIDENCE tests=233 passed=230 skipped=3 failures=0 errors=0
+```
+
+The same exact-count gate runs in the Python 3.10/3.11/3.12 matrix. Coverage includes positive/negative rule cases, parser edge cases and Hypothesis fuzzing, SARIF output validation, and failure-mode tests.
 
 ### Performance gates
 
@@ -38,15 +50,16 @@ The benchmark enforces:
 - **p95 latency < 10 ms per policy**
 - **throughput > 1,000 policies/second**
 
-A successful current CI performance job on 2026-09-21 reported:
+The same fresh current-head CI run reported:
 
 ```text
-p95 latency: 1.1473 ms (gate: <10ms)
-Throughput: 1866 policies/sec (gate: >1000)
+p95 latency: 0.8491 ms (gate: <10ms)
+Throughput: 2596 policies/sec (gate: >1000)
 p95 gate: PASS
 Throughput gate: PASS
 ```
 
-GitHub Actions run: https://github.com/poojakira/aws-agent-identity-guard/actions/runs/35555722252
+GitHub Actions run: https://github.com/poojakira/aws-agent-identity-guard/actions/runs/35637577557  
+Performance job: `106458771333`
 
 These values are regression gates measured on a 500-policy synthetic benchmark, not universal production-performance guarantees.
