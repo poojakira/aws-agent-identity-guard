@@ -6,15 +6,18 @@ This file is the evidence anchor for quantitative résumé and portfolio claims 
 
 **Audited code commit:** `d5a72870a9a296878a5b4ca562d194da157f9857`  
 **Successful main CI run:** https://github.com/poojakira/aws-agent-identity-guard/actions/runs/33730289448  
-**Verification date:** 2026-09-03
+**Verification date:** 2026-09-21
+
+**Fresh exact-count CI proof:** https://github.com/poojakira/aws-agent-identity-guard/actions/runs/35637577557  
+**Fresh head commit:** `e95fc426e326e1ce9d2ffe03c39cc7d203631f15`
 
 | Claim | Verified value | Evidence |
 |---|---:|---|
 | Deterministic rule IDs | **25** | `src/aws_agent_identity_guard/scanner.py` + `live_scanner.py`: AIG001–AIG021, AIG-TP001–AIG-TP003, AIG-PB001 |
-| Test result | **230 passed, 3 skipped** | README verification record and successful Python 3.10/3.11/3.12 CI matrix |
+| Test result | **230 passed, 3 skipped** | Run 35637577557; Python 3.11 job 106458771376 emits `PYTEST_EVIDENCE tests=233 passed=230 skipped=3 failures=0 errors=0`; the exact-count gate runs across Python 3.10/3.11/3.12 |
 | SARIF | **2.1.0 output implemented and tested** | CLI/output tests and README |
-| Performance latency gate | **p95 < 10 ms/policy** | `benchmarks/perf_gate.py`; now enforced by `.github/workflows/ci.yml` |
-| Performance throughput gate | **> 1,000 policies/sec** | `benchmarks/perf_gate.py`; now enforced by `.github/workflows/ci.yml` |
+| Performance latency gate | **p95 < 10 ms/policy** | Run 35637577557, job 106458771333: measured 0.8491 ms p95; gate PASS |
+| Performance throughput gate | **> 1,000 policies/sec** | Same job: measured 2,596 policies/sec; gate PASS |
 
 ## Rule-count proof
 
