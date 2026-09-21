@@ -775,8 +775,8 @@ class TestCrossAccountTrustPolicyConfusedDeputy:
     Real-world pattern: Cross-account trust policy for an AI agent orchestration
     platform. The partner/vendor account is trusted to assume a role in the
     customer account, but the trust policy is missing:
-    1. sts:ExternalId (confused deputy protection)
-    2. aws:SourceArn (lateral movement protection)
+    1. sts:ExternalId when this is third-party delegated access
+    2. source scoping is evaluated separately for AWS service principals
 
     Source: AWS Organizations multi-account agent deployment
     Reference: https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html
@@ -834,16 +834,27 @@ class TestCrossAccountTrustPolicyConfusedDeputy:
         rule_ids = {f.rule_id for f in findings}
         assert "AIG-TP002" in rule_ids
         tp002 = [f for f in findings if f.rule_id == "AIG-TP002"]
-        assert tp002[0].severity == "high"
+        assert tp002[0].severity == "medium"
         assert "ExternalId" in tp002[0].message
 
-    def test_catches_missing_source_arn(self):
-        """AIG-TP003: Cross-account trust without aws:SourceArn."""
-        findings = scan_trust_policy(self.VULNERABLE_TRUST_POLICY)
+    def test_catches_service_principal_missing_source_scope(self):
+        """AIG-TP003: service-principal trust without supported source scoping."""
+        findings = scan_trust_policy(
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {"Service": "bedrock.amazonaws.com"},
+                        "Action": "sts:AssumeRole",
+                    }
+                ],
+            }
+        )
         rule_ids = {f.rule_id for f in findings}
         assert "AIG-TP003" in rule_ids
         tp003 = [f for f in findings if f.rule_id == "AIG-TP003"]
-        assert tp003[0].severity == "high"
+        assert tp003[0].severity == "medium"
 
     def test_catches_wildcard_principal(self):
         """AIG-TP001: Wildcard principal '*' = any AWS identity can assume."""
@@ -859,8 +870,8 @@ class TestCrossAccountTrustPolicyConfusedDeputy:
         rule_ids = {f.rule_id for f in findings}
         # Still missing ExternalId even though it has PrincipalOrgID
         assert "AIG-TP002" in rule_ids
-        # Still missing SourceArn
-        assert "AIG-TP003" in rule_ids
+        # TP003 is reserved for AWS service principals, not ordinary AWS principals.
+        assert "AIG-TP003" not in rule_ids
 
     def test_properly_secured_trust_policy(self):
         """Properly secured cross-account trust with ExternalId and SourceArn."""
@@ -888,11 +899,11 @@ class TestCrossAccountTrustPolicyConfusedDeputy:
         assert not any(f.rule_id == "AIG-TP001" for f in findings)
         # Should NOT fire TP002 (has ExternalId)
         assert not any(f.rule_id == "AIG-TP002" for f in findings)
-        # Should NOT fire TP003 (has SourceArn)
+        # Should NOT fire TP003 (ordinary AWS principal; TP003 is service-principal scoping)
         assert not any(f.rule_id == "AIG-TP003" for f in findings)
 
     def test_service_principal_trust_not_flagged(self):
-        """Service principals (bedrock.amazonaws.com) should NOT trigger TP002/TP003."""
+        """A service principal with source scoping should not trigger TP002/TP003."""
         service_trust = {
             "Version": "2012-10-17",
             "Statement": [
