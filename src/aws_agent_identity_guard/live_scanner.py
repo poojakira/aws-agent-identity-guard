@@ -39,7 +39,6 @@ CLI:
 
 from __future__ import annotations
 
-import contextlib
 import logging
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
@@ -380,8 +379,11 @@ class LiveAccountScanner:
                     user_name = user_data["UserName"]
                     user_arn = user_data["Arn"]
                     tags_resp = []
-                    with contextlib.suppress(botocore.exceptions.ClientError):
+                    try:
                         tags_resp = self._iam.list_user_tags(UserName=user_name).get("Tags", [])
+                    except botocore.exceptions.ClientError as exc:
+                        self._collection_errors.append(f"{type(exc).__name__}: {exc}")
+                        logger.warning("Could not fetch tags for user %s: %s", user_name, exc)
                     tags = {t["Key"]: t["Value"] for t in tags_resp}
                     policies = self._collect_user_policies(user_name, user_arn)
                     users.append(
