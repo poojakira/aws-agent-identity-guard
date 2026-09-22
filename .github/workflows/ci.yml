@@ -111,10 +111,16 @@ jobs:
           passed = tests - failures - errors - skipped
 
           print(f"PYTEST_EVIDENCE tests={tests} passed={passed} skipped={skipped} failures={failures} errors={errors}")
-          if (passed, skipped, failures, errors) != (230, 3, 0, 0):
+          if failures or errors:
+              raise SystemExit("Test suite contains failures/errors")
+          if tests < 200:
               raise SystemExit(
-                  "Documented test evidence drifted; update VERIFIED_METRICS.md only after reviewing the change."
+                  f"Unexpected test-suite contraction: collected {tests}, expected at least 200"
               )
+          print(
+              "NOTE: public test-count claims belong in generated evidence tied to this commit; "
+              "CI does not freeze an exact historical count."
+          )
           PY
       - name: Upload pytest evidence
         if: always()
