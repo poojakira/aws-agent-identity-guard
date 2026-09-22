@@ -293,3 +293,28 @@ def test_aig_pb001_does_not_fire_when_boundary_present():
     assert (
         not pb_findings
     ), f"AIG-PB001 must NOT fire when a permissions boundary is attached, got: {pb_findings}"
+
+@mock_aws
+def test_live_scan_marks_report_incomplete_on_aws_collection_error(monkeypatch):
+    """AWS API collection failures must never produce a complete-looking report."""
+    import botocore.exceptions
+
+    sess = _session()
+    scanner = LiveAccountScanner(session=sess)
+
+    original_get_paginator = scanner._iam.get_paginator
+
+    def failing_get_paginator(name: str):
+        if name == "list_roles":
+            raise botocore.exceptions.ClientError(
+                {"Error": {"Code": "AccessDenied", "Message": "denied"}},
+                "ListRoles",
+            )
+        return original_get_paginator(name)
+
+    monkeypatch.setattr(scanner._iam, "get_paginator", failing_get_paginator)
+    report = scanner.scan_account()
+
+    assert report.scan_complete is False
+    assert report.errors
+    assert "collection error" in (report.completeness_reason or "")
