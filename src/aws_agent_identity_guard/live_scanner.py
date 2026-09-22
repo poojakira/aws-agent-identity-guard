@@ -159,6 +159,7 @@ class LiveAccountScanner:
         self._sts = self._session.client("sts", region_name=self._region)
         self._role_name_filter = role_name_filter
         self._max_roles = max_roles
+        self._collection_errors: list[str] = []
 
     # ── Account identity ───────────────────────────────────────────────────────
 
@@ -166,6 +167,7 @@ class LiveAccountScanner:
         try:
             return self._sts.get_caller_identity()["Account"]
         except botocore.exceptions.ClientError as exc:
+            self._collection_errors.append(f"{type(exc).__name__}: {exc}")
             logger.warning("Could not determine account ID: %s", exc)
             return "unknown"
 
@@ -182,6 +184,7 @@ class LiveAccountScanner:
             )
             return version["PolicyVersion"]["Document"]
         except botocore.exceptions.ClientError as exc:
+            self._collection_errors.append(f"{type(exc).__name__}: {exc}")
             logger.warning("Could not fetch policy %s: %s", policy_arn, exc)
             return None
 
@@ -209,10 +212,12 @@ class LiveAccountScanner:
                             )
                         )
                     except botocore.exceptions.ClientError as exc:
+            self._collection_errors.append(f"{type(exc).__name__}: {exc}")
                         logger.warning(
                             "Could not fetch inline policy %s/%s: %s", role_name, policy_name, exc
                         )
         except botocore.exceptions.ClientError as exc:
+            self._collection_errors.append(f"{type(exc).__name__}: {exc}")
             logger.warning("Could not list inline policies for role %s: %s", role_name, exc)
 
         # Attached managed policies
@@ -232,6 +237,7 @@ class LiveAccountScanner:
                             )
                         )
         except botocore.exceptions.ClientError as exc:
+            self._collection_errors.append(f"{type(exc).__name__}: {exc}")
             logger.warning("Could not list attached policies for role %s: %s", role_name, exc)
 
         return policies
@@ -260,6 +266,7 @@ class LiveAccountScanner:
                             )
                         )
                     except botocore.exceptions.ClientError as exc:
+            self._collection_errors.append(f"{type(exc).__name__}: {exc}")
                         logger.warning(
                             "Could not fetch inline user policy %s/%s: %s",
                             user_name,
@@ -267,6 +274,7 @@ class LiveAccountScanner:
                             exc,
                         )
         except botocore.exceptions.ClientError as exc:
+            self._collection_errors.append(f"{type(exc).__name__}: {exc}")
             logger.warning("Could not list inline user policies for %s: %s", user_name, exc)
 
         # Attached managed policies
@@ -286,6 +294,7 @@ class LiveAccountScanner:
                             )
                         )
         except botocore.exceptions.ClientError as exc:
+            self._collection_errors.append(f"{type(exc).__name__}: {exc}")
             logger.warning("Could not list attached user policies for %s: %s", user_name, exc)
 
         return policies
@@ -328,6 +337,7 @@ class LiveAccountScanner:
                 if not was_truncated:
                     total_discovered = len(role_list)
         except botocore.exceptions.ClientError as exc:
+            self._collection_errors.append(f"{type(exc).__name__}: {exc}")
             logger.error("Could not enumerate roles: %s", exc)
             return roles, False, 0
 
@@ -383,6 +393,7 @@ class LiveAccountScanner:
                         )
                     )
         except botocore.exceptions.ClientError as exc:
+            self._collection_errors.append(f"{type(exc).__name__}: {exc}")
             logger.error("Could not enumerate users: %s", exc)
 
         return users
@@ -452,23 +463,23 @@ class LiveAccountScanner:
         botocore.exceptions.ClientError
             On unrecoverable AWS API errors (e.g. access denied to iam:ListRoles).
         """
+        self._collection_errors = []
         account_id = self._get_account_id()
         scan_ts = datetime.now(tz=timezone.utc).isoformat()
         all_findings: list[dict[str, Any]] = []
         role_rows: list[dict[str, Any]] = []
-        errors: list[str] = []
 
         logger.info("Scanning account %s (region=%s)", account_id, self._region)
 
         # Scan roles — capture completeness metadata
         roles, roles_truncated, roles_discovered = self._enumerate_roles()
         scan_complete = not roles_truncated
-        completeness_reason = (
-            f"Role scan truncated at {self._max_roles} (discovered at least {roles_discovered}). "
-            "Findings may be incomplete — increase max_roles or filter by role name."
-            if roles_truncated
-            else None
-        )
+        completeness_reasons: list[str] = []
+        if roles_truncated:
+            completeness_reasons.append(
+                f"Role scan truncated at {self._max_roles} (discovered at least {roles_discovered}). "
+                "Findings may be incomplete — increase max_roles or filter by role name."
+            )
         for role in roles:
             findings = self._scan_role(role)
             all_findings.extend(findings)
@@ -499,6 +510,14 @@ class LiveAccountScanner:
                     d["policy_arn"] = policy.policy_arn
                     d["policy_type"] = policy.policy_type
                     all_findings.append(d)
+
+        if self._collection_errors:
+            scan_complete = False
+            completeness_reasons.append(
+                f"{len(self._collection_errors)} AWS API collection error(s) occurred; findings may be incomplete."
+            )
+        errors = list(self._collection_errors)
+        completeness_reason = " ".join(completeness_reasons) or None
 
         severity_counts = {
             "critical": sum(1 for f in all_findings if f["severity"] == "critical"),
@@ -541,6 +560,7 @@ class LiveAccountScanner:
         try:
             resp = self._iam.get_role(RoleName=role_name)
         except botocore.exceptions.ClientError as exc:
+            self._collection_errors.append(f"{type(exc).__name__}: {exc}")
             raise ValueError(f"Role {role_name!r} not found or access denied: {exc}") from exc
 
         role_data = resp["Role"]
