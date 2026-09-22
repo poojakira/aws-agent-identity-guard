@@ -516,7 +516,8 @@ class LiveAccountScanner:
         if self._collection_errors:
             scan_complete = False
             completeness_reasons.append(
-                f"{len(self._collection_errors)} AWS API collection error(s) occurred; findings may be incomplete."
+                f"{len(self._collection_errors)} AWS API collection error(s) occurred; "
+                "findings may be incomplete."
             )
         errors = list(self._collection_errors)
         completeness_reason = " ".join(completeness_reasons) or None
