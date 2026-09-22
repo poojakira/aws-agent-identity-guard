@@ -38,14 +38,10 @@ jobs:
           python - <<'PY'
           import os
           import tomllib
-          from pathlib import Path
+          from aws_agent_identity_guard import __version__ as init_version
 
           with open("pyproject.toml", "rb") as fh:
               project_version = tomllib.load(fh)["project"]["version"]
-
-          namespace = {}
-          exec(Path("src/aws_agent_identity_guard/__init__.py").read_text(), namespace)
-          init_version = namespace["__version__"]
           expected_tag = f"v{project_version}"
           actual_tag = os.environ["GITHUB_REF_NAME"]
 
