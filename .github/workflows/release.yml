@@ -7,86 +7,132 @@ on:
 
 permissions:
   contents: write
-  id-token: write # Required for Sigstore signing and trusted publishing
+  id-token: write
   attestations: write
 
+env:
+  PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+
 jobs:
-  build:
-    name: Build distribution packages
+  verify-build:
+    name: Verify and build release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: "3.12"
+          cache: pip
 
-      - name: Install build tools
-        run: pip install build==1.2.1
+      - name: Install release verification dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install build==1.2.1 twine bandit==1.8.3 pip-audit==2.10.1
+
+      - name: Verify tag and package versions agree
+        run: |
+          python - <<'PY'
+          import os
+          import tomllib
+          from pathlib import Path
+
+          with open("pyproject.toml", "rb") as fh:
+              project_version = tomllib.load(fh)["project"]["version"]
+
+          namespace = {}
+          exec(Path("src/aws_agent_identity_guard/__init__.py").read_text(), namespace)
+          init_version = namespace["__version__"]
+          expected_tag = f"v{project_version}"
+          actual_tag = os.environ["GITHUB_REF_NAME"]
+
+          if init_version != project_version:
+              raise SystemExit(
+                  f"version drift: pyproject={project_version}, __init__={init_version}"
+              )
+          if actual_tag != expected_tag:
+              raise SystemExit(
+                  f"release tag {actual_tag!r} does not match package version {expected_tag!r}"
+              )
+          print(f"release version verified: {project_version}")
+          PY
+
+      - name: Run release gates
+        run: |
+          ruff check src tests
+          ruff format --check src tests
+          pyright src/aws_agent_identity_guard tests
+          bandit -r src -ll
+          pip-audit --skip-editable --progress-spinner=off
+          pytest tests -q --junitxml=pytest-results.xml
+          python benchmarks/perf_gate.py --policies 500 --output perf-results.json
 
       - name: Build wheel and sdist
         run: python -m build
 
-      - name: Upload dist artifacts
-        uses: actions/upload-artifact@v4
+      - name: Verify distributions
+        run: twine check dist/*
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: dist
           path: dist/
           retention-days: 5
 
-  sbom:
-    name: Generate CycloneDX SBOM
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: release-evidence
+          path: |
+            pytest-results.xml
+            perf-results.json
+          retention-days: 90
 
-      - uses: actions/setup-python@v5
+  sbom:
+    name: Generate release-environment SBOM
+    runs-on: ubuntu-latest
+    needs: verify-build
+    steps:
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: "3.12"
 
-      - name: Install CycloneDX tooling
-        run: pip install cyclonedx-bom==4.5.0
-
-      - name: Generate SBOM
-        run: |
-          cyclonedx-py environment \
-            --output sbom.cdx.json \
-            --format json \
-            --schema-version 1.5
-
-      - name: Generate source SBOM from requirements
-        run: |
-          cyclonedx-py requirements \
-            --input-file requirements-dev.txt \
-            --output sbom-dev.cdx.json \
-            --format json \
-            --schema-version 1.5 || true
-
-      - name: Upload SBOM
-        uses: actions/upload-artifact@v4
-        with:
-          name: sbom
-          path: "*.cdx.json"
-          retention-days: 5
-
-  sign:
-    name: Sign with Sigstore and create GitHub Release
-    runs-on: ubuntu-latest
-    needs: [build, sbom]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download dist artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist/
 
-      - name: Download SBOM
-        uses: actions/download-artifact@v4
+      - name: Install built wheel and CycloneDX tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install dist/*.whl
+          pip install cyclonedx-bom==5.1.1
+
+      - name: Generate CycloneDX SBOM
+        run: |
+          cyclonedx-py environment             --output-format JSON             --outfile sbom.cdx.json
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: sbom
+          path: sbom.cdx.json
+          retention-days: 5
+
+  sign-release:
+    name: Sign and create GitHub release
+    runs-on: ubuntu-latest
+    needs: [verify-build, sbom]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - uses: actions/download-artifact@v4
         with:
           name: sbom
           path: sbom/
@@ -94,22 +140,19 @@ jobs:
       - name: Install Sigstore
         run: pip install sigstore==3.1.0
 
-      - name: Sign distribution packages
+      - name: Sign and verify release artifacts
         run: |
-          for file in dist/*; do
-            sigstore sign "$file"
+          for file in dist/* sbom/sbom.cdx.json; do
+            python -m sigstore sign "$file"
+            python -m sigstore verify identity               --cert-identity "https://github.com/${{ github.repository }}/.github/workflows/release.yml@${{ github.ref }}"               --cert-oidc-issuer "https://token.actions.githubusercontent.com"               "$file"
           done
 
-      - name: Sign SBOM
-        run: |
-          for file in sbom/*.cdx.json; do
-            sigstore sign "$file"
-          done
-
-      - name: Generate attestation
-        uses: actions/attest-build-provenance@v1
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
         with:
-          subject-path: "dist/*"
+          subject-path: |
+            dist/*.whl
+            dist/*.tar.gz
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -117,43 +160,32 @@ jobs:
           generate_release_notes: true
           files: |
             dist/*
-            dist/*.sigstore.json
-            sbom/*.cdx.json
-            sbom/*.sigstore.json
+            sbom/*
           body: |
             ## Verification
 
-            All artifacts are signed with [Sigstore](https://www.sigstore.dev/).
+            Release artifacts were built only after lint, type, test, security,
+            dependency-audit, and performance gates passed. Distribution files
+            and the CycloneDX release-environment SBOM are Sigstore signed.
 
-            ```bash
-            pip install sigstore
-            sigstore verify identity \
-              --cert-identity "https://github.com/${{ github.repository }}/.github/workflows/release.yml@${{ github.ref }}" \
-              --cert-oidc-issuer "https://token.actions.githubusercontent.com" \
-              <artifact>
-            ```
-
-            ## SBOM
-
-            CycloneDX SBOM is attached as `sbom.cdx.json`.
+            The performance artifact is a synthetic CI measurement, not a
+            production throughput or latency SLO.
 
   publish:
-    name: Publish to PyPI (trusted publisher)
+    name: Publish to PyPI
     runs-on: ubuntu-latest
-    needs: sign
+    needs: sign-release
     environment:
       name: pypi
       url: https://pypi.org/p/aws-agent-identity-guard
     permissions:
-      id-token: write # Required for trusted publishing
+      id-token: write
     steps:
-      - name: Download dist artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist/
 
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           print-hash: true
