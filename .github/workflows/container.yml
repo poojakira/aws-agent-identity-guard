@@ -32,7 +32,7 @@ jobs:
             type=ref,event=tag
             type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
       - id: build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: Dockerfile
