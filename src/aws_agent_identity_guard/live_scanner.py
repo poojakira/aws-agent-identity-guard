@@ -266,7 +266,7 @@ class LiveAccountScanner:
                             )
                         )
                     except botocore.exceptions.ClientError as exc:
-            self._collection_errors.append(f"{type(exc).__name__}: {exc}")
+                        self._collection_errors.append(f"{type(exc).__name__}: {exc}")
                         logger.warning(
                             "Could not fetch inline user policy %s/%s: %s",
                             user_name,
