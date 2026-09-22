@@ -1,0 +1,26 @@
+name: "AWS Agent Identity Guard"
+description: "Fail a CI job when an IAM policy contains high-risk agent identity findings."
+inputs:
+  policy:
+    description: "Repository-relative path to IAM policy JSON."
+    required: true
+  format:
+    description: "Output format: text, json, or sarif."
+    required: false
+    default: "sarif"
+  output:
+    description: "Output file for json/sarif formats."
+    required: false
+    default: "aws-agent-identity-guard.sarif"
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - "${{ inputs.policy }}"
+    - "--format"
+    - "${{ inputs.format }}"
+    - "--output"
+    - "${{ inputs.output }}"
+branding:
+  icon: "shield"
+  color: "orange"
