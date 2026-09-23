@@ -294,6 +294,7 @@ def test_aig_pb001_does_not_fire_when_boundary_present():
         not pb_findings
     ), f"AIG-PB001 must NOT fire when a permissions boundary is attached, got: {pb_findings}"
 
+
 @mock_aws
 def test_live_scan_marks_report_incomplete_on_aws_collection_error(monkeypatch):
     """AWS API collection failures must never produce a complete-looking report."""
