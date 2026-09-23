@@ -479,7 +479,8 @@ class LiveAccountScanner:
         completeness_reasons: list[str] = []
         if roles_truncated:
             completeness_reasons.append(
-                f"Role scan truncated at {self._max_roles} (discovered at least {roles_discovered}). "
+                f"Role scan truncated at {self._max_roles} "
+                f"(discovered at least {roles_discovered}). "
                 "Findings may be incomplete — increase max_roles or filter by role name."
             )
         for role in roles:
