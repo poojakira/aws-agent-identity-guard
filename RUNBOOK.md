@@ -326,9 +326,9 @@ CRITICAL AIG004 statement=0: iam:PassRole without iam:PassedToService condition.
   remediation: Add a Condition: {StringEquals: {iam:PassedToService: 'bedrock.amazonaws.com'}} ...
 ...
 
-======================================================================
+---------------------------------------------------------------------
 GENERATED REMEDIATIONS (deterministic IaC templates)
-======================================================================
+---------------------------------------------------------------------
 
 --- Fix for AIG004 ---
 Explanation: Scoped iam:PassRole to only pass roles to bedrock.amazonaws.com. ...
