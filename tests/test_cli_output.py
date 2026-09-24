@@ -10,7 +10,22 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from aws_agent_identity_guard.cli import main
+
+
+def test_duplicate_policy_key_is_rejected_before_analysis(tmp_path, capsys):
+    policy = tmp_path / "ambiguous.json"
+    policy.write_text(
+        '{"Statement":[{"Effect":"Allow","Action":"*",' '"Action":"s3:GetObject","Resource":"*"}]}',
+        encoding="utf-8",
+    )
+    with pytest.raises(SystemExit) as error:
+        main([str(policy)])
+    assert error.value.code == 2
+    assert "duplicate" in capsys.readouterr().err.lower()
+
 
 # A policy that must produce at least one high/critical finding.
 _BAD_POLICY = {

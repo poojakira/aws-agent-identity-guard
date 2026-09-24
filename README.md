@@ -127,9 +127,9 @@ jobs:
 | AIG016 | HIGH | Lambda invoke without function-name scoping |
 | AIG017 | HIGH | `sts:AssumeRole` without session tag requirements |
 | AIG018 | HIGH | Database full-table access without row-level conditions |
-| AIG019 | CRITICAL | Credential-harvest plus lateral-movement permission combination |
-| AIG020 | HIGH | Credential-harvest plus cloud-metadata reachability pattern |
-| AIG021 | CRITICAL | Combined credential-harvest, metadata, and lateral-movement chain in one identity |
+| AIG019 | CRITICAL | Credential-access and identity-pivot actions in Allow statements; effective permissions require review |
+| AIG020 | HIGH | Credential-access and instance-identity discovery actions; does not prove IMDS reachability |
+| AIG021 | CRITICAL | All three action categories appear; does not prove an executable chain |
 | AIG-TP001 | CRITICAL / HIGH | Wildcard principal (`*`); severity is lower when a Condition block exists because static analysis cannot prove its sufficiency |
 | AIG-TP002 | MEDIUM | AWS-principal trust without `sts:ExternalId`; advisory for third-party/shared-service delegation, not a universal cross-account requirement |
 | AIG-TP003 | MEDIUM | AWS service-principal trust without `aws:SourceArn` / `aws:SourceAccount` / `aws:SourceOrg*` scoping where supported |
@@ -210,9 +210,10 @@ This tool is a static linter. It reads a file, analyzes it, and exits. There is 
 | Field | Value |
 |-------|-------|
 | Environment | GitHub Actions `ubuntu-latest`; Python 3.11 evidence job (matrix also covers 3.10 and 3.12) |
-| Last verified | 2026-09-23 |
+| Historical main CI | 2026-09-23, 231 passed and 3 skipped |
+| Current local repair | 2026-09-24, 235 passed and 3 skipped; new main CI pending |
 | Test command | `python -m pytest tests/ -q` |
-| Test result | 231 passed, 3 skipped (`PYTEST_EVIDENCE tests=234 passed=231 skipped=3 failures=0 errors=0`) |
+| Test result | See historical CI and current local results above; exact commands in `VERIFIED_METRICS.md` |
 | Rule coverage | All 25 emitted rule IDs (AIG001–AIG021, AIG-TP001–TP003, AIG-PB001) are referenced by positive/negative tests; parser edge cases fuzzed in `tests/test_iam_parser_fuzz.py` (Hypothesis), failure modes in `tests/test_failure_modes.py` |
 | SARIF | Output validated against SARIF 2.1.0 MUST-level invariants in `tests/test_cli_output.py` |
 | Lint/format | `ruff==0.8.4 check src tests` and `ruff format --check src tests` clean |

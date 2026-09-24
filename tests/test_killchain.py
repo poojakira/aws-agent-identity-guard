@@ -1,18 +1,31 @@
 """
 Tests for policy-level kill-chain combination rules (AIG019-AIG021).
 
-Grounded in the 2026 OpenAI-Hugging Face incident (first documented autonomous
-AI cyberattack): the agent harvested credentials, reached cloud metadata, and
-moved laterally. These rules detect the COMBINATION across a whole policy that
-per-statement linters miss.
+These rules find potentially risky combinations of Allow actions across a
+policy. They do not calculate effective IAM permissions or prove an exploit.
 """
 
 from aws_agent_identity_guard import scan_policy_document
 
 
 class TestKillChainCombinations:
+    def test_service_wildcard_does_not_grant_other_services(self):
+        policy = {"Statement": [{"Effect": "Allow", "Action": "s3:*", "Resource": "*"}]}
+        findings = scan_policy_document(policy)
+        assert not any(f.rule_id in {"AIG019", "AIG020", "AIG021"} for f in findings)
+
+    def test_notaction_complement_is_not_treated_as_excluded_action(self):
+        policy = {"Statement": [{"Effect": "Allow", "NotAction": "s3:GetObject", "Resource": "*"}]}
+        findings = scan_policy_document(policy)
+        assert any(f.rule_id == "AIG021" for f in findings)
+
+    def test_notaction_star_grants_no_combo_actions(self):
+        policy = {"Statement": [{"Effect": "Allow", "NotAction": "*", "Resource": "*"}]}
+        findings = scan_policy_document(policy)
+        assert not any(f.rule_id in {"AIG019", "AIG020", "AIG021"} for f in findings)
+
     def test_harvest_plus_lateral_is_aig019_critical(self):
-        """The exact HF-incident chain: read secrets + assume roles."""
+        """Secret access plus role assumption warrants review."""
         policy = {
             "Statement": [
                 {

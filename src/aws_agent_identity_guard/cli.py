@@ -27,10 +27,19 @@ def _exit_input_error(message: str) -> SystemExit:
     return SystemExit(2)
 
 
+def _unique_json_pairs(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    result: dict[str, object] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate policy JSON key: {key}")
+        result[key] = value
+    return result
+
+
 def _load_json(path: Path) -> dict:
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError, UnicodeDecodeError) as exc:
+        data = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=_unique_json_pairs)
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError, ValueError) as exc:
         raise _exit_input_error(f"failed to read policy JSON: {exc}") from exc
     if not isinstance(data, dict):
         raise _exit_input_error("policy JSON must be an object")

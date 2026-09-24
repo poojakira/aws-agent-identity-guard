@@ -862,17 +862,16 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
     # ─── Policy-level kill-chain combinations (AIG019-AIG021) ─────────────────
     # Per-statement rules miss the DANGEROUS COMBINATIONS that turn a single
     # compromised agent into a multi-day breach. These are grounded in the
-    # 2026 OpenAI-Hugging Face incident (first documented autonomous AI
-    # cyberattack): the agent harvested cloud/cluster credentials, then moved
-    # laterally by assuming other roles, staying inside for 3 days.
+    # These combinations are policy-review signals. Static analysis cannot
+    # establish the effective permissions of a principal or a real intrusion.
     findings.extend(_scan_killchain_combinations(document))
 
     return findings
 
 
-# ─── Kill-chain combination patterns (grounded in real Aug-2026 incidents) ────
+# ─── Cross-statement action combination patterns ─────────────────────────────
 
-# Actions that let an agent HARVEST credentials/secrets (breach step 1).
+# Sensitive credential and service-access actions used as review signals.
 _CREDENTIAL_HARVEST_ACTIONS = (
     "secretsmanager:GetSecretValue",
     "ssm:GetParameter",
@@ -883,14 +882,13 @@ _CREDENTIAL_HARVEST_ACTIONS = (
     "iam:CreateAccessKey",
     "iam:UpdateAccessKey",
     "ecr:GetAuthorizationToken",
-    "eks:DescribeCluster",  # returns cluster CA + endpoint used to pull kubeconfig
+    "eks:DescribeCluster",  # cluster endpoint/CA discovery; not a credential by itself
 )
 
 # Actions that let an agent MOVE LATERALLY by pivoting IDENTITY or executing
 # code on OTHER hosts (breach step 2). Deliberately excludes lambda:InvokeFunction
 # and ecs:RunTask: invoking a scoped tool function is core legitimate agent
-# behavior, not an identity pivot. The HF-incident lateral movement was role
-# assumption and cluster API access, which is what we flag here.
+# behavior, not an identity pivot. These are coarse action categories.
 _LATERAL_MOVEMENT_ACTIONS = (
     "sts:AssumeRole",
     "iam:PassRole",
@@ -900,7 +898,8 @@ _LATERAL_MOVEMENT_ACTIONS = (
 )
 
 # Actions that let an agent reach cloud metadata / instance identity, the
-# SSRF-to-IMDS credential-theft path used in the Hugging Face intrusion.
+# Possible paths to instance/role identity discovery. These calls alone do not
+# give access to instance metadata or imply SSRF.
 _METADATA_REACH_ACTIONS = (
     "ec2:DescribeInstances",
     "ec2:DescribeIamInstanceProfileAssociations",
@@ -910,50 +909,58 @@ _METADATA_REACH_ACTIONS = (
 
 
 def _all_allowed_actions(document: dict[str, Any]) -> list[str]:
-    """Collect every action across all Allow statements (for combination checks)."""
+    """Collect explicit Action entries, never NotAction exclusions."""
     actions: list[str] = []
     for statement in _statements(document):
         if statement.get("Effect", "Allow") != "Allow":
             continue
-        actions.extend(_as_list(statement.get("Action") or statement.get("NotAction")))
+        actions.extend(_as_list(statement.get("Action")))
     return actions
 
 
 def _scan_killchain_combinations(document: dict[str, Any]) -> list[Finding]:
     """Detect action COMBINATIONS across a whole policy that enable a breach chain.
 
-    Grounded in the 2026 OpenAI-Hugging Face incident kill chain:
-    harvest credentials -> reach cloud metadata -> move laterally.
+    These are heuristic combinations of Allow statements, not proof of effective
+    permissions or that any incident can be reproduced.
     """
     findings: list[Finding] = []
     actions = _all_allowed_actions(document)
+    complements = [
+        {action.lower() for action in _as_list(statement["NotAction"])}
+        for statement in _statements(document)
+        if statement.get("Effect", "Allow") == "Allow" and statement.get("NotAction")
+    ]
 
     def _has(patterns: tuple[str, ...]) -> list[str]:
         hits = []
         for a in actions:
             for p in patterns:
-                if a == "*" or a.endswith(":*") or _matches_any(a, {p}):
+                if fnmatchcase(p.lower(), a.lower()):
                     hits.append(a)
                     break
+        if any(
+            any(not _action_excluded_by(pattern, excluded) for pattern in patterns)
+            for excluded in complements
+        ):
+            hits.append("NotAction complement")
         return hits
 
     harvest = _has(_CREDENTIAL_HARVEST_ACTIONS)
     lateral = _has(_LATERAL_MOVEMENT_ACTIONS)
     metadata = _has(_METADATA_REACH_ACTIONS)
 
-    # AIG019 - the exact combination that turned the HF foothold into a 3-day breach.
+    # AIG019 - secret-read and identity-pivot actions appear together.
     if harvest and lateral:
         findings.append(
             Finding(
                 "AIG019",
                 "critical",
-                "Policy grants BOTH credential-harvesting "
+                "Allow statements may combine credential-access "
                 f"({', '.join(sorted(set(harvest))[:3])}) AND lateral-movement "
-                f"({', '.join(sorted(set(lateral))[:3])}) actions. This is the exact "
-                "kill chain of the 2026 OpenAI-Hugging Face incident: an autonomous "
-                "agent read credentials then assumed other roles to move laterally, "
-                "staying inside for 3 days. Individually each may look reasonable; "
-                "together they let one compromised agent pivot across your account.",
+                f"({', '.join(sorted(set(lateral))[:3])}) actions. Check effective "
+                "permissions, conditions, boundaries, and resource scopes before "
+                "concluding the same principal can use both capabilities.",
                 "Split credential-read and role-assumption into separate roles that "
                 "cannot be held by the same session. If an agent must do both, gate "
                 "the assume-role behind a distinct short-lived role with "
@@ -962,32 +969,31 @@ def _scan_killchain_combinations(document: dict[str, Any]) -> list[Finding]:
             )
         )
 
-    # AIG020 - credential harvest + cloud-metadata reach = IMDS credential theft path.
+    # AIG020 - credential access and instance identity discovery together.
     if harvest and metadata:
         findings.append(
             Finding(
                 "AIG020",
                 "high",
-                "Policy grants credential-harvesting actions alongside cloud-metadata "
-                "enumeration. This mirrors the SSRF-to-IMDS credential-theft path used "
-                "to escalate the Hugging Face intrusion to node-level access.",
-                "Enforce IMDSv2 (HttpTokens=required) on all instances and remove "
-                "instance-profile enumeration from agent roles. Agents should never "
-                "need to discover other instances' identities.",
+                "Allow statements may combine credential-access actions with instance "
+                "identity discovery. This is a review signal, not proof of IMDS access "
+                "or an SSRF path.",
+                "Review whether the role needs instance and profile enumeration. "
+                "Evaluate instance metadata protection separately; these IAM actions "
+                "alone do not establish metadata reachability.",
                 None,
             )
         )
 
-    # AIG021 - full chain present: harvest + metadata + lateral. Highest urgency.
+    # AIG021 - all three action categories appear together.
     if harvest and metadata and lateral:
         findings.append(
             Finding(
                 "AIG021",
                 "critical",
-                "Policy enables the COMPLETE breach chain (credential harvest -> "
-                "metadata reach -> lateral movement) in a single agent identity. "
-                "A prompt-injected or escaped agent with this policy can reproduce "
-                "the full 2026 autonomous-agent breach pattern end to end.",
+                "Allow statements contain credential-access, identity-discovery, and "
+                "lateral-movement actions. Review effective permissions and trust "
+                "boundaries; this static match does not prove an executable chain.",
                 "This role is over-scoped for any single agent. Decompose it by "
                 "capability, apply a permission boundary denying sts:AssumeRole and "
                 "secretsmanager:* together, and require human approval for role chaining.",

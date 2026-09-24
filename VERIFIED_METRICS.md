@@ -2,7 +2,7 @@
 
 This file is the evidence anchor for quantitative résumé and portfolio claims about this repository.
 
-## Verified baseline
+## Historical main CI baseline
 
 **Audited code commit:** `001fb2ccd828ae157150d6f1a53bbd0741dc51d9`  
 **Successful main CI run:** https://github.com/poojakira/aws-agent-identity-guard/actions/runs/35808439923  
@@ -29,6 +29,16 @@ Total: **25**.
 ## Performance claim boundary
 
 The latency and throughput values above are **CI gate thresholds**, not fixed measured production performance. The benchmark uses 500 synthetic policies, a fixed seed, 1–15 statements per policy, a 5-policy warm-up, and no network I/O. CI writes the actual measurement to `perf-results.json`.
+
+## Local repair verification (2026-09-24)
+
+The cross-statement combination logic now distinguishes `Action` grants from
+`NotAction` exclusions and matches service wildcards only to their service.
+The CLI rejects duplicate JSON keys. With this checkout's source forced via
+`PYTHONPATH=src`, the suite reports **235 passed, 3 skipped**. Ruff lint and
+format pass. A local 500-synthetic-policy benchmark measured **0.6935 ms p95**
+and **3,178 policies/sec** on this workspace. These are local measurements,
+not production performance or a new main-branch CI result.
 
 ## Reproduce
 
