@@ -2,11 +2,11 @@
 
 ## System role
 
-This repository is maintained as a **AWS IAM analysis and enforcement tool**.
+This repository is maintained as a **static AWS IAM policy analysis tool**.
 
 ## Production purpose
 
-analyze agent-role policies, trust relationships, privilege-escalation paths, and enforcement decisions.
+Analyze supplied agent-role IAM policies and trust relationships, and report possible privilege-escalation paths as static findings. CI callers may choose to block promotion on the exit status. The tool does not enforce IAM permissions or observe live AWS requests.
 
 ## Release gate
 
