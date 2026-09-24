@@ -3,7 +3,7 @@
 **Repository owner & maintainer:** Pooja Kiran ([@poojakira](https://github.com/poojakira)) — I own and maintain this repository and drive its design, engineering, validation, documentation, and evidence-backed releases.
 
 > Quantitative résumé and portfolio claims are reconciled in [`VERIFIED_METRICS.md`](VERIFIED_METRICS.md).
-> Resume-specific proof for 25 rule IDs, 230 tests, and the CI performance gates is in [`RESUME_EVIDENCE.md`](RESUME_EVIDENCE.md).
+> Resume-specific proof preserves the 230-test application snapshot; current repository metrics are in [`VERIFIED_METRICS.md`](VERIFIED_METRICS.md).
 
 Static IAM policy checks for AWS roles used by AI agents and tool executors.
 
@@ -209,10 +209,10 @@ This tool is a static linter. It reads a file, analyzes it, and exits. There is 
 
 | Field | Value |
 |-------|-------|
-| Environment | Python 3.12.10, Windows 11, pytest 9.1.1 |
-| Last verified | 2026-09-03 |
+| Environment | GitHub Actions `ubuntu-latest`; Python 3.11 evidence job (matrix also covers 3.10 and 3.12) |
+| Last verified | 2026-09-23 |
 | Test command | `python -m pytest tests/ -q` |
-| Test result | 230 passed, 3 skipped (skips: optional `rules` extension module not present) |
+| Test result | 231 passed, 3 skipped (`PYTEST_EVIDENCE tests=234 passed=231 skipped=3 failures=0 errors=0`) |
 | Rule coverage | All 25 emitted rule IDs (AIG001–AIG021, AIG-TP001–TP003, AIG-PB001) are referenced by positive/negative tests; parser edge cases fuzzed in `tests/test_iam_parser_fuzz.py` (Hypothesis), failure modes in `tests/test_failure_modes.py` |
 | SARIF | Output validated against SARIF 2.1.0 MUST-level invariants in `tests/test_cli_output.py` |
 | Lint/format | `ruff==0.8.4 check src tests` and `ruff format --check src tests` clean |
