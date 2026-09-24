@@ -1,9 +1,8 @@
 # AWS Agent Identity Guard
 
-**Repository owner & maintainer:** Pooja Kiran ([@poojakira](https://github.com/poojakira)) — I own and maintain this repository and drive its design, engineering, validation, documentation, and evidence-backed releases.
+Maintainer: Pooja Kiran ([@poojakira](https://github.com/poojakira)).
 
-> Quantitative résumé and portfolio claims are reconciled in [`VERIFIED_METRICS.md`](VERIFIED_METRICS.md).
-> Resume-specific proof preserves the 230-test application snapshot; current repository metrics are in [`VERIFIED_METRICS.md`](VERIFIED_METRICS.md).
+> Test counts and other metrics are recorded in [`VERIFIED_METRICS.md`](VERIFIED_METRICS.md).
 
 Static IAM policy checks for AWS roles used by AI agents and tool executors.
 
