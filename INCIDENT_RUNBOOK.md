@@ -1,6 +1,15 @@
 # Incident Response Runbook — aws-agent-identity-guard
 
-This runbook covers operational incidents related to the IAM identity guard tool in CI/CD pipelines and live scanning environments.
+> **Reference template, not an operated service.** This is an open-source IAM
+> linter. There is **no on-call rotation, no SLA/SLO, and no operated
+> production deployment** behind this document. The scenarios and escalation
+> paths are a **procedure you can adapt** for wherever you run the tool in your
+> own CI/CD or live-scanning setup. "Live scan" refers to the tool querying
+> your AWS account's IAM via read-only APIs on demand — not a continuously
+> running monitoring service.
+
+This runbook is a reference for handling issues related to the IAM identity
+guard tool when used in CI/CD pipelines and on-demand live-scanning.
 
 ---
 
@@ -308,11 +317,14 @@ misleading suggestion, not the tool mutating infrastructure.
 
 ## General Escalation Path
 
-| Level | Contact | When |
-|-------|---------|------|
-| L1 | On-call engineer | Any incident during business hours |
-| L2 | Security team lead | Privilege escalation gaps, active exploitation |
-| L3 | CISO / VP Engineering | Data breach, widespread CI outage |
+> Placeholder roles — map these to whoever actually owns the tool in your
+> environment. This project provides no staffed on-call.
+
+| Level | Contact (fill in) | When |
+|-------|-------------------|------|
+| L1 | Whoever runs the scan | Any incident |
+| L2 | Your security owner | Privilege escalation gaps, active exploitation |
+| L3 | Your leadership | Data breach, widespread CI outage |
 
 ## Post-Incident Template
 

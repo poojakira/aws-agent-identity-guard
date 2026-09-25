@@ -358,7 +358,7 @@ resource "aws_iam_role_policy" "agent_wildcard_passrole_scoped" {
 
 | Severity | Meaning | Action Required |
 |----------|---------|-----------------|
-| **CRITICAL** | Privilege escalation, wildcard admin, confused deputy — active exploit path | **Block deployment immediately.** Fix before merge. Page on-call if in production. |
+| **CRITICAL** | Privilege escalation, wildcard admin, confused deputy — active exploit path | **Block deployment immediately.** Fix before merge. If the role is already live, treat it as urgent per your own process. |
 | **HIGH** | Over-permissive scope, unscoped tool execution, cross-account risk | **Block deployment.** Fix in current sprint. Notify security team. |
 | **MEDIUM** | Missing defense-in-depth controls, missing conditions | **Warning.** Fix within 2 sprints. Track in backlog. |
 
@@ -506,34 +506,40 @@ pipeline {
 
 ## 11. Alerting & Escalation
 
+> This section is **reference guidance you adapt to your own organization**, not
+> a description of an operated service. This tool is a static/live IAM linter;
+> it ships **no on-call rotation, no SLA/SLO, no PagerDuty/OpsGenie hookup, and
+> no operated alerting**. The response times, roles, and channels below are
+> suggestions — replace them with whatever your team actually runs.
+
 ### When CRITICAL Findings Are Detected
 
-**Immediate actions (within 15 minutes):**
+**Suggested immediate actions:**
 
 1. **Block the deployment.** Exit code 1 should already prevent merge/deploy in CI.
 2. **Identify the policy owner.** Check git blame on the policy file.
-3. **Notify the security team.** Post to `#security-alerts` with:
+3. **Notify your security team** (adapt the channel) with:
    - Repository and PR link
    - Rule IDs triggered (e.g., AIG002, AIG004)
    - Affected IAM role name
-4. **If already deployed to production:**
-   - Apply a permission boundary immediately to contain blast radius
-   - Open a SEV-2 incident
+4. **If the role is already live:**
+   - Apply a permission boundary to contain blast radius
+   - Open an incident per your own process
    - Rotate any credentials that may have been exposed via the overprivileged role
 
-**Escalation matrix:**
+**Suggested escalation matrix (illustrative — no committed SLA):**
 
-| Scenario | Escalate To | SLA |
-|----------|-------------|-----|
+| Scenario | Escalate To | Suggested target |
+|----------|-------------|------------------|
 | CRITICAL in PR (not deployed) | Policy author + security reviewer | Fix before merge |
-| CRITICAL in production role | Security on-call → Engineering Manager | 4 hours to remediate |
-| AIG004 (PassRole without condition) | Security Lead | 2 hours — potential privilege escalation |
-| AIG-TP001 (wildcard principal) | Security Lead + Cloud Architect | 1 hour — anyone can assume this role |
+| CRITICAL in a live role | Whoever owns the account | Remediate promptly |
+| AIG004 (PassRole without condition) | Security owner | Treat as potential privilege escalation |
+| AIG-TP001 (wildcard principal) | Security owner + cloud architect | High urgency — anyone can assume this role |
 
-### Recommended Alert Channels
+### Recommended Alert Channels (if you wire them up yourself)
 
-- **Slack/Teams:** Post JSON output to `#ml-security-alerts`
-- **PagerDuty/OpsGenie:** Trigger on exit code 1 in production scan pipelines
+- **Slack/Teams:** Post JSON output to a channel of your choosing
+- **PagerDuty/OpsGenie:** You may trigger on exit code 1 in your own pipelines
 - **SIEM:** Forward SARIF findings to your SIEM for correlation
 
 ---
