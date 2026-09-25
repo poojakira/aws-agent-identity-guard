@@ -193,11 +193,19 @@ def main() -> int:
     # Report
     print("\n--- Performance Gate Results ---", file=sys.stderr)
     print(f"  Policies scanned:    {args.policies}", file=sys.stderr)
-    print(f"  p95 latency:         {results['latency_ms']['p95']:.4f} ms (gate: <10ms)", file=sys.stderr)
-    print(f"  Throughput:          {results['throughput']['policies_per_second']:.0f} policies/sec (gate: >1000)", file=sys.stderr)
-    print(f"  p95 gate:            {'PASS' if results['gates']['p95_under_10ms'] else 'FAIL'}", file=sys.stderr)
-    print(f"  Throughput gate:     {'PASS' if results['gates']['throughput_over_1000'] else 'FAIL'}", file=sys.stderr)
-    print(f"  Overall:             {'PASS ✓' if results['passed'] else 'FAIL ✗'}", file=sys.stderr)
+    p95_ms = results["latency_ms"]["p95"]
+    throughput = results["throughput"]["policies_per_second"]
+    p95_gate = "PASS" if results["gates"]["p95_under_10ms"] else "FAIL"
+    tput_gate = "PASS" if results["gates"]["throughput_over_1000"] else "FAIL"
+    overall = "PASS ✓" if results["passed"] else "FAIL ✗"
+    print(f"  p95 latency:         {p95_ms:.4f} ms (gate: <10ms)", file=sys.stderr)
+    print(
+        f"  Throughput:          {throughput:.0f} policies/sec (gate: >1000)",
+        file=sys.stderr,
+    )
+    print(f"  p95 gate:            {p95_gate}", file=sys.stderr)
+    print(f"  Throughput gate:     {tput_gate}", file=sys.stderr)
+    print(f"  Overall:             {overall}", file=sys.stderr)
 
     return 0 if results["passed"] else 1
 
