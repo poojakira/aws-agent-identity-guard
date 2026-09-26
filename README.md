@@ -1,5 +1,18 @@
 <!-- profile-growth-header -->
 
+<!-- security-systems-poster -->
+## Research Poster
+
+**Security Systems / 02 — Static Security Analysis of AWS IAM Policies for AI Workload Identities**
+
+[![Research poster](poster/poster.png)](poster/poster_36x48.pdf)
+
+> Technical research poster (36 x 48 in). Click the image for the print-resolution **[PDF](poster/poster_36x48.pdf)**.
+> Every metric on it is evidence-backed; historical/projected numbers are labeled and separated from current results.
+> Part of the *Pooja Kiran - Security Systems* engineering poster collection.
+<!-- security-systems-poster -->
+
+
 # aws-agent-identity-guard
 
 > **AWS IAM / agent identity security**
