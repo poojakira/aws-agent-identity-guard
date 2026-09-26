@@ -29,7 +29,11 @@ dependencies = []
 
 [project.optional-dependencies]
 live = ["boto3>=1.34.0"]
-dev = ["pytest>=8.2", "ruff>=0.8", "pyright>=1.1.380", "moto[iam]>=5.0.0", "boto3>=1.34.0", "hypothesis>=6.100"]
+# ruff is pinned to the exact version used by CI (.github/workflows/ci.yml RUFF_VERSION)
+# and documented in VERIFIED_METRICS.md, so `pip install -e .[dev]` reproduces the same
+# lint/format result locally. Newer ruff releases change formatter defaults and would
+# report spurious `ruff format --check` diffs against a repository formatted with 0.8.4.
+dev = ["pytest>=8.2", "ruff==0.8.4", "pyright>=1.1.380", "moto[iam]>=5.0.0", "boto3>=1.34.0", "hypothesis>=6.100"]
 
 [project.scripts]
 aws-agent-identity-guard = "aws_agent_identity_guard.cli:main"
