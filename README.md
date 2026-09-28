@@ -240,7 +240,7 @@ This tool is a static linter. It reads a file, analyzes it, and exits. There is 
 |-------|-------|
 | Environment | GitHub Actions `ubuntu-latest`; Python 3.11 evidence job (matrix also covers 3.10 and 3.12) |
 | Historical main CI | 2026-09-23, 231 passed and 3 skipped |
-| Current main CI | 235 passed and 3 skipped; confirmed on current commit (4518bea) |
+| Current main CI | 238 collected: 235 passed, 3 skipped; confirmed on current commit (b01690a) |
 | Test command | `python -m pytest tests/ -q` |
 | Test result | See historical CI and current local results above; exact commands in `VERIFIED_METRICS.md` |
 | Rule coverage | All 25 emitted rule IDs (AIG001–AIG021, AIG-TP001–TP003, AIG-PB001) are referenced by positive/negative tests; parser edge cases fuzzed in `tests/test_iam_parser_fuzz.py` (Hypothesis), failure modes in `tests/test_failure_modes.py` |
