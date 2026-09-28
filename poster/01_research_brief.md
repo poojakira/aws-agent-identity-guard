@@ -1,5 +1,7 @@
 # Research Brief — Poster 02
 
+> Evidence status: This is a dated repository snapshot at the commit identified below. `VERIFIED_AT_SNAPSHOT` means verified for that commit and environment; it does not assert the same result on the latest `main`. Compare newer claims with the repository evidence before reuse.
+
 ## Repository
 `github.com/poojakira/aws-agent-identity-guard` (public, default branch `main`, primary language Python). MIT • Python 3.12 • HEAD b01690a • verified 2026-09-26
 
@@ -34,10 +36,10 @@ O4 — Optional read-only live account scan
 ## Methodology
 1 Load (policy JSON) -> 2 Classify (statements) -> 3 Match (25 rules) -> 4 Score (severity) -> 5 Emit (SARIF) -> 6·7 Exit + gate (code 0/1/2)
 
-## Current Verified Evidence + Claim Ledger
-- **VERIFIED_CURRENT** — 235 tests passed, 3 skipped (local, Py 3.12, HEAD b01690a) — Independent local run: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests -q -> '235 passed, 3 skipped'.
-- **VERIFIED_CURRENT** — 25 deterministic rule IDs — Distinct AIG001-021, AIG-TP001-003, AIG-PB001 counted in src; README rule table; all test-covered.
-- **VERIFIED_CURRENT** — Text / JSON / SARIF 2.1.0 output — README + CLI; SARIF invariants tested in tests/test_cli_output.py.
+## Evidence at Poster Snapshot + Claim Ledger
+- **VERIFIED_AT_SNAPSHOT** — 235 tests passed, 3 skipped (local, Py 3.12, HEAD b01690a) — Independent local run: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests -q -> '235 passed, 3 skipped'.
+- **VERIFIED_AT_SNAPSHOT** — 25 deterministic rule IDs — Distinct AIG001-021, AIG-TP001-003, AIG-PB001 counted in src; README rule table; all test-covered.
+- **VERIFIED_AT_SNAPSHOT** — Text / JSON / SARIF 2.1.0 output — README + CLI; SARIF invariants tested in tests/test_cli_output.py.
 - **VERIFIED_HISTORICAL** — 231 passed/3 skipped; p95 1.10ms; 1913 policies/sec — CI run 35808439923 (001fb2c, 2026-09-23). Perf are CI-gate thresholds on 500 synthetic policies, not SLOs.
 - **PARTIAL** — Local benchmark 0.69ms p95 / 3178 pps — VERIFIED_METRICS.md local repair note; environment-scoped, single machine.
 - **UNSUPPORTED (disclaimed)** — Runtime enforcement / effective-permission proof — README states static-only, no fail-closed; not claimed on poster.
