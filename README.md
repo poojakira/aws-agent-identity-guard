@@ -286,6 +286,12 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests/ -q
 - [docs/PERFORMANCE_BASELINE.md](docs/PERFORMANCE_BASELINE.md) - scan performance baselines and regression gates
 - [benchmarks/perf_gate.py](benchmarks/perf_gate.py) - CI performance gate (p95 < 10ms, >1000 policies/sec)
 
+## Companion demo: delegated short-lived credentials (mocked)
+
+An additive, illustrative demo lives under [`examples/delegated_credentials/`](examples/delegated_credentials/README.md). It shows an agent exchanging an OIDC/workload-identity token for **short-lived, scoped credentials** via STS `AssumeRoleWithWebIdentity`, with `ExternalId`-based confused-deputy prevention.
+
+This demo is **mocked with [moto](https://github.com/getmoto/moto) (`@mock_aws`) — it does not call live AWS.** It is illustrative only and does not change the fact that the core tool is a static IAM linter. Verified: 6 tests passed with moto 5.2.3 / boto3 1.43.103. See [`examples/delegated_credentials/README.md`](examples/delegated_credentials/README.md) for details.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
