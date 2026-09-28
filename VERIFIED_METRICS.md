@@ -30,15 +30,15 @@ Total: **25**.
 
 The latency and throughput values above are **CI gate thresholds**, not fixed measured production performance. The benchmark uses 500 synthetic policies, a fixed seed, 1–15 statements per policy, a 5-policy warm-up, and no network I/O. CI writes the actual measurement to `perf-results.json`.
 
-## Local repair verification (2026-09-24)
+## Current main verification (2026-09-27)
 
-The cross-statement combination logic now distinguishes `Action` grants from
-`NotAction` exclusions and matches service wildcards only to their service.
-The CLI rejects duplicate JSON keys. With this checkout's source forced via
-`PYTHONPATH=src`, the suite reports **235 passed, 3 skipped**. Ruff lint and
-format pass. A local 500-synthetic-policy benchmark measured **0.6935 ms p95**
-and **3,178 policies/sec** on this workspace. These are local measurements,
-not production performance or a new main-branch CI result.
+On current main (`b01690a`), CI and a local run both report **238 collected: 235 passed,
+3 skipped** (the 3 skips are live-scan tests that need AWS credentials). The
+cross-statement combination logic distinguishes `Action` grants from `NotAction`
+exclusions and matches service wildcards only to their service; the CLI rejects
+duplicate JSON keys. Ruff lint and format pass. A local 500-synthetic-policy benchmark
+measured **0.6935 ms p95** and **3,178 policies/sec** on this workspace — a local
+measurement, not a production performance claim.
 
 ## Reproduce
 
