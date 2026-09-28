@@ -1,11 +1,11 @@
 # Verified Metrics — Poster 02
 
-MIT • Python 3.12 • HEAD e1f19cd • verified 2026-09-26. Verified for this poster on Windows / CPython 3.12.10.
+MIT • Python 3.12 • HEAD b01690a • verified 2026-09-26. Verified for this poster on Windows / CPython 3.12.10.
 
 ## Headline cards
 - 235 — TESTS PASSED
 - 25 — RULE IDs
-Notes: Local: 235 passed, 3 skipped (Py 3.12, HEAD e1f19cd). Rule IDs AIG001–021, TP001–003, PB001 = 25, all test-covered.
+Notes: Local: 235 passed, 3 skipped (Py 3.12, HEAD b01690a). Rule IDs AIG001–021, TP001–003, PB001 = 25, all test-covered.
 
 ## Verified surface
 | Item | Value |
