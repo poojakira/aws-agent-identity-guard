@@ -1,5 +1,3 @@
-<!-- profile-growth-header -->
-
 <!-- security-systems-poster -->
 ## Research Poster
 
@@ -9,42 +7,70 @@
 
 > Technical research poster (36 x 48 in). Click the image for the print-resolution **[PDF](poster/poster_36x48.pdf)**.
 > Every metric on it is evidence-backed; historical/projected numbers are labeled and separated from current results.
-> Part of the *Pooja Kiran - Security Systems* engineering poster collection.
 <!-- security-systems-poster -->
-
-
-# aws-agent-identity-guard
-
-> **AWS IAM / agent identity security**
-
-Static analysis for AWS IAM policies used by AI agents and tool executors.
-
-**Why this project:** security teams need a reproducible way to test, inspect, or measure this boundary before treating a security control as effective.
-
-**Quick path**
-1. Read the threat model / scope below.
-2. Run the smallest documented example.
-3. Reproduce the tests or benchmark.
-4. Inspect the limitations and evidence before making deployment claims.
-5. Open an issue or PR if you find a gap, add a fixture, or improve the documentation.
 
 # AWS Agent Identity Guard
 
+> Static analysis for AWS IAM policies used by AI agents and tool executors — flag over-privileged, escalation-prone, and audit-tampering grants before deployment.
+
+[![CI](https://github.com/poojakira/aws-agent-identity-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/poojakira/aws-agent-identity-guard/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-235%20passing-brightgreen)](VERIFIED_METRICS.md)
+[![Rules](https://img.shields.io/badge/rules-25-blue)](VERIFIED_METRICS.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Maintainer: Pooja Kiran ([@poojakira](https://github.com/poojakira)).
 
-> Test counts and other metrics are recorded in [`VERIFIED_METRICS.md`](VERIFIED_METRICS.md).
+## Overview
 
-Static IAM policy checks for AWS roles used by AI agents and tool executors.
+`aws-agent-identity-guard` reads IAM policy JSON (identity, trust, and permission-boundary) and produces reviewable findings for the agent-specific risk patterns that turn overbroad cloud permissions into real actions — invoking Lambda, assuming roles, changing Bedrock/SageMaker control-plane resources, reading secrets, or disabling audit trails. It is a static linter: no AWS calls in default mode, zero runtime dependencies for local-file scanning, and an optional live account scan when installed with `boto3`.
 
-AI agents and tool executors can turn overbroad cloud permissions into real actions: invoking Lambda functions, assuming roles, changing Bedrock/SageMaker control-plane resources, reading secrets, or disabling audit trails. `aws-agent-identity-guard` checks IAM policy JSON for these agent-specific risk patterns before deployment.
+## Verified Snapshot
 
-This tool is a static linter. It does not call AWS in default mode, does not prove an agent is safe, and does not replace IAM Access Analyzer, Prowler, Parliament, CloudTrail, Security Hub, or threat modeling. Its narrow job is to produce reviewable findings for policies that grant risky permissions to autonomous or semi-autonomous workloads.
+Reproduced on current `main`; CI emits `PYTEST_EVIDENCE`. Evidence: [VERIFIED_METRICS.md](VERIFIED_METRICS.md).
 
-Current implemented surface:
-- 25 deterministic rules for identity policies, trust policies, and permission-boundary presence.
-- Text, JSON, and SARIF output.
-- Zero runtime dependencies for static local-file scanning.
-- Optional live account scan mode when installed with `boto3`.
+| Metric | Current verified result |
+|---|---:|
+| Tests | 238 collected — 235 passed, 3 skipped (live-scan, need AWS creds) |
+| Deterministic rules | 25 (AIG001–AIG021, AIG-TP001–003, AIG-PB001) |
+| Output formats | text, JSON, SARIF 2.1.0 |
+| Ruff / format | clean |
+
+## Security Problem
+
+AI agents and tool executors run under IAM roles. An over-permissive role lets an autonomous agent escalate privilege (`iam:PassRole` without conditions, policy-modification actions), widen blast radius (`Resource: "*"`), pivot across accounts (weak trust policies), or disable its own audit trail (`cloudtrail:StopLogging`). These risks are reviewable in the policy document *before* deployment — which is where this tool operates.
+
+## Threat Model & Scope
+
+**In scope:** static analysis of a single IAM policy document per invocation (identity/trust/permission-boundary), emitted as text/JSON/SARIF for pre-deploy review and CI gating.
+
+**Out of scope / not claimed:** It does not call AWS in default mode, does not compute effective permissions, does not resolve ARNs or prove a role exists, and does not enforce at runtime. It complements — does not replace — IAM Access Analyzer, Prowler, Parliament, CloudTrail, and Security Hub. There is no fail-open/fail-closed runtime behavior because it is not a runtime gatekeeper. Condition-key checks verify presence, not logical sufficiency.
+
+## Architecture
+
+```text
+IAM policy JSON  --->  argparse / json.loads (allow_pickle=False, dup-key reject)
+      |
+      v
+scanner.py: scan_policy_document / scan_trust_policy   (25 deterministic rules)
+      |
+      v
+Output: text / JSON / SARIF 2.1.0  --->  stdout or file
+      |
+      v
+Exit code 0 (clean) / 1 (high|critical finding) / 2 (input/CLI error)   --->  CI gate
+
+[--live-scan]  AWS IAM read-only APIs (boto3) ---> same rule engine
+```
+
+## Core Capabilities
+
+- 25 deterministic rules: wildcard grants, `iam:PassRole`, `sts:AssumeRole`, privilege escalation, blast radius, trust-policy risks (wildcard principal, missing `ExternalId`/`SourceArn`), and missing permission boundaries
+- Text, JSON, and SARIF 2.1.0 output; GitHub Code Scanning compatible
+- CI merge-gate exit codes (0 / 1 / 2)
+- Optional `--live-scan` mode (read-only IAM APIs) with a `max_roles` safety cap
+- Deterministic remediation templates for a subset of rules
+
+
 
 No AWS credentials required. No cloud calls. Just feed it your policy JSON.
 
