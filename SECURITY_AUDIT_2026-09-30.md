@@ -30,3 +30,10 @@ Password reset, SQL tenant isolation, web rate limiting unless a network service
 - **Security note:** IAM findings remain static-analysis evidence; no claim is made that analyzed policies were deployed to a live AWS account.
 - **Evidence boundary:** This update records repository and GitHub Actions evidence observed during the pass. It is not a claim of independent penetration testing, production deployment, or zero residual risk.
 <!-- repo-verification:end -->
+
+## Verification checkpoint — 2026-09-30
+
+- **Snapshot commit:** `43da7475d0b44877f387994743af2fa20590905b`
+- **Status:** VERIFIED GREEN
+- **Evidence:** Container Release, Documentation Integrity, repository checks, Production Gate, and CI completed successfully on the snapshot revision.
+- This note records only the observed workflow state for this dated snapshot.
