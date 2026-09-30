@@ -1,19 +1,14 @@
-# Claim Ledger — Poster 02 (02-aws-agent-identity-guard)
+# Claim Ledger - Poster 02
 
-> Evidence status: This is a dated repository snapshot at the commit identified below. `VERIFIED_AT_SNAPSHOT` means verified for that commit and environment; it does not assert the same result on the latest `main`. Compare newer claims with the repository evidence before reuse.
-
-MIT • Python 3.12 • HEAD b01690a • verified 2026-09-26. Classification: VERIFIED_AT_SNAPSHOT / VERIFIED_HISTORICAL / PARTIAL / UNVERIFIED / UNSUPPORTED.
+> Verified code snapshot: `c39ba67f43ef6ebddd03a8ce429b42afec0c08a9`; successful CI run `36781556871`, 2026-09-30.
 
 | # | Claim | Classification | Evidence |
 |---|---|---|---|
-| 1 | 235 tests passed, 3 skipped (local, Py 3.12, HEAD b01690a) | VERIFIED_AT_SNAPSHOT | Independent local run: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests -q -> '235 passed, 3 skipped'. |
-| 2 | 25 deterministic rule IDs | VERIFIED_AT_SNAPSHOT | Distinct AIG001-021, AIG-TP001-003, AIG-PB001 counted in src; README rule table; all test-covered. |
-| 3 | Text / JSON / SARIF 2.1.0 output | VERIFIED_AT_SNAPSHOT | README + CLI; SARIF invariants tested in tests/test_cli_output.py. |
-| 4 | 231 passed/3 skipped; p95 1.10ms; 1913 policies/sec | VERIFIED_HISTORICAL | CI run 35808439923 (001fb2c, 2026-09-23). Perf are CI-gate thresholds on 500 synthetic policies, not SLOs. |
-| 5 | Local benchmark 0.69ms p95 / 3178 pps | PARTIAL | VERIFIED_METRICS.md local repair note; environment-scoped, single machine. |
-| 6 | Runtime enforcement / effective-permission proof | UNSUPPORTED (disclaimed) | README states static-only, no fail-closed; not claimed on poster. |
+| 1 | 235 passed, 3 skipped | VERIFIED_AT_SNAPSHOT | CI emits `PYTEST_EVIDENCE tests=238 passed=235 skipped=3 failures=0 errors=0`. |
+| 2 | 25 deterministic rule IDs | VERIFIED_AT_SNAPSHOT | AIG001-AIG021, AIG-TP001-AIG-TP003, AIG-PB001; current README/code/tests. |
+| 3 | Text / JSON / SARIF output | VERIFIED_AT_SNAPSHOT | Current CLI and tests. |
+| 4 | p95 1.1460 ms on 500 synthetic policies | VERIFIED_AT_SNAPSHOT | Current CI performance gate; environment-scoped microbenchmark. |
+| 5 | 1,846 policies/sec on the same synthetic gate | VERIFIED_AT_SNAPSHOT | Current CI performance gate; not an SLO. |
+| 6 | Runtime enforcement or account-wide effective-permission proof | UNSUPPORTED | Static analyzer; not a runtime gatekeeper or full account graph analyzer. |
 
-## Policy applied
-- Only VERIFIED_AT_SNAPSHOT figures appear as prominent current results.
-- Historical/projected values are labeled (dashed box / explicit note).
-- Unsupported production/accuracy claims are omitted or shown in the red "NOT ESTABLISHED" box.
+Prominent poster numbers must stay scoped to this snapshot and environment.

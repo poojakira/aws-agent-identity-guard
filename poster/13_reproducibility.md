@@ -1,12 +1,18 @@
-# Reproduce the Work — Poster 02
+# Reproduce the Work - Poster 02
 
-> Evidence status: This is a dated repository snapshot at the commit identified below. `VERIFIED_AT_SNAPSHOT` means verified for that commit and environment; it does not assert the same result on the latest `main`. Compare newer claims with the repository evidence before reuse.
+**Repository:** `github.com/poojakira/aws-agent-identity-guard`  
+**Verified code snapshot:** `c39ba67f43ef6ebddd03a8ce429b42afec0c08a9`  
+**CI run:** `36781556871`
 
-**Repository:** `github.com/poojakira/aws-agent-identity-guard` · MIT • Python 3.12 • HEAD e1f19cd • verified 2026-09-26
-
+```bash
+git clone https://github.com/poojakira/aws-agent-identity-guard.git
+cd aws-agent-identity-guard
+git checkout c39ba67f43ef6ebddd03a8ce429b42afec0c08a9
+python -m pip install -e ".[dev]"
+pytest tests/ -q
+python benchmarks/perf_gate.py
 ```
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests -q
-aws-agent-identity-guard policy.json --format sarif
-```
 
-Evidence artifacts: VERIFIED_METRICS.md, benchmarks/perf_gate.py
+Expected CI test evidence: **238 collected, 235 passed, 3 skipped**.
+
+Current CI performance evidence: **1.1460 ms p95**, **1,846 policies/sec** on the repository's synthetic 500-policy gate.

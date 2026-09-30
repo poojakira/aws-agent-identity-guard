@@ -1,50 +1,21 @@
 # Verified Metrics
 
-This file is the evidence anchor for quantitative résumé and portfolio claims about this repository.
+## Current main verification - 2026-09-30
 
-## Historical main CI baseline
+**Code commit:** `c39ba67f43ef6ebddd03a8ce429b42afec0c08a9`  
+**Successful CI:** https://github.com/poojakira/aws-agent-identity-guard/actions/runs/36781556871
 
-**Audited code commit:** `001fb2ccd828ae157150d6f1a53bbd0741dc51d9`  
-**Successful main CI run:** https://github.com/poojakira/aws-agent-identity-guard/actions/runs/35808439923  
-**Verification date:** 2026-09-23
-
-| Claim | Verified value | Evidence |
+| Claim | Current verified value | Scope |
 |---|---:|---|
-| Deterministic rule IDs | **25** | `src/aws_agent_identity_guard/scanner.py` + `live_scanner.py`: AIG001–AIG021, AIG-TP001–AIG-TP003, AIG-PB001 |
-| Test result | **231 passed, 3 skipped** | Run 35808439923; Python 3.11 job 107014379871 emits `PYTEST_EVIDENCE tests=234 passed=231 skipped=3 failures=0 errors=0`; the evidence gate also runs across Python 3.10/3.11/3.12 |
-| SARIF | **2.1.0 output implemented and tested** | CLI/output tests and README |
-| Performance latency gate | **p95 < 10 ms/policy** | Run 35808439923, job 107014379859: measured 1.1040 ms p95; gate PASS |
-| Performance throughput gate | **> 1,000 policies/sec** | Same job: measured 1,913 policies/sec; gate PASS |
+| Test result | **238 collected, 235 passed, 3 skipped** | Current-main CI |
+| Deterministic rule IDs | **25** | Current scanner/live-scanner rule set |
+| Performance p95 | **1.1460 ms/policy** | Current CI, 500 synthetic policies |
+| Performance throughput | **1,846 policies/sec** | Same synthetic gate |
+| Configured p95 gate | **< 10 ms/policy** | Gate threshold, not an SLO |
+| Configured throughput gate | **> 1,000 policies/sec** | Gate threshold, not an SLO |
 
-## Rule-count proof
+The 3 skipped tests require AWS credentials. Do not commit credentials; use `AWS_PROFILE`, SSO/STS, or workload-role credentials through the standard provider chain.
 
-The 25 emitted rule IDs are:
+## Claim boundary
 
-- Identity-policy rules: AIG001–AIG021 = 21
-- Trust-policy rules: AIG-TP001–AIG-TP003 = 3
-- Permission-boundary rule: AIG-PB001 = 1
-
-Total: **25**.
-
-## Performance claim boundary
-
-The latency and throughput values above are **CI gate thresholds**, not fixed measured production performance. The benchmark uses 500 synthetic policies, a fixed seed, 1–15 statements per policy, a 5-policy warm-up, and no network I/O. CI writes the actual measurement to `perf-results.json`.
-
-## Current main verification (2026-09-27)
-
-On current main (`b01690a`), CI and a local run both report **238 collected: 235 passed,
-3 skipped** (the 3 skips are live-scan tests that need AWS credentials). The
-cross-statement combination logic distinguishes `Action` grants from `NotAction`
-exclusions and matches service wildcards only to their service; the CLI rejects
-duplicate JSON keys. Ruff lint and format pass. A local 500-synthetic-policy benchmark
-measured **0.6935 ms p95** and **3,178 policies/sec** on this workspace — a local
-measurement, not a production performance claim.
-
-## Reproduce
-
-```bash
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests -q
-python benchmarks/perf_gate.py --policies 500 --output perf-results.json
-```
-
-When tests, rule IDs, or benchmark behavior change, reconcile this file, the README, the portfolio, and résumé claims together.
+This repository performs static IAM analysis. It does not establish runtime enforcement, production reliability, or complete account-wide effective permissions.
