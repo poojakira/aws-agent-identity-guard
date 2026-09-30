@@ -142,27 +142,27 @@ Set these before running `--live-scan`:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `AWS_ACCESS_KEY_ID` | Yes* | IAM access key with read-only permissions |
-| `AWS_SECRET_ACCESS_KEY` | Yes* | Corresponding secret key |
-| `AWS_DEFAULT_REGION` | Yes | Region to scan (e.g., `us-east-1`) |
-| `AWS_SESSION_TOKEN` | No | Required if using temporary credentials (STS) |
-| `AWS_PROFILE` | No | Use named profile from `~/.aws/credentials` instead of env vars |
+| `AWS_PROFILE` | Recommended for local use | Named profile from the standard AWS credential chain |
+| `AWS_DEFAULT_REGION` | Yes | Region to scan (for example, `us-east-1`) |
+| Temporary role/session credentials | Recommended in managed environments | Obtain through AWS SSO, STS, workload identity, EC2/ECS role, or another supported credential provider |
 
-*Not required if using instance profiles (EC2/ECS), `~/.aws/credentials`, or `AWS_PROFILE`.
+Do not paste long-lived access keys or secret keys into this repository, Markdown, shell history, screenshots, or committed `.env` files. The live scanner uses boto3 and therefore follows the standard AWS credential-provider chain.
 
 **Windows (PowerShell):**
 ```powershell
-$env:AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE"
-$env:AWS_SECRET_ACCESS_KEY = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+$env:AWS_PROFILE = "your-read-only-security-profile"
 $env:AWS_DEFAULT_REGION = "us-east-1"
+aws sts get-caller-identity
 ```
 
 **Linux / macOS (bash):**
 ```bash
-export AWS_ACCESS_KEY_ID="AKIAIOSFODNN7EXAMPLE"
-export AWS_SECRET_ACCESS_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+export AWS_PROFILE="your-read-only-security-profile"
 export AWS_DEFAULT_REGION="us-east-1"
+aws sts get-caller-identity
 ```
+
+For CI or workloads running in AWS, prefer short-lived role credentials/workload identity rather than static access keys.
 
 ### Required IAM Permissions for Live Scan
 
@@ -493,7 +493,7 @@ pipeline {
 | Problem | Cause | Fix |
 |---------|-------|-----|
 | `ModuleNotFoundError: No module named 'boto3'` | Live scanning requires boto3 | `pip install "aws-agent-identity-guard[live]"` |
-| `NoCredentialsError` during `--live-scan` | No AWS creds configured | Set `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` env vars, or configure `~/.aws/credentials` |
+| `NoCredentialsError` during `--live-scan` | No AWS credentials available in the standard provider chain | Configure AWS SSO/profile for local use, or attach an appropriate short-lived workload/instance role |
 | `AccessDenied` on live scan | Scanning identity lacks IAM read permissions | Attach the read-only IAM policy from Section 3 above |
 | Exit code `2` with no output | JSON parse error or file not found | Check stderr: `aws-agent-identity-guard policy.json 2>&1` — look for file path or JSON syntax errors |
 | `command not found: aws-agent-identity-guard` | Not in PATH | Verify install: `pip show aws-agent-identity-guard`. Use `python -m aws_agent_identity_guard` as fallback. |
