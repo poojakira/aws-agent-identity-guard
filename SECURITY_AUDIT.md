@@ -104,3 +104,21 @@ ruff format --check src tests
 # Static security scan
 bandit -r src/ -ll
 ```
+
+
+---
+
+## 2026-09-29 Deep Re-audit
+
+The current repository now includes both static-policy analysis and optional live AWS-account collection. The re-audit covered credential use, IAM enumeration, error/completeness handling, generated remediation, containers, CI and secret exposure.
+
+| ID | Severity | Finding | Status |
+|---|---|---|---|
+| AIG-2026-01 | Info | Live scanning uses the AWS SDK credential provider chain; no credentials are hardcoded in source. | Verified |
+| AIG-2026-02 | Info | AWS collection errors mark scan completeness as false rather than silently presenting a partial account scan as complete. | Verified |
+| AIG-2026-03 | Info | Generated remediation is deterministic IaC text; it is not automatically applied to AWS. | Verified boundary |
+| AIG-2026-04 | Info | No web login/database/password-reset/XSS/SQL surface exists in this CLI/scanner repository. | N/A |
+
+### Verification plan
+
+Run the full CI, production, container and security-hygiene workflows on the final main branch and re-check live-scanner credential/error handling before closing this audit.
