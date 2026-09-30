@@ -97,6 +97,8 @@ def scan_workflows() -> list[str]:
             failures.append(f"{rel}: write-all workflow permissions are forbidden")
         if re.search(r"(?m)^\s*pull_request_target:\s*$", text):
             failures.append(f"{rel}: pull_request_target is forbidden")
+        if re.search(r"(?m)^\s*workflow_run:\s*$", text):
+            failures.append(f"{rel}: workflow_run is forbidden")
         if re.search(r"(?m)^\s*curl\s+[^\n|]+\|\s*(?:ba)?sh", text, flags=re.IGNORECASE):
             failures.append(f"{rel}: pipe-to-shell install pattern is forbidden")
 
