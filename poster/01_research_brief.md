@@ -1,6 +1,6 @@
 # Research Brief - Poster 02
 
-> Evidence status: Refreshed against current code snapshot `c39ba67f43ef6ebddd03a8ce429b42afec0c08a9` and successful CI run `36781556871` on 2026-09-30.
+> Evidence status: Refreshed against verified code snapshot `c39ba67f43ef6ebddd03a8ce429b42afec0c08a9` and successful CI run `36781556871` on 2026-09-30.
 
 ## Repository
 
