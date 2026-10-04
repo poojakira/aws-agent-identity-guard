@@ -41,9 +41,7 @@ def test_compare_policy_keeps_local_and_aws_evidence_separate(tmp_path: Path):
         json.dumps(
             {
                 "Version": "2012-10-17",
-                "Statement": [
-                    {"Effect": "Allow", "Action": "*", "Resource": "*"}
-                ],
+                "Statement": [{"Effect": "Allow", "Action": "*", "Resource": "*"}],
             }
         ),
         encoding="utf-8",
