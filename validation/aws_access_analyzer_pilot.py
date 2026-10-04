@@ -1,70 +1,28 @@
-"""Differential validation pilot against AWS IAM Access Analyzer.
+"""Operator-facing AWS IAM Access Analyzer differential-validation pilot.
 
-This script is intentionally separate from normal CI. It requires an operator-supplied
-AWS identity with permission to call access-analyzer:ValidatePolicy. It never mutates
-AWS resources and never prints credentials.
-
-The result is interoperability evidence, not proof of effective permissions or
-production safety.
+Requires an operator-supplied AWS identity with
+access-analyzer:ValidatePolicy. The command performs no AWS mutations and does
+not print credentials.
 """
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 from pathlib import Path
-from typing import Any
 
-from aws_agent_identity_guard.scanner import scan_policy_document
-
-
-def _aws_validate(client: Any, policy: dict[str, Any]) -> list[dict[str, Any]]:
-    response = client.validate_policy(
-        policyDocument=json.dumps(policy, separators=(",", ":")),
-        policyType="IDENTITY_POLICY",
-    )
-    findings = response.get("findings", [])
-    return findings if isinstance(findings, list) else []
-
-
-def compare_policy(client: Any, path: Path) -> dict[str, Any]:
-    raw = path.read_bytes()
-    policy = json.loads(raw.decode("utf-8"))
-    local = scan_policy_document(policy)
-    aws_findings = _aws_validate(client, policy)
-    return {
-        "policy": path.name,
-        "policy_sha256": hashlib.sha256(raw).hexdigest(),
-        "local_finding_count": len(local),
-        "local_rule_ids": sorted({finding.rule_id for finding in local}),
-        "aws_finding_count": len(aws_findings),
-        "aws_finding_types": sorted(
-            {
-                str(item.get("findingType", "UNKNOWN"))
-                for item in aws_findings
-                if isinstance(item, dict)
-            }
-        ),
-        "aws_issue_codes": sorted(
-            {
-                str(item.get("issueCode", "UNKNOWN"))
-                for item in aws_findings
-                if isinstance(item, dict)
-            }
-        ),
-        "scope": (
-            "Differential policy-validation evidence only; neither side computes "
-            "the complete effective permissions of a deployed principal."
-        ),
-    }
+from aws_agent_identity_guard.access_analyzer_validation import compare_policy
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("policies", nargs="+", type=Path)
     parser.add_argument("--region", default="us-east-1")
-    parser.add_argument("--output", type=Path, default=Path("validation/access-analyzer-report.json"))
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("validation/access-analyzer-report.json"),
+    )
     args = parser.parse_args()
 
     import boto3
