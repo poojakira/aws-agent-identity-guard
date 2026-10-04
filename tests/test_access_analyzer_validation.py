@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import json
-from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 from validation.aws_access_analyzer_pilot import compare_policy
 
