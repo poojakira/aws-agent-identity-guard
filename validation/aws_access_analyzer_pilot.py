@@ -11,6 +11,7 @@ production safety.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -28,17 +29,26 @@ def _aws_validate(client: Any, policy: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def compare_policy(client: Any, path: Path) -> dict[str, Any]:
-    policy = json.loads(path.read_text(encoding="utf-8"))
+    raw = path.read_bytes()
+    policy = json.loads(raw.decode("utf-8"))
     local = scan_policy_document(policy)
     aws_findings = _aws_validate(client, policy)
     return {
         "policy": path.name,
+        "policy_sha256": hashlib.sha256(raw).hexdigest(),
         "local_finding_count": len(local),
         "local_rule_ids": sorted({finding.rule_id for finding in local}),
         "aws_finding_count": len(aws_findings),
         "aws_finding_types": sorted(
             {
                 str(item.get("findingType", "UNKNOWN"))
+                for item in aws_findings
+                if isinstance(item, dict)
+            }
+        ),
+        "aws_issue_codes": sorted(
+            {
+                str(item.get("issueCode", "UNKNOWN"))
                 for item in aws_findings
                 if isinstance(item, dict)
             }
