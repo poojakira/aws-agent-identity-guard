@@ -5,11 +5,11 @@
 
 | Metric | Current value |
 |---|---:|
-| Tests collected | **238** |
-| Tests passed | **235** |
+| Tests collected | **243** |
+| Tests passed | **240** |
 | Tests skipped | **3** |
 | Deterministic rule IDs | **25** |
-| Synthetic-policy p95 | **1.1460 ms** |
-| Synthetic-policy throughput | **1,846 policies/sec** |
+| Synthetic-policy p95 | **0.8397 ms** |
+| Synthetic-policy throughput | **2,573 policies/sec** |
 
 The performance figures come from the current CI performance gate over 500 synthetic policies. They are not production performance claims.

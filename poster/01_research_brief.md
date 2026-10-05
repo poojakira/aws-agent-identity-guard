@@ -30,9 +30,9 @@ A deterministic, non-executing IAM linter specialized for AI-agent roles with **
 
 Current-main CI on Python 3.12 reports:
 
-- **238 collected: 235 passed, 3 skipped**, 0 failures/errors.
+- **243 collected: 240 passed, 3 skipped**, 0 failures/errors.
 - **25 deterministic rule IDs** remain implemented and test-covered.
-- Current performance gate over 500 synthetic policies: **1.1460 ms p95** and **1,846 policies/sec**, both passing configured gates.
+- Current performance gate over 500 synthetic policies: **0.8397 ms p95** and **2,573 policies/sec**, both passing configured gates.
 - Ruff/format and security-audit jobs complete successfully.
 
 ## Claim Boundary
@@ -53,4 +53,4 @@ pytest tests/ -q
 python benchmarks/perf_gate.py
 ```
 
-Expected test evidence: **235 passed, 3 skipped**.
+Expected test evidence: **240 passed, 3 skipped**.
