@@ -13,6 +13,6 @@ pytest tests/ -q
 python benchmarks/perf_gate.py
 ```
 
-Expected CI test evidence: **238 collected, 235 passed, 3 skipped**.
+Expected CI test evidence: **243 collected, 240 passed, 3 skipped**.
 
-Current CI performance evidence: **1.1460 ms p95**, **1,846 policies/sec** on the repository's synthetic 500-policy gate.
+Current CI performance evidence: **0.8397 ms p95**, **2,573 policies/sec** on the repository's synthetic 500-policy gate.
