@@ -1,13 +1,13 @@
 # Reproduce the Work - Poster 02
 
 **Repository:** `github.com/poojakira/aws-agent-identity-guard`  
-**Verified code snapshot:** `c39ba67f43ef6ebddd03a8ce429b42afec0c08a9`  
-**CI run:** `36781556871`
+**Verified code snapshot:** `229605c9c53068f4c0d7116d67554d19afe30183`  
+**CI run:** `37170669504`
 
 ```bash
 git clone https://github.com/poojakira/aws-agent-identity-guard.git
 cd aws-agent-identity-guard
-git checkout c39ba67f43ef6ebddd03a8ce429b42afec0c08a9
+git checkout 229605c9c53068f4c0d7116d67554d19afe30183
 python -m pip install -e ".[dev]"
 pytest tests/ -q
 python benchmarks/perf_gate.py

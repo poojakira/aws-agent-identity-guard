@@ -1,6 +1,6 @@
 # Research Brief - Poster 02
 
-> Evidence status: Refreshed against verified code snapshot `c39ba67f43ef6ebddd03a8ce429b42afec0c08a9` and successful CI run `36781556871` on 2026-09-30.
+> Evidence status: Refreshed against verified code snapshot `229605c9c53068f4c0d7116d67554d19afe30183` and successful CI run `37170669504` on 2026-10-04.
 
 ## Repository
 
@@ -47,7 +47,7 @@ Current-main CI on Python 3.12 reports:
 ```bash
 git clone https://github.com/poojakira/aws-agent-identity-guard.git
 cd aws-agent-identity-guard
-git checkout c39ba67f43ef6ebddd03a8ce429b42afec0c08a9
+git checkout 229605c9c53068f4c0d7116d67554d19afe30183
 python -m pip install -e ".[dev]"
 pytest tests/ -q
 python benchmarks/perf_gate.py

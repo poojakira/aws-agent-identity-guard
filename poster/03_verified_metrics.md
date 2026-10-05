@@ -1,7 +1,7 @@
 # Verified Metrics - Poster 02
 
-**Code snapshot:** `c39ba67f43ef6ebddd03a8ce429b42afec0c08a9`  
-**CI run:** https://github.com/poojakira/aws-agent-identity-guard/actions/runs/36781556871
+**Code snapshot:** `229605c9c53068f4c0d7116d67554d19afe30183`  
+**CI run:** https://github.com/poojakira/aws-agent-identity-guard/actions/runs/37170669504
 
 | Metric | Current value |
 |---|---:|
