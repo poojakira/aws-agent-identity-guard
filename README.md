@@ -15,7 +15,7 @@
 > Static analysis for AWS IAM policies used by AI agents and tool executors — flag over-privileged, escalation-prone, and audit-tampering grants before deployment.
 
 [![CI](https://github.com/poojakira/aws-agent-identity-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/poojakira/aws-agent-identity-guard/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-235%20passing-brightgreen)](VERIFIED_METRICS.md)
+[![Tests](https://img.shields.io/badge/tests-240%20passing-brightgreen)](VERIFIED_METRICS.md)
 [![Rules](https://img.shields.io/badge/rules-25-blue)](VERIFIED_METRICS.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -31,7 +31,7 @@ Reproduced on current `main`; CI emits `PYTEST_EVIDENCE`. Evidence: [VERIFIED_ME
 
 | Metric | Current verified result |
 |---|---:|
-| Tests | 238 collected — 235 passed, 3 skipped (live-scan, need AWS creds) |
+| Tests | 243 collected — 240 passed, 3 skipped (live-scan, need AWS creds) |
 | Deterministic rules | 25 (AIG001–AIG021, AIG-TP001–003, AIG-PB001) |
 | Output formats | text, JSON, SARIF 2.1.0 |
 | Ruff / format | clean |
@@ -267,7 +267,7 @@ This tool is a static linter. It reads a file, analyzes it, and exits. There is 
 |-------|-------|
 | Environment | GitHub Actions `ubuntu-latest`; Python 3.11 evidence job (matrix also covers 3.10 and 3.12) |
 | Historical main CI | 2026-09-23, 231 passed and 3 skipped |
-| Current main CI | 238 collected: 235 passed, 3 skipped; confirmed at current HEAD `e77583a` |
+| Current main CI | 243 collected: 240 passed, 3 skipped; confirmed at current HEAD `e77583a` |
 | Test command | `python -m pytest tests/ -q` |
 | Test result | See historical CI and current local results above; exact commands in `VERIFIED_METRICS.md` |
 | Rule coverage | All 25 emitted rule IDs (AIG001–AIG021, AIG-TP001–TP003, AIG-PB001) are referenced by positive/negative tests; parser edge cases fuzzed in `tests/test_iam_parser_fuzz.py` (Hypothesis), failure modes in `tests/test_failure_modes.py` |
