@@ -21,6 +21,8 @@
 
 Maintainer: Pooja Kiran ([@poojakira](https://github.com/poojakira)).
 
+Portfolio: [Pooja Kiran Security Engineering Portfolio](https://poojakira.github.io/Pooja_Kiran_Portfolio_Website/).
+
 ## Overview
 
 `aws-agent-identity-guard` reads IAM policy JSON (identity, trust, and permission-boundary) and produces reviewable findings for the agent-specific risk patterns that turn overbroad cloud permissions into real actions — invoking Lambda, assuming roles, changing Bedrock/SageMaker control-plane resources, reading secrets, or disabling audit trails. It is a static linter: no AWS calls in default mode, zero runtime dependencies for local-file scanning, and an optional live account scan when installed with `boto3`.
