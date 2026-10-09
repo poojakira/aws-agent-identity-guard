@@ -29,14 +29,39 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 AWS_SERVICES = [
-    "s3", "ec2", "iam", "lambda", "dynamodb", "sqs", "sns", "kms",
-    "sts", "cloudwatch", "logs", "secretsmanager", "rds", "ecs",
-    "eks", "cloudformation", "ssm", "config", "guardduty", "inspector",
+    "s3",
+    "ec2",
+    "iam",
+    "lambda",
+    "dynamodb",
+    "sqs",
+    "sns",
+    "kms",
+    "sts",
+    "cloudwatch",
+    "logs",
+    "secretsmanager",
+    "rds",
+    "ecs",
+    "eks",
+    "cloudformation",
+    "ssm",
+    "config",
+    "guardduty",
+    "inspector",
 ]
 
 ACTIONS_PER_SERVICE = [
-    "Get*", "List*", "Describe*", "Put*", "Delete*", "Create*",
-    "Update*", "Invoke*", "TagResource", "UntagResource",
+    "Get*",
+    "List*",
+    "Describe*",
+    "Put*",
+    "Delete*",
+    "Create*",
+    "Update*",
+    "Invoke*",
+    "TagResource",
+    "UntagResource",
 ]
 
 
@@ -68,9 +93,7 @@ def generate_policy(num_statements: int = 5) -> dict:
 
         # Occasionally add conditions
         if random.random() < 0.3:
-            statement["Condition"] = {
-                "StringEquals": {"aws:RequestedRegion": "us-east-1"}
-            }
+            statement["Condition"] = {"StringEquals": {"aws:RequestedRegion": "us-east-1"}}
 
         # Occasionally use wildcards (privilege escalation pattern)
         if random.random() < 0.15:
@@ -166,13 +189,15 @@ def run_benchmark(num_policies: int = 500) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Performance regression gate")
     parser.add_argument(
-        "--output", "-o",
+        "--output",
+        "-o",
         type=str,
         default=None,
         help="Path to write JSON results (default: stdout)",
     )
     parser.add_argument(
-        "--policies", "-n",
+        "--policies",
+        "-n",
         type=int,
         default=500,
         help="Number of policies to benchmark (default: 500)",

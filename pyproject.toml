@@ -61,3 +61,7 @@ select = ["E", "F", "W", "I", "UP", "B", "SIM", "TCH"]
 [tool.pyright]
 pythonVersion = "3.10"
 typeCheckingMode = "standard"
+
+[tool.ruff.lint.per-file-ignores]
+# Poster HTML/SVG template literals retain intentional long lines.
+"poster/render_poster.py" = ["E501"]

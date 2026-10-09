@@ -235,9 +235,7 @@ def _demo() -> None:  # pragma: no cover - convenience entrypoint
     """
     from moto import mock_aws
 
-    oidc_provider = (
-        "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com"
-    )
+    oidc_provider = "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com"
     role_arn = "arn:aws:iam::123456789012:role/agent-delegated-role"
     external_id = "agent-tenant-7f3a-external-id"
 
