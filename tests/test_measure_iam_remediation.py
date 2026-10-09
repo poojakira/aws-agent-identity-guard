@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
+import importlib.util
 import json
+from pathlib import Path
 
 import pytest
-
-import importlib.util
-from pathlib import Path
 
 spec = importlib.util.spec_from_file_location(
     "measure_iam_role_remediation",
