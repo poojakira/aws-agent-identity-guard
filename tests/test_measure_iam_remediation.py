@@ -6,7 +6,17 @@ import json
 
 import pytest
 
-from scripts.measure_iam_role_remediation import measure
+import importlib.util
+from pathlib import Path
+
+spec = importlib.util.spec_from_file_location(
+    "measure_iam_role_remediation",
+    Path(__file__).resolve().parents[1] / "scripts" / "measure_iam_role_remediation.py",
+)
+assert spec is not None and spec.loader is not None
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+measure = module.measure
 
 
 def reports(tmp_path):
