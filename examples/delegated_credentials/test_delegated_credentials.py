@@ -51,9 +51,7 @@ ConfusedDeputyError = _mod.ConfusedDeputyError
 # ---------------------------------------------------------------------------
 # Fixtures / constants
 # ---------------------------------------------------------------------------
-OIDC_PROVIDER = (
-    "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com"
-)
+OIDC_PROVIDER = "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com"
 ROLE_ARN = "arn:aws:iam::123456789012:role/agent-delegated-role"
 ALLOWED_SUBJECT = "repo:poojakira/aws-agent-identity-guard:ref:refs/heads/main"
 EXTERNAL_ID = "agent-tenant-7f3a-external-id"

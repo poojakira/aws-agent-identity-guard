@@ -56,8 +56,8 @@ jobs:
 
       - name: Run release gates
         run: |
-          ruff check src tests
-          ruff format --check src tests
+          ruff check .
+          ruff format --check .
           pyright src/aws_agent_identity_guard tests
           bandit -r src -ll
           pip-audit --skip-editable --progress-spinner=off
