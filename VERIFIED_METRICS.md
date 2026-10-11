@@ -18,9 +18,9 @@
 
 | Claim | Historical verified value | Scope |
 |---|---:|---|
-| Test result | **243 collected, 240 passed, 3 skipped** | Current-main CI |
-| Deterministic rule IDs | **25** | Current scanner/live-scanner rule set |
-| Performance p95 | **0.8397 ms/policy** | Current CI, 500 synthetic policies |
+| Test result | **243 collected, 240 passed, 3 skipped** | September 2026 CI at cited commit |
+| Deterministic rule IDs | **25** | Static rule inventory at cited commit |
+| Performance p95 | **0.8397 ms/policy** | September 2026 CI, 500 synthetic policies |
 | Performance throughput | **2,573 policies/sec** | Same synthetic gate |
 | Configured p95 gate | **< 10 ms/policy** | Gate threshold, not an SLO |
 | Configured throughput gate | **> 1,000 policies/sec** | Gate threshold, not an SLO |
