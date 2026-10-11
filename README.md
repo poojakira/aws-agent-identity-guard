@@ -15,7 +15,7 @@
 > Static analysis for AWS IAM policies used by AI agents and tool executors — flag over-privileged, escalation-prone, and audit-tampering grants before deployment.
 
 [![CI](https://github.com/poojakira/aws-agent-identity-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/poojakira/aws-agent-identity-guard/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-240%20passing-brightgreen)](VERIFIED_METRICS.md)
+[![Tests](https://img.shields.io/badge/tests-244%20passing-brightgreen)](VERIFIED_METRICS.md)
 [![Rules](https://img.shields.io/badge/rules-25-blue)](VERIFIED_METRICS.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -27,11 +27,15 @@ Portfolio: [Pooja Kiran Security Engineering Portfolio](https://poojakira.github
 
 `aws-agent-identity-guard` reads IAM policy JSON (identity, trust, and permission-boundary) and produces reviewable findings for the agent-specific risk patterns that turn overbroad cloud permissions into real actions — invoking Lambda, assuming roles, changing Bedrock/SageMaker control-plane resources, reading secrets, or disabling audit trails. It is a static linter: no AWS calls in default mode, zero runtime dependencies for local-file scanning, and an optional live account scan when installed with `boto3`.
 
-## Verified Snapshot
+## Latest inspected hosted CI (2026-10-10)
 
-Reproduced on current `main`; CI emits `PYTEST_EVIDENCE`. Evidence: [VERIFIED_METRICS.md](VERIFIED_METRICS.md).
+[CI run 38009457205](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38009457205), commit `bc35752dbfd72a7ce80eb1ad992bc6bc656d70fe`: **247 collected, 244 passed, 3 skipped** on Python 3.12; 3.10/3.11/3.12, lint, security audit and synthetic performance gate succeeded. This static analysis does not establish live AWS effective permissions or production latency.
 
-| Metric | Current verified result |
+## Historical verified snapshot (September 2026)
+
+The earlier 243/240/3 CI evidence is a dated snapshot, **not the latest `main` test total**. The original poster keeps its separate evidence anchor. See [VERIFIED_METRICS.md](VERIFIED_METRICS.md).
+
+| Metric | Historical verified result |
 |---|---:|
 | Tests | 243 collected — 240 passed, 3 skipped (live-scan, need AWS creds) |
 | Deterministic rules | 25 (AIG001–AIG021, AIG-TP001–003, AIG-PB001) |
@@ -269,9 +273,9 @@ This tool is a static linter. It reads a file, analyzes it, and exits. There is 
 |-------|-------|
 | Environment | GitHub Actions `ubuntu-latest`; Python 3.11 evidence job (matrix also covers 3.10 and 3.12) |
 | Historical main CI | 2026-09-23, 231 passed and 3 skipped |
-| Current main CI | 243 collected: 240 passed, 3 skipped; confirmed at current HEAD `e77583a` |
+| Previously cited main CI (historical) | 243 collected: 240 passed, 3 skipped; anchored to earlier HEAD `e77583a`, not current main |
 | Test command | `python -m pytest tests/ -q` |
-| Test result | See historical CI and current local results above; exact commands in `VERIFIED_METRICS.md` |
+| Latest hosted test result | 247 collected: 244 passed, 3 skipped on [CI 38009457205](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38009457205); details and benchmark limits in `VERIFIED_METRICS.md` |
 | Rule coverage | All 25 emitted rule IDs (AIG001–AIG021, AIG-TP001–TP003, AIG-PB001) are referenced by positive/negative tests; parser edge cases fuzzed in `tests/test_iam_parser_fuzz.py` (Hypothesis), failure modes in `tests/test_failure_modes.py` |
 | SARIF | Output validated against SARIF 2.1.0 MUST-level invariants in `tests/test_cli_output.py` |
 | Lint/format | `ruff==0.8.4 check src tests` and `ruff format --check src tests` clean |
