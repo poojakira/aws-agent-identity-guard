@@ -1,15 +1,3 @@
-<!-- security-systems-poster -->
-## Research Poster
-
-**Security Systems / 02 — Static Security Analysis of AWS IAM Policies for AI Workload Identities**
-
-[![Research poster](poster/poster.png)](poster/poster_36x48.pdf)
-
-> Technical research poster (36 x 48 in). Click the image for the print-resolution **[PDF](poster/poster_36x48.pdf)**.
-> Poster measurements are dated snapshots at their printed commits. Use the repository evidence files for newer results; do not read the poster as a verification of the latest `main`.
-> Every metric on it is evidence-backed; historical/projected numbers are labeled and separated from current results.
-<!-- security-systems-poster -->
-
 # AWS Agent Identity Guard
 
 > Static analysis for AWS IAM policies used by AI agents and tool executors — flag over-privileged, escalation-prone, and audit-tampering grants before deployment.
@@ -76,7 +64,6 @@ Exit code 0 (clean) / 1 (high|critical finding) / 2 (input/CLI error)   --->  CI
 - CI merge-gate exit codes (0 / 1 / 2)
 - Optional `--live-scan` mode (read-only IAM APIs) with a `max_roles` safety cap
 - Deterministic remediation templates for a subset of rules
-
 
 
 No AWS credentials required. No cloud calls. Just feed it your policy JSON.
@@ -298,6 +285,18 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests/ -q
 An additive, illustrative demo lives under [`examples/delegated_credentials/`](examples/delegated_credentials/README.md). It shows an agent exchanging an OIDC/workload-identity token for **short-lived, scoped credentials** via STS `AssumeRoleWithWebIdentity`, with `ExternalId`-based confused-deputy prevention.
 
 This demo is **mocked with [moto](https://github.com/getmoto/moto) (`@mock_aws`) — it does not call live AWS.** It is illustrative only and does not change the fact that the core tool is a static IAM linter. Verified: 6 tests passed with moto 5.2.3 / boto3 1.43.103. See [`examples/delegated_credentials/README.md`](examples/delegated_credentials/README.md) for details.
+
+<!-- security-systems-poster -->
+## Research Poster
+
+**Security Systems / 02 — Static Security Analysis of AWS IAM Policies for AI Workload Identities**
+
+[![Research poster](poster/poster.png)](poster/poster_36x48.pdf)
+
+> Technical research poster (36 x 48 in). Click the image for the print-resolution **[PDF](poster/poster_36x48.pdf)**.
+> Poster measurements are dated snapshots at their printed commits. Use the repository evidence files for newer results; do not read the poster as a verification of the latest `main`.
+> Every metric on it is evidence-backed; historical/projected numbers are labeled and separated from current results.
+<!-- security-systems-poster -->
 
 ## License
 
