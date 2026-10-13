@@ -33,7 +33,7 @@ jobs:
       - name: Compare against AWS IAM Access Analyzer
         run: |
           python validation/aws_access_analyzer_pilot.py             validation/policies/agent-overprivileged.json             validation/policies/agent-scoped.json
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: access-analyzer-differential-report
           path: validation/access-analyzer-report.json
