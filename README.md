@@ -1,3 +1,5 @@
+> **READ THIS LICENSE BEFORE USING THIS REPOSITORY.** Owner-controlled new releases are subject to the [proprietary All Rights Reserved LICENSE](LICENSE): copying, modification, and redistribution require written authorization except where law or GitHub's Terms allow. Previously granted MIT rights remain valid for versions covered by that license; see the [historical license](docs/license-history/LICENSE-BEFORE-2026-10-13.txt). Third-party rights remain unaffected.
+
 # AWS Agent Identity Guard
 
 > Static analysis for AWS IAM policies used by AI agents and tool executors — flag over-privileged, escalation-prone, and audit-tampering grants before deployment.
@@ -5,7 +7,7 @@
 [![CI](https://github.com/poojakira/aws-agent-identity-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/poojakira/aws-agent-identity-guard/actions/workflows/ci.yml)
 [![Tests](https://img.shields.io/badge/tests-244%20passing-brightgreen)](VERIFIED_METRICS.md)
 [![Rules](https://img.shields.io/badge/rules-25-blue)](VERIFIED_METRICS.md)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 
 Maintainer: Pooja Kiran ([@poojakira](https://github.com/poojakira)).
 
@@ -300,7 +302,7 @@ This demo is **mocked with [moto](https://github.com/getmoto/moto) (`@mock_aws`)
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Proprietary / All Rights Reserved. See [LICENSE](LICENSE); previously published MIT-licensed versions retain their applicable grants.
 
 <!-- repo-verification:start -->
 ## Verification update — 2026-09-30
