@@ -2,7 +2,7 @@
 
 ## Latest directly checked hosted CI - 2026-10-10
 
-**Main commit:** [`bc35752dbfd72a7ce80eb1ad992bc6bc656d70fe`](https://github.com/poojakira/aws-agent-identity-guard/commit/bc35752dbfd72a7ce80eb1ad992bc6bc656d70fe)
+**Main commit:** [`4098ff55`](https://github.com/poojakira/aws-agent-identity-guard/commit/4098ff55)
 
 **Successful CI:** [GitHub Actions run 38009457205](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38009457205)
 
@@ -18,7 +18,7 @@
 
 | Claim | Historical verified value | Scope |
 |---|---:|---|
-| Test result | **243 collected, 240 passed, 3 skipped** | September 2026 CI at cited commit |
+| Test result | **247 collected, 244 passed, 3 skipped** | October 13, 2026 CI run [38462296804](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38462296804) |
 | Deterministic rule IDs | **25** | Static rule inventory at cited commit |
 | Performance p95 | **0.8397 ms/policy** | September 2026 CI, 500 synthetic policies |
 | Performance throughput | **2,573 policies/sec** | Same synthetic gate |
@@ -30,3 +30,4 @@ The 3 skipped tests require AWS credentials. Do not commit credentials; use `AWS
 ## Claim boundary
 
 This repository performs static IAM analysis. It does not establish runtime enforcement, production reliability, or complete account-wide effective permissions.
+

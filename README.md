@@ -358,3 +358,4 @@ where present. Ruff's standard exclusions omit version-control metadata, virtual
 environments, and build/cache directories; generated poster HTML/PDF/PNG assets are
 not Python source. The poster generator keeps a narrowly documented E501 exception for
 long HTML/SVG template literals; its other lint rules and formatting still apply. Passing these static checks does not establish runtime behavior or product effectiveness.
+

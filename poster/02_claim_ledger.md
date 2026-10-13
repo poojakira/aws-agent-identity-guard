@@ -4,7 +4,7 @@
 
 | # | Claim | Classification | Evidence |
 |---|---|---|---|
-| 1 | 240 passed, 3 skipped | VERIFIED_AT_SNAPSHOT | CI emits `PYTEST_EVIDENCE tests=243 passed=240 skipped=3 failures=0 errors=0`. |
+| 1 | 244 passed, 3 skipped | VERIFIED_AT_SNAPSHOT | CI emits `PYTEST_EVIDENCE tests=247 passed=244 skipped=3 failures=0 errors=0`. Oct 13 2026 CI run 38462296804. |
 | 2 | 25 deterministic rule IDs | VERIFIED_AT_SNAPSHOT | AIG001-AIG021, AIG-TP001-AIG-TP003, AIG-PB001; current README/code/tests. |
 | 3 | Text / JSON / SARIF output | VERIFIED_AT_SNAPSHOT | Current CLI and tests. |
 | 4 | p95 0.8397 ms on 500 synthetic policies | VERIFIED_AT_SNAPSHOT | Current CI performance gate; environment-scoped microbenchmark. |
@@ -12,3 +12,4 @@
 | 6 | Runtime enforcement or account-wide effective-permission proof | UNSUPPORTED | Static analyzer; not a runtime gatekeeper or full account graph analyzer. |
 
 Prominent poster numbers must stay scoped to this snapshot and environment.
+
