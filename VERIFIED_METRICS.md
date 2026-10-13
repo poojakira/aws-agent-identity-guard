@@ -8,7 +8,7 @@
 
 - Python 3.12 JUnit-derived summary: **247 collected, 244 passed, 3 skipped, 0 failures, 0 errors**.
 - Python 3.10, 3.11 and 3.12 tests, lint/format, security audit and synthetic performance gate completed successfully in the cited run.
-- Skips require live AWS credentials; this is a static analyzer and no live AWS effective-permission evaluation is implied.
+- The current local source skips three direct rule-module tests because the suite explicitly sets `HAS_RULES = False` for an unavailable separate rules API. Supplying AWS credentials does not enable this separate API. This is a static analyzer; no live AWS effective-permission evaluation is implied.
 - Historical poster and September benchmark figures below remain valid only for their anchored snapshot; the October CI summary does not assert a new benchmark value.
 
 ## Historical main verification - 2026-09-30
@@ -25,8 +25,18 @@
 | Configured p95 gate | **< 10 ms/policy** | Gate threshold, not an SLO |
 | Configured throughput gate | **> 1,000 policies/sec** | Gate threshold, not an SLO |
 
-The 3 skipped tests require AWS credentials. Do not commit credentials; use `AWS_PROFILE`, SSO/STS, or workload-role credentials through the standard provider chain.
+The historical count of 3 skips is retained above. The current local skip reasons are documented below; do not infer that supplying AWS credentials will enable those tests. Never commit credentials.
 
 ## Claim boundary
 
 This repository performs static IAM analysis. It does not establish runtime enforcement, production reliability, or complete account-wide effective permissions.
+
+## Skip-reason verification, October 12, 2026
+
+A fresh local Python 3.12 run passed 244 tests and skipped 3. Pytest identifies all
+three skips in `tests/test_coverage_boost.py::TestRulesModule` as `rules module not
+importable`. The guard is `skipif(not HAS_RULES)`; `HAS_RULES` is hardcoded false because
+rules are data/patterns in `scanner.py`, not a separate public rules API. The prior statement that these skips require live
+AWS credentials was not supported by this source or run. Historical counts and
+run links above are preserved; this correction does not execute live AWS or
+certify effective permissions. Ruff 0.8.4 lint passed.

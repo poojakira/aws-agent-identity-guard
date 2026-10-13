@@ -25,7 +25,7 @@ The earlier 243/240/3 CI evidence is a dated snapshot, **not the latest `main` t
 
 | Metric | Historical verified result |
 |---|---:|
-| Tests | 243 collected — 240 passed, 3 skipped (live-scan, need AWS creds) |
+| Tests | 243 collected — 240 passed, 3 skipped (historical count; see current skip reasons in VERIFIED_METRICS.md) |
 | Deterministic rules | 25 (AIG001–AIG021, AIG-TP001–003, AIG-PB001) |
 | Output formats | text, JSON, SARIF 2.1.0 |
 | Ruff / format | clean |
@@ -356,3 +356,10 @@ where present. Ruff's standard exclusions omit version-control metadata, virtual
 environments, and build/cache directories; generated poster HTML/PDF/PNG assets are
 not Python source. The poster generator keeps a narrowly documented E501 exception for
 long HTML/SVG template literals; its other lint rules and formatting still apply. Passing these static checks does not establish runtime behavior or product effectiveness.
+
+### Current skip-reason correction, October 12, 2026
+
+The local verification run passed 244 tests and skipped three direct rule-module
+tests with `rules module not importable`. These are explicitly disabled separate-rule-API checks, not
+credential-dependent live scans. See `VERIFIED_METRICS.md` for the exact source
+boundary. The earlier test counts and benchmark anchors remain historical.
