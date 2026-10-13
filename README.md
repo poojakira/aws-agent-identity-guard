@@ -46,7 +46,8 @@ AI agents and tool executors run under IAM roles. An over-permissive role lets a
 IAM policy JSON  --->  argparse / json.loads (allow_pickle=False, dup-key reject)
       |
       v
-scanner.py: scan_policy_document / scan_trust_policy   (25 deterministic rules)
+scanner.py: scan_policy_document / scan_trust_policy   (24 offline rules)
+live_scanner.py: optional role metadata                 (AIG-PB001 boundary check)
       |
       v
 Output: text / JSON / SARIF 2.1.0  --->  stdout or file
