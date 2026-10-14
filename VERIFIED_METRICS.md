@@ -1,6 +1,10 @@
 # Verified Metrics
 
-## Latest directly checked hosted CI - 2026-10-10
+## Hosted CI results — October 10 and 13, 2026
+
+**October 13 hosted CI:** [Run 38462296804](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38462296804) reported **247 collected, 244 passed, 3 skipped**. This is a dated test result, not a September benchmark measurement.
+
+### October 10 hosted CI evidence
 
 **Main commit:** [`4098ff55`](https://github.com/poojakira/aws-agent-identity-guard/commit/4098ff55)
 
@@ -18,7 +22,6 @@
 
 | Claim | Historical verified value | Scope |
 |---|---:|---|
-| Test result | **247 collected, 244 passed, 3 skipped** | October 13, 2026 CI run [38462296804](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38462296804) |
 | Deterministic rule IDs | **25** | Static rule inventory at cited commit |
 | Performance p95 | **0.8397 ms/policy** | September 2026 CI, 500 synthetic policies |
 | Performance throughput | **2,573 policies/sec** | Same synthetic gate |
