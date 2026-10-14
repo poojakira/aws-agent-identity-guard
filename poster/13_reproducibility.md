@@ -1,19 +1,16 @@
-# Reproduce the Work - Poster 02
+# Reproduce the Work — AWS Identity Guard Poster 02
 
-**Repository:** `github.com/poojakira/aws-agent-identity-guard`  
-**Verified code snapshot:** `229605c9c53068f4c0d7116d67554d19afe30183`  
-**CI run:** `37170669504`
+**Current code snapshot:** `718582f5fd8419b0b8c2ca21361f7b0c715cb54b`  
+**Successful main CI:** [run 38497940763](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38497940763) (October 14, 2026 UTC)
 
 ```bash
 git clone https://github.com/poojakira/aws-agent-identity-guard.git
 cd aws-agent-identity-guard
-git checkout 229605c9c53068f4c0d7116d67554d19afe30183
+git checkout 718582f5fd8419b0b8c2ca21361f7b0c715cb54b
 python -m pip install -e ".[dev]"
 pytest tests/ -q
-python benchmarks/perf_gate.py
 ```
 
-Expected CI test evidence: **247 collected, 244 passed, 3 skipped** (Oct 13 2026 CI run 38462296804).
+Expected from Python 3.12 JUnit: **247 collected, 244 passed, 3 skipped** (credential-dependent). Static rule inventory: **25 deterministic rule IDs**, without implying effective permissions in a real AWS account.
 
-Current CI performance evidence: **0.8397 ms p95**, **2,573 policies/sec** on the repository's synthetic 500-policy gate.
-
+Historical synthetic performance measurements, from [October 4 CI run 37170669504](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/37170669504), were **0.8397 ms p95** and **2,573 policies/second** on 500 artificial policies. That is a distinct benchmark and not a production SLO or a result measured in this current test run. The historical test snapshot was 243/240/3.
