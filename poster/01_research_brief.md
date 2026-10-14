@@ -1,6 +1,6 @@
 # Research Brief - Poster 02
 
-> Evidence status: Refreshed against verified code snapshot `229605c9c53068f4c0d7116d67554d19afe30183` and successful CI run `37170669504` on 2026-10-04.
+> Evidence status: Refreshed against verified code snapshot `718582f5fd8419b0b8c2ca21361f7b0c715cb54b` and successful CI run `38497940763` on 2026-10-14.
 
 ## Repository
 
@@ -32,7 +32,7 @@ Current-main CI on Python 3.12 reports:
 
 - **247 collected: 244 passed, 3 skipped**, 0 failures/errors.
 - **25 deterministic rule IDs** remain implemented and test-covered.
-- Current performance gate over 500 synthetic policies: **0.8397 ms p95** and **2,573 policies/sec**, both passing configured gates.
+- Separately anchored earlier synthetic performance gate over 500 policies (not a measured result in the current test count): **0.8397 ms p95** and **2,573 policies/sec**, both passing configured gates.
 - Ruff/format and security-audit jobs complete successfully.
 
 ## Claim Boundary
@@ -47,11 +47,11 @@ Current-main CI on Python 3.12 reports:
 ```bash
 git clone https://github.com/poojakira/aws-agent-identity-guard.git
 cd aws-agent-identity-guard
-git checkout 229605c9c53068f4c0d7116d67554d19afe30183
+git checkout 718582f5fd8419b0b8c2ca21361f7b0c715cb54b
 python -m pip install -e ".[dev]"
 pytest tests/ -q
 python benchmarks/perf_gate.py
 ```
 
-Expected test evidence: **244 passed, 3 skipped** (Oct 13 2026 CI run 38462296804).
+Expected test evidence: **244 passed, 3 skipped** (Oct 13 2026 CI run 38497940763).
 
