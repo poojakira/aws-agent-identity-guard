@@ -17,9 +17,9 @@ Portfolio: [Pooja Kiran Security Engineering Portfolio](https://poojakira.github
 
 `aws-agent-identity-guard` reads IAM policy JSON (identity, trust, and permission-boundary) and produces reviewable findings for the agent-specific risk patterns that turn overbroad cloud permissions into real actions — invoking Lambda, assuming roles, changing Bedrock/SageMaker control-plane resources, reading secrets, or disabling audit trails. It is a static linter: no AWS calls in default mode, zero runtime dependencies for local-file scanning, and an optional live account scan when installed with `boto3`.
 
-## Latest inspected hosted CI (2026-10-10)
+## Latest inspected hosted CI (2026-10-13)
 
-[CI run 38009457205](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38009457205), commit `bc35752dbfd72a7ce80eb1ad992bc6bc656d70fe`: **247 collected, 244 passed, 3 skipped** on Python 3.12; 3.10/3.11/3.12, lint, security audit and synthetic performance gate succeeded. This static analysis does not establish live AWS effective permissions or production latency.
+[CI run 38462296804](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38462296804), commit `4098ff55`: **247 collected, 244 passed, 3 skipped** on Python 3.12; 3.10/3.11/3.12, lint, security audit and synthetic performance gate succeeded. This static analysis does not establish live AWS effective permissions or production latency.
 
 ## Historical verified snapshot (September 2026)
 
@@ -264,7 +264,7 @@ This tool is a static linter. It reads a file, analyzes it, and exits. There is 
 | Historical main CI | 2026-09-23, 231 passed and 3 skipped |
 | Previously cited main CI (historical) | 243 collected: 240 passed, 3 skipped; anchored to earlier HEAD `e77583a`, not current main |
 | Test command | `python -m pytest tests/ -q` |
-| Latest hosted test result | 247 collected: 244 passed, 3 skipped on [CI 38009457205](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38009457205); details and benchmark limits in `VERIFIED_METRICS.md` |
+| Latest hosted test result | 247 collected: 244 passed, 3 skipped on [CI 38462296804](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38462296804) (October 13, 2026); details and benchmark limits in `VERIFIED_METRICS.md` |
 | Rule coverage | All 25 emitted rule IDs (AIG001–AIG021, AIG-TP001–TP003, AIG-PB001) are referenced by positive/negative tests; parser edge cases fuzzed in `tests/test_iam_parser_fuzz.py` (Hypothesis), failure modes in `tests/test_failure_modes.py` |
 | SARIF | Output validated against SARIF 2.1.0 MUST-level invariants in `tests/test_cli_output.py` |
 | Lint/format | `ruff==0.8.4 check src tests` and `ruff format --check src tests` clean |
