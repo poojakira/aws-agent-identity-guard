@@ -53,5 +53,5 @@ pytest tests/ -q
 python benchmarks/perf_gate.py
 ```
 
-Expected test evidence: **244 passed, 3 skipped** (Oct 13 2026 CI run 38497940763).
+Expected test evidence: **244 passed, 3 skipped** (Oct 14 2026 CI run 38497940763).
 
