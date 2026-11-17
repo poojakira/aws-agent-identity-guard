@@ -56,7 +56,7 @@ def main():
         "runs": [],
         "limitations": [
             "Static patterns do not establish effective IAM permissions or exploitability",
-            "No live AWS validation; credential-dependent tests are skipped",
+            "No live AWS validation; actual skip names and reasons are recorded separately",
             "No public or multi-user deployment approval",
             "Full historical document and branch reconciliation remains incomplete",
             "Installed wheels cannot attest to source Git metadata and report UNKNOWN",
@@ -196,7 +196,11 @@ def main():
             - manifest["tests"]["skipped"]
         )
         manifest["skipped_tests"] = [
-            {"name": case.get("name"), "reason": skipped.get("message", "")}
+            {
+                "name": case.get("name"),
+                "class": case.get("classname"),
+                "reason": skipped.get("message", ""),
+            }
             for case in ElementTree.parse(output / "junit.xml").getroot().iter("testcase")
             for skipped in case.findall("skipped")
         ]
