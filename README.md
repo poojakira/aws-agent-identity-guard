@@ -49,7 +49,7 @@ echo 'c3b4bb2d6093897483348925aaa73af03b3e3f4bd4ca38cef26dcb4212a2682e  /tmp/iam
 python scripts/studio_verify.py --output /tmp/iam-studio-evidence --schema /tmp/iam-sarif-schema.json --chromium /usr/bin/chromium
 ```
 
-The browser gate needs Chromium at the chosen path; CI installs the tested Playwright browser. The verifier requires a clean source and generates commands/times, JUnit, coverage, scan exports, screenshots, builds, audit results and hashes outside the checkout. It preserves the existing minimum test-collection and performance gates. Credential-dependent legacy tests are skips, not live validation. The official schema is downloaded only for verification, never by the running studio. No schema source is vendored or relicensed.
+The browser gate needs Chromium at the chosen path; CI installs the tested Playwright browser. The verifier requires a clean source and generates commands/times, JUnit, coverage, scan exports, screenshots, builds, audit results and hashes outside the checkout. It preserves the existing minimum test-collection and performance gates. Three legacy rule-contract tests skip because their optional rules module is absent; no live AWS validation is claimed. The official schema is downloaded only for verification, never by the running studio. No schema source is vendored or relicensed.
 
 For focused development: `SARIF_SCHEMA_PATH=/tmp/iam-sarif-schema.json python -m pytest tests/test_studio.py`. Without that prerequisite, the schema test is explicitly skipped. The existing static CLI remains `aws-agent-identity-guard POLICY.json --format sarif`.
 
