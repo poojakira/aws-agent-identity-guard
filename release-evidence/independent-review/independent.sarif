@@ -1,0 +1,166 @@
+{
+  "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "aws-agent-identity-guard",
+          "version": "0.3.0",
+          "informationUri": "https://github.com/poojakira/aws-agent-identity-guard",
+          "rules": [
+            {
+              "id": "AIG007",
+              "name": "AIG007",
+              "shortDescription": {
+                "text": "Sensitive-data or metadata action 's3:GetObject' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents."
+              },
+              "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+              "properties": {
+                "severity": "medium"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "AIG007",
+          "ruleIndex": 0,
+          "level": "warning",
+          "message": {
+            "text": "Sensitive-data or metadata action 's3:GetObject' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "identity-policy.json",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 4,
+                  "endLine": 8
+                }
+              },
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "/Statement/0"
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "statementIndex": 0,
+            "remediation": "Add principal tags (aws:PrincipalTag/tenant, aws:PrincipalTag/agent-id) or resource tags to ensure the agent only accesses data belonging to its tenant.",
+            "scope": "static pattern; effective permission UNKNOWN",
+            "counterEvidence": {
+              "deny_statement_indices": [],
+              "conditions_present": false
+            }
+          }
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "identity-policy.json",
+            "uriBaseId": "%SRCROOT%"
+          }
+        }
+      ],
+      "properties": {
+        "scope": "STATIC_ONLY_CONTEXT_INCOMPLETE",
+        "inputSha256": "d5a7f3f09750f906e08dd33a9db499f239a68dc98d982fb3fed7d4b72579909f",
+        "run_id": "60f298ac-14c1-4f7d-82be-32b3395b89ff",
+        "source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+        "source_status": "CLEAN",
+        "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+        "timestamp_utc": "2026-11-17T21:24:07.941601+00:00",
+        "configuration_sha256": "d81ae5078af75f171f499d8ca83ad41d537f7cfb8dbe4f11c532255b8cea8171",
+        "input_sha256": "f20aa1d6341849224e6ff2811bd4bb2fd1e63c38a01b6426d23d5bfb68e5eb38",
+        "app_version": "0.3.0"
+      }
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "aws-agent-identity-guard",
+          "version": "0.3.0",
+          "informationUri": "https://github.com/poojakira/aws-agent-identity-guard",
+          "rules": [
+            {
+              "id": "AIG-TP002",
+              "name": "AIGTP002",
+              "shortDescription": {
+                "text": "AWS-principal trust to ['arn:aws:iam::123456789012:role/<img src=x onerror=\"window.iamXss=1\">'] has no sts:ExternalId condition. ExternalId is recommended when a third party assumes roles for multiple customers, but it is not required for every same-account or cross-account trust relationship."
+              },
+              "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+              "properties": {
+                "severity": "medium"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "AIG-TP002",
+          "ruleIndex": 0,
+          "level": "warning",
+          "message": {
+            "text": "AWS-principal trust to ['arn:aws:iam::123456789012:role/<img src=x onerror=\"window.iamXss=1\">'] has no sts:ExternalId condition. ExternalId is recommended when a third party assumes roles for multiple customers, but it is not required for every same-account or cross-account trust relationship."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "trust-policy.json",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 8
+                }
+              },
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "/Statement"
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "statementIndex": 0,
+            "remediation": "If this principal belongs to a third-party/shared service, require the provider's unique sts:ExternalId. Otherwise document the trust model and use the condition keys appropriate to your account/organization boundary.",
+            "scope": "static pattern; effective permission UNKNOWN",
+            "counterEvidence": {
+              "deny_statement_indices": [],
+              "conditions_present": false
+            }
+          }
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "trust-policy.json",
+            "uriBaseId": "%SRCROOT%"
+          }
+        }
+      ],
+      "properties": {
+        "scope": "STATIC_ONLY_CONTEXT_INCOMPLETE",
+        "inputSha256": "072951585070b34394449175a3df16b35bfbdb5c4a7f517d78d4138e26ef7d18",
+        "run_id": "60f298ac-14c1-4f7d-82be-32b3395b89ff",
+        "source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+        "source_status": "CLEAN",
+        "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+        "timestamp_utc": "2026-11-17T21:24:07.941601+00:00",
+        "configuration_sha256": "d81ae5078af75f171f499d8ca83ad41d537f7cfb8dbe4f11c532255b8cea8171",
+        "input_sha256": "f20aa1d6341849224e6ff2811bd4bb2fd1e63c38a01b6426d23d5bfb68e5eb38",
+        "app_version": "0.3.0"
+      }
+    }
+  ]
+}

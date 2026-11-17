@@ -1,0 +1,665 @@
+{
+  "app_version": "0.3.0",
+  "source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+  "source_status": "CLEAN",
+  "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+  "static_rule_count": 24,
+  "static_rule_ids": [
+    "AIG001",
+    "AIG002",
+    "AIG003",
+    "AIG004",
+    "AIG005",
+    "AIG006",
+    "AIG007",
+    "AIG008",
+    "AIG009",
+    "AIG010",
+    "AIG011",
+    "AIG012",
+    "AIG013",
+    "AIG014",
+    "AIG015",
+    "AIG016",
+    "AIG017",
+    "AIG018",
+    "AIG019",
+    "AIG020",
+    "AIG021",
+    "AIG-TP001",
+    "AIG-TP002",
+    "AIG-TP003"
+  ],
+  "live_context_rule_ids_not_run": [
+    "AIG-PB001"
+  ],
+  "run_id": "90bb7183-9f5b-46ad-b274-0df236e80f16",
+  "timestamp_utc": "2026-11-17T21:24:09.837075+00:00",
+  "configuration": {
+    "mode": "static-identity-and-optional-trust",
+    "compare": false,
+    "max_document_bytes": 32768,
+    "max_statements": 32,
+    "max_depth": 16
+  },
+  "configuration_sha256": "d81ae5078af75f171f499d8ca83ad41d537f7cfb8dbe4f11c532255b8cea8171",
+  "input_sha256": "9fe0aa2fc32d4042603ebfa2db4d6117d528f523b7fc2b5d89c6caa727b208c2",
+  "findings": [
+    {
+      "rule_id": "AIG003",
+      "severity": "high",
+      "message": "Statement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope.",
+      "remediation": "Check each listed action's resource-level support. Where supported, use specific ARNs or applicable resource-tag conditions; otherwise review service-specific conditions and required context.",
+      "statement_index": 1,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/1",
+        "startLine": 5,
+        "endLine": 5,
+        "snippet": "{\"Sid\":\"second\",\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"iam:PassedToService\":\"lambda.amazonaws.com\"}}}"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [
+          0
+        ],
+        "conditions_present": true
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "c394770e6e3951d88a610e8941dd3d1e24cb00dabd9f6fbf21529aba0d857a8f"
+    },
+    {
+      "rule_id": "AIG005",
+      "severity": "critical",
+      "message": "Agent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path.",
+      "remediation": "Separate agent runtime roles from IAM administration. Agent runtime identities should NEVER have iam:* or policy-modification permissions.",
+      "statement_index": 1,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/1",
+        "startLine": 5,
+        "endLine": 5,
+        "snippet": "{\"Sid\":\"second\",\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"iam:PassedToService\":\"lambda.amazonaws.com\"}}}"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [
+          0
+        ],
+        "conditions_present": true
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "34a8d169320766c1acad054b50e7a1b244b1be5e72aea6cc7c4f0fce51136818"
+    },
+    {
+      "rule_id": "AIG-TP002",
+      "severity": "medium",
+      "message": "AWS-principal trust to ['arn:aws:iam::123456789012:role/<img src=x onerror=\"window.iamXss=1\">'] has no sts:ExternalId condition. ExternalId is recommended when a third party assumes roles for multiple customers, but it is not required for every same-account or cross-account trust relationship.",
+      "remediation": "If this principal belongs to a third-party/shared service, require the provider's unique sts:ExternalId. Otherwise document the trust model and use the condition keys appropriate to your account/organization boundary.",
+      "statement_index": 0,
+      "location": {
+        "source": "trust-policy.json",
+        "json_pointer": "/Statement",
+        "startLine": 1,
+        "endLine": 1,
+        "snippet": "{\"Effect\": \"Allow\", \"Action\": \"sts:AssumeRole\", \"Principal\": {\"AWS\": \"arn:aws:iam::123456789012:role/<img src=x onerror=\\\"window.iamXss=1\\\">\"}}"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "61a7dfec4a0db8103fb484846d22414efe7eac05eddbc9707efa86bfbc4d6cc5"
+    }
+  ],
+  "sources": [
+    {
+      "name": "identity-policy.json",
+      "sha256": "19e55ac96700d5e19873326491a7e2804a4cfd4c3837d796c5b57bfec4a8e2e1",
+      "text": "{\n \"Id\":\"Statement in an escaped string: \\\"not syntax\\\"\",\n \"St\\u0061tement\":[\n  {\"Sid\":\"first\",\"Effect\":\"Deny\",\"Action\":\"s3:GetObject\",\"Resource\":\"*\"},\n  {\"Sid\":\"second\",\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"iam:PassedToService\":\"lambda.amazonaws.com\"}}}\n ]\n}"
+    },
+    {
+      "name": "trust-policy.json",
+      "sha256": "b8e43a084a8a16a9c6659e5b0b04dcfa22463a8e2c4689fcad3795751f618520",
+      "text": "{\"Statement\": {\"Effect\": \"Allow\", \"Action\": \"sts:AssumeRole\", \"Principal\": {\"AWS\": \"arn:aws:iam::123456789012:role/<img src=x onerror=\\\"window.iamXss=1\\\">\"}}}"
+    }
+  ],
+  "statements": [
+    {
+      "id": "identity-policy.json#/Statement/0",
+      "index": 0,
+      "effect": "Deny",
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 4,
+        "endLine": 4,
+        "snippet": "{\"Sid\":\"first\",\"Effect\":\"Deny\",\"Action\":\"s3:GetObject\",\"Resource\":\"*\"}"
+      },
+      "condition": {}
+    },
+    {
+      "id": "identity-policy.json#/Statement/1",
+      "index": 1,
+      "effect": "Allow",
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/1",
+        "startLine": 5,
+        "endLine": 5,
+        "snippet": "{\"Sid\":\"second\",\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"iam:PassedToService\":\"lambda.amazonaws.com\"}}}"
+      },
+      "condition": {
+        "StringEquals": {
+          "iam:PassedToService": "lambda.amazonaws.com"
+        }
+      }
+    },
+    {
+      "id": "trust-policy.json#/Statement",
+      "index": 0,
+      "effect": "Allow",
+      "location": {
+        "source": "trust-policy.json",
+        "json_pointer": "/Statement",
+        "startLine": 1,
+        "endLine": 1,
+        "snippet": "{\"Effect\": \"Allow\", \"Action\": \"sts:AssumeRole\", \"Principal\": {\"AWS\": \"arn:aws:iam::123456789012:role/<img src=x onerror=\\\"window.iamXss=1\\\">\"}}"
+      },
+      "condition": {}
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "identity-policy.json",
+        "kind": "document",
+        "label": "identity-policy.json"
+      },
+      {
+        "id": "identity-policy.json#/Statement/0",
+        "kind": "statement",
+        "label": "Statement 0: Deny",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 4,
+          "snippet": "{\"Sid\":\"first\",\"Effect\":\"Deny\",\"Action\":\"s3:GetObject\",\"Resource\":\"*\"}"
+        }
+      },
+      {
+        "id": "identity-policy.json#/Statement/0/Action",
+        "kind": "Action",
+        "label": "\"s3:GetObject\"",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 4,
+          "snippet": "{\"Sid\":\"first\",\"Effect\":\"Deny\",\"Action\":\"s3:GetObject\",\"Resource\":\"*\"}"
+        }
+      },
+      {
+        "id": "identity-policy.json#/Statement/0/Resource",
+        "kind": "Resource",
+        "label": "\"*\"",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 4,
+          "snippet": "{\"Sid\":\"first\",\"Effect\":\"Deny\",\"Action\":\"s3:GetObject\",\"Resource\":\"*\"}"
+        }
+      },
+      {
+        "id": "identity-policy.json#/Statement/1",
+        "kind": "statement",
+        "label": "Statement 1: Allow",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/1",
+          "startLine": 5,
+          "endLine": 5,
+          "snippet": "{\"Sid\":\"second\",\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"iam:PassedToService\":\"lambda.amazonaws.com\"}}}"
+        }
+      },
+      {
+        "id": "identity-policy.json#/Statement/1/Action",
+        "kind": "Action",
+        "label": "\"iam:PassRole\"",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/1",
+          "startLine": 5,
+          "endLine": 5,
+          "snippet": "{\"Sid\":\"second\",\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"iam:PassedToService\":\"lambda.amazonaws.com\"}}}"
+        }
+      },
+      {
+        "id": "identity-policy.json#/Statement/1/Resource",
+        "kind": "Resource",
+        "label": "\"*\"",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/1",
+          "startLine": 5,
+          "endLine": 5,
+          "snippet": "{\"Sid\":\"second\",\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"iam:PassedToService\":\"lambda.amazonaws.com\"}}}"
+        }
+      },
+      {
+        "id": "trust-policy.json",
+        "kind": "document",
+        "label": "trust-policy.json"
+      },
+      {
+        "id": "trust-policy.json#/Statement",
+        "kind": "statement",
+        "label": "Statement 0: Allow",
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 1,
+          "endLine": 1,
+          "snippet": "{\"Effect\": \"Allow\", \"Action\": \"sts:AssumeRole\", \"Principal\": {\"AWS\": \"arn:aws:iam::123456789012:role/<img src=x onerror=\\\"window.iamXss=1\\\">\"}}"
+        }
+      },
+      {
+        "id": "trust-policy.json#/Statement/Action",
+        "kind": "Action",
+        "label": "\"sts:AssumeRole\"",
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 1,
+          "endLine": 1,
+          "snippet": "{\"Effect\": \"Allow\", \"Action\": \"sts:AssumeRole\", \"Principal\": {\"AWS\": \"arn:aws:iam::123456789012:role/<img src=x onerror=\\\"window.iamXss=1\\\">\"}}"
+        }
+      },
+      {
+        "id": "trust-policy.json#/Statement/Principal",
+        "kind": "Principal",
+        "label": "{\"AWS\": \"arn:aws:iam::123456789012:role/<img src=x onerror=\\\"window.iamXss=1\\\">\"}",
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 1,
+          "endLine": 1,
+          "snippet": "{\"Effect\": \"Allow\", \"Action\": \"sts:AssumeRole\", \"Principal\": {\"AWS\": \"arn:aws:iam::123456789012:role/<img src=x onerror=\\\"window.iamXss=1\\\">\"}}"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "from": "identity-policy.json",
+        "to": "identity-policy.json#/Statement/0",
+        "label": "contains",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 4,
+          "snippet": "{\"Sid\":\"first\",\"Effect\":\"Deny\",\"Action\":\"s3:GetObject\",\"Resource\":\"*\"}"
+        }
+      },
+      {
+        "from": "identity-policy.json#/Statement/0",
+        "to": "identity-policy.json#/Statement/0/Action",
+        "label": "Action pattern",
+        "effect": "Deny",
+        "conditions_present": false,
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 4,
+          "snippet": "{\"Sid\":\"first\",\"Effect\":\"Deny\",\"Action\":\"s3:GetObject\",\"Resource\":\"*\"}"
+        }
+      },
+      {
+        "from": "identity-policy.json#/Statement/0",
+        "to": "identity-policy.json#/Statement/0/Resource",
+        "label": "Resource pattern",
+        "effect": "Deny",
+        "conditions_present": false,
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 4,
+          "snippet": "{\"Sid\":\"first\",\"Effect\":\"Deny\",\"Action\":\"s3:GetObject\",\"Resource\":\"*\"}"
+        }
+      },
+      {
+        "from": "identity-policy.json",
+        "to": "identity-policy.json#/Statement/1",
+        "label": "contains",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/1",
+          "startLine": 5,
+          "endLine": 5,
+          "snippet": "{\"Sid\":\"second\",\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"iam:PassedToService\":\"lambda.amazonaws.com\"}}}"
+        }
+      },
+      {
+        "from": "identity-policy.json#/Statement/1",
+        "to": "identity-policy.json#/Statement/1/Action",
+        "label": "Action pattern",
+        "effect": "Allow",
+        "conditions_present": true,
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/1",
+          "startLine": 5,
+          "endLine": 5,
+          "snippet": "{\"Sid\":\"second\",\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"iam:PassedToService\":\"lambda.amazonaws.com\"}}}"
+        }
+      },
+      {
+        "from": "identity-policy.json#/Statement/1",
+        "to": "identity-policy.json#/Statement/1/Resource",
+        "label": "Resource pattern",
+        "effect": "Allow",
+        "conditions_present": true,
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/1",
+          "startLine": 5,
+          "endLine": 5,
+          "snippet": "{\"Sid\":\"second\",\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"iam:PassedToService\":\"lambda.amazonaws.com\"}}}"
+        }
+      },
+      {
+        "from": "trust-policy.json",
+        "to": "trust-policy.json#/Statement",
+        "label": "contains",
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 1,
+          "endLine": 1,
+          "snippet": "{\"Effect\": \"Allow\", \"Action\": \"sts:AssumeRole\", \"Principal\": {\"AWS\": \"arn:aws:iam::123456789012:role/<img src=x onerror=\\\"window.iamXss=1\\\">\"}}"
+        }
+      },
+      {
+        "from": "trust-policy.json#/Statement",
+        "to": "trust-policy.json#/Statement/Action",
+        "label": "Action pattern",
+        "effect": "Allow",
+        "conditions_present": false,
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 1,
+          "endLine": 1,
+          "snippet": "{\"Effect\": \"Allow\", \"Action\": \"sts:AssumeRole\", \"Principal\": {\"AWS\": \"arn:aws:iam::123456789012:role/<img src=x onerror=\\\"window.iamXss=1\\\">\"}}"
+        }
+      },
+      {
+        "from": "trust-policy.json#/Statement",
+        "to": "trust-policy.json#/Statement/Principal",
+        "label": "Principal pattern",
+        "effect": "Allow",
+        "conditions_present": false,
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 1,
+          "endLine": 1,
+          "snippet": "{\"Effect\": \"Allow\", \"Action\": \"sts:AssumeRole\", \"Principal\": {\"AWS\": \"arn:aws:iam::123456789012:role/<img src=x onerror=\\\"window.iamXss=1\\\">\"}}"
+        }
+      }
+    ],
+    "scope": "Supplied relationships only; no effective grants or reachability inferred"
+  },
+  "sarif": {
+    "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+      {
+        "tool": {
+          "driver": {
+            "name": "aws-agent-identity-guard",
+            "version": "0.3.0",
+            "informationUri": "https://github.com/poojakira/aws-agent-identity-guard",
+            "rules": [
+              {
+                "id": "AIG003",
+                "name": "AIG003",
+                "shortDescription": {
+                  "text": "Statement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "high"
+                }
+              },
+              {
+                "id": "AIG005",
+                "name": "AIG005",
+                "shortDescription": {
+                  "text": "Agent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "critical"
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "ruleId": "AIG003",
+            "ruleIndex": 0,
+            "level": "error",
+            "message": {
+              "text": "Statement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 5,
+                    "endLine": 5
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/1"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 1,
+              "remediation": "Check each listed action's resource-level support. Where supported, use specific ARNs or applicable resource-tag conditions; otherwise review service-specific conditions and required context.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [
+                  0
+                ],
+                "conditions_present": true
+              }
+            }
+          },
+          {
+            "ruleId": "AIG005",
+            "ruleIndex": 1,
+            "level": "error",
+            "message": {
+              "text": "Agent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 5,
+                    "endLine": 5
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/1"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 1,
+              "remediation": "Separate agent runtime roles from IAM administration. Agent runtime identities should NEVER have iam:* or policy-modification permissions.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [
+                  0
+                ],
+                "conditions_present": true
+              }
+            }
+          }
+        ],
+        "artifacts": [
+          {
+            "location": {
+              "uri": "identity-policy.json",
+              "uriBaseId": "%SRCROOT%"
+            }
+          }
+        ],
+        "properties": {
+          "scope": "STATIC_ONLY_CONTEXT_INCOMPLETE",
+          "inputSha256": "19e55ac96700d5e19873326491a7e2804a4cfd4c3837d796c5b57bfec4a8e2e1",
+          "run_id": "90bb7183-9f5b-46ad-b274-0df236e80f16",
+          "source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+          "source_status": "CLEAN",
+          "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+          "timestamp_utc": "2026-11-17T21:24:09.837075+00:00",
+          "configuration_sha256": "d81ae5078af75f171f499d8ca83ad41d537f7cfb8dbe4f11c532255b8cea8171",
+          "input_sha256": "9fe0aa2fc32d4042603ebfa2db4d6117d528f523b7fc2b5d89c6caa727b208c2",
+          "app_version": "0.3.0"
+        }
+      },
+      {
+        "tool": {
+          "driver": {
+            "name": "aws-agent-identity-guard",
+            "version": "0.3.0",
+            "informationUri": "https://github.com/poojakira/aws-agent-identity-guard",
+            "rules": [
+              {
+                "id": "AIG-TP002",
+                "name": "AIGTP002",
+                "shortDescription": {
+                  "text": "AWS-principal trust to ['arn:aws:iam::123456789012:role/<img src=x onerror=\"window.iamXss=1\">'] has no sts:ExternalId condition. ExternalId is recommended when a third party assumes roles for multiple customers, but it is not required for every same-account or cross-account trust relationship."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "medium"
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "ruleId": "AIG-TP002",
+            "ruleIndex": 0,
+            "level": "warning",
+            "message": {
+              "text": "AWS-principal trust to ['arn:aws:iam::123456789012:role/<img src=x onerror=\"window.iamXss=1\">'] has no sts:ExternalId condition. ExternalId is recommended when a third party assumes roles for multiple customers, but it is not required for every same-account or cross-account trust relationship."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "trust-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 1,
+                    "endLine": 1
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "If this principal belongs to a third-party/shared service, require the provider's unique sts:ExternalId. Otherwise document the trust model and use the condition keys appropriate to your account/organization boundary.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          }
+        ],
+        "artifacts": [
+          {
+            "location": {
+              "uri": "trust-policy.json",
+              "uriBaseId": "%SRCROOT%"
+            }
+          }
+        ],
+        "properties": {
+          "scope": "STATIC_ONLY_CONTEXT_INCOMPLETE",
+          "inputSha256": "b8e43a084a8a16a9c6659e5b0b04dcfa22463a8e2c4689fcad3795751f618520",
+          "run_id": "90bb7183-9f5b-46ad-b274-0df236e80f16",
+          "source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+          "source_status": "CLEAN",
+          "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+          "timestamp_utc": "2026-11-17T21:24:09.837075+00:00",
+          "configuration_sha256": "d81ae5078af75f171f499d8ca83ad41d537f7cfb8dbe4f11c532255b8cea8171",
+          "input_sha256": "9fe0aa2fc32d4042603ebfa2db4d6117d528f523b7fc2b5d89c6caa727b208c2",
+          "app_version": "0.3.0"
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "Patterns are review signals, not effective permissions or proven exploitability.",
+    "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+    "SCPs, boundaries, session/resource policies and condition semantics are unknown.",
+    "No AWS call is made. AIG-PB001 requires live role context and is not run here.",
+    "No findings means no configured pattern matched; it does not prove least privilege or safety."
+  ],
+  "effective_permissions": "UNKNOWN",
+  "delta": {
+    "comparison_performed": false,
+    "before_count": null,
+    "after_count": 3,
+    "added": [],
+    "removed": [],
+    "interpretation": "Rule/severity/message/statement-position changes; not measured AWS risk reduction"
+  },
+  "before_input_sha256": [],
+  "human_report": "IAM Permission Engineering Studio — static review\nRun: 90bb7183-9f5b-46ad-b274-0df236e80f16\nSource: 970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc (CLEAN)\nEngine version: 0.3.0\nEffective permissions: UNKNOWN\n\nPatterns are review signals, not effective permissions or proven exploitability.\nExplicit Deny and conditions are counter-evidence; their intersections are not evaluated.\nSCPs, boundaries, session/resource policies and condition semantics are unknown.\nNo AWS call is made. AIG-PB001 requires live role context and is not run here.\nNo findings means no configured pattern matched; it does not prove least privilege or safety.\n\nFindings:\nHIGH AIG003 identity-policy.json:5 /Statement/1\nStatement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope.\nRemediation: Check each listed action's resource-level support. Where supported, use specific ARNs or applicable resource-tag conditions; otherwise review service-specific conditions and required context.\nCounter-evidence: {\"deny_statement_indices\": [0], \"conditions_present\": true}\nEvidence:\n{\"Sid\":\"second\",\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"iam:PassedToService\":\"lambda.amazonaws.com\"}}}\n\nCRITICAL AIG005 identity-policy.json:5 /Statement/1\nAgent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path.\nRemediation: Separate agent runtime roles from IAM administration. Agent runtime identities should NEVER have iam:* or policy-modification permissions.\nCounter-evidence: {\"deny_statement_indices\": [0], \"conditions_present\": true}\nEvidence:\n{\"Sid\":\"second\",\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"iam:PassedToService\":\"lambda.amazonaws.com\"}}}\n\nMEDIUM AIG-TP002 trust-policy.json:1 /Statement\nAWS-principal trust to ['arn:aws:iam::123456789012:role/<img src=x onerror=\"window.iamXss=1\">'] has no sts:ExternalId condition. ExternalId is recommended when a third party assumes roles for multiple customers, but it is not required for every same-account or cross-account trust relationship.\nRemediation: If this principal belongs to a third-party/shared service, require the provider's unique sts:ExternalId. Otherwise document the trust model and use the condition keys appropriate to your account/organization boundary.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\"Effect\": \"Allow\", \"Action\": \"sts:AssumeRole\", \"Principal\": {\"AWS\": \"arn:aws:iam::123456789012:role/<img src=x onerror=\\\"window.iamXss=1\\\">\"}}\n\nDelta: {\"comparison_performed\": false, \"before_count\": null, \"after_count\": 3, \"interpretation\": \"Rule/severity/message/statement-position changes; not measured AWS risk reduction\"}\nConfiguration SHA256: d81ae5078af75f171f499d8ca83ad41d537f7cfb8dbe4f11c532255b8cea8171\nInput SHA256: 9fe0aa2fc32d4042603ebfa2db4d6117d528f523b7fc2b5d89c6caa727b208c2"
+}

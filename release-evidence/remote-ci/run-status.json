@@ -1,0 +1,134 @@
+{
+  "repository": "poojakira/aws-agent-identity-guard",
+  "source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+  "retrieved_utc": "2026-11-17T21:28:22.005Z",
+  "runs": [
+    {
+      "id": 44179660809,
+      "name": "Documentation Integrity",
+      "head_sha": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-17T21:25:28Z",
+      "updated_at": "2026-11-17T21:25:35Z",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44179660809"
+    },
+    {
+      "id": 44179660554,
+      "name": "Security Hygiene",
+      "head_sha": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-17T21:25:28Z",
+      "updated_at": "2026-11-17T21:25:46Z",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44179660554"
+    },
+    {
+      "id": 44179660628,
+      "name": "Production Gate",
+      "head_sha": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-17T21:25:28Z",
+      "updated_at": "2026-11-17T21:25:59Z",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44179660628"
+    },
+    {
+      "id": 44179660652,
+      "name": "Poster Artifact Parity",
+      "head_sha": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-17T21:25:28Z",
+      "updated_at": "2026-11-17T21:25:54Z",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44179660652"
+    },
+    {
+      "id": 44179660511,
+      "name": "CI",
+      "head_sha": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-17T21:25:28Z",
+      "updated_at": "2026-11-17T21:26:39Z",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44179660511"
+    },
+    {
+      "id": 44179660845,
+      "name": "Local IAM studio acceptance",
+      "head_sha": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-17T21:25:28Z",
+      "updated_at": "2026-11-17T21:26:32Z",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44179660845"
+    },
+    {
+      "id": 44179652556,
+      "name": "PR #75",
+      "head_sha": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-17T21:25:25Z",
+      "updated_at": "2026-11-17T21:26:21Z",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44179652556"
+    }
+  ],
+  "jobs": [
+    {
+      "id": 134380252783,
+      "name": "Lint and format",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-17T21:25:30Z",
+      "completed_at": "2026-11-17T21:25:37Z",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44179660511/job/134380252783"
+    },
+    {
+      "id": 134380346438,
+      "name": "Security audit",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-17T21:25:40Z",
+      "completed_at": "2026-11-17T21:26:10Z",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44179660511/job/134380346438"
+    },
+    {
+      "id": 134380346450,
+      "name": "Performance gate",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-17T21:25:39Z",
+      "completed_at": "2026-11-17T21:25:50Z",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44179660511/job/134380346450"
+    },
+    {
+      "id": 134380346703,
+      "name": "Tests on Python 3.12",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-17T21:25:39Z",
+      "completed_at": "2026-11-17T21:26:07Z",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44179660511/job/134380346703"
+    },
+    {
+      "id": 134380346714,
+      "name": "Tests on Python 3.10",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-17T21:25:40Z",
+      "completed_at": "2026-11-17T21:26:38Z",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44179660511/job/134380346714"
+    },
+    {
+      "id": 134380346783,
+      "name": "Tests on Python 3.11",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-17T21:25:39Z",
+      "completed_at": "2026-11-17T21:26:06Z",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44179660511/job/134380346783"
+    }
+  ],
+  "note": "New studio workflow explicitly checks out candidate head. Existing workflows use default PR merge checkout; merge-tree equivalence is checked separately. Success is not production approval."
+}

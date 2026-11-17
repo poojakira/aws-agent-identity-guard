@@ -1,0 +1,10 @@
+Running performance benchmark with 500 policies...
+Results written to /workspace/work/evidence/aws-agent-identity-guard/final/performance.json
+
+--- Performance Gate Results ---
+  Policies scanned:    500
+  p95 latency:         0.8780 ms (gate: <10ms)
+  Throughput:          2656 policies/sec (gate: >1000)
+  p95 gate:            PASS
+  Throughput gate:     PASS
+  Overall:             PASS ✓

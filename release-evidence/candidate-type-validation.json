@@ -1,0 +1,965 @@
+{
+  "repository": "/workspace/work/candidates/aws-agent-identity-guard",
+  "commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+  "status": "",
+  "files": [
+    {
+      "path": ".dockerignore",
+      "bytes": 200,
+      "sha256": "6e7bf0e625e99992beb1d80d23ebc5f3543c47415eedd1994de3a6d7ddf6e181",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": ".env.example",
+      "bytes": 423,
+      "sha256": "db8bac5fc6b1e4b56ae6693f6f57feade1e3b8f47e523fb79532382b56ad1130",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": ".github/CODEOWNERS",
+      "bytes": 13,
+      "sha256": "27d3ad00ee4a7804316eb48c1a30918124876bc87aa26a5ee84ef7c47eb0faef",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "bytes": 581,
+      "sha256": "bf4813139146eb9fde7e0b79ab790af7e7e032d1b1747720fd59a688af8122e5",
+      "symlink": false,
+      "syntax": "PASSED YAML parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": ".github/workflows/aws-access-analyzer-pilot.yml",
+      "bytes": 1454,
+      "sha256": "fdaa06558ad44eaaa79a89add1fe901f498e5b3a1d8972e69aa8226edf6f07f9",
+      "symlink": false,
+      "syntax": "PASSED YAML parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "bytes": 5824,
+      "sha256": "163c1c12f13c8183f5a8820765d892d6b21cd981f31d186d4305406935e32399",
+      "symlink": false,
+      "syntax": "PASSED YAML parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": ".github/workflows/container.yml",
+      "bytes": 1640,
+      "sha256": "8d85b564e4fc481e0f11ec9cc0a114b3b337a3be4e0b632f30c90d222db97e43",
+      "symlink": false,
+      "syntax": "PASSED YAML parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": ".github/workflows/local-studio.yml",
+      "bytes": 1971,
+      "sha256": "6fa57bd62223d6b81b674110ff8dd9b732b5263de0f482669b6d8fb25f786158",
+      "symlink": false,
+      "syntax": "PASSED YAML parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": ".github/workflows/poster-artifact-parity.yml",
+      "bytes": 3039,
+      "sha256": "c106b8407cb8a07011d47337b1861e43522e1626073ed8fd07b970c9663af889",
+      "symlink": false,
+      "syntax": "PASSED YAML parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": ".github/workflows/production-gate.yml",
+      "bytes": 1021,
+      "sha256": "210dcc8c3709129749e4dd25283ae4d85a120f30efb1c56180dfcecc8b60ac3a",
+      "symlink": false,
+      "syntax": "PASSED YAML parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": ".github/workflows/production-policy.yml",
+      "bytes": 1389,
+      "sha256": "7e4a5a26e3922beb6f9dc019172423b17ee15b8421b8dc88757580056d56ce6c",
+      "symlink": false,
+      "syntax": "PASSED YAML parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "bytes": 5971,
+      "sha256": "e6714fc2226a18ddde9691d131061b4498da1429bfd8186a20a425246a1dbfd9",
+      "symlink": false,
+      "syntax": "PASSED YAML parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": ".github/workflows/security-hygiene.yml",
+      "bytes": 4400,
+      "sha256": "0b1e156188ff856db14fe6f5136f7a78c518e1aa771eae24547436bbd15db59e",
+      "symlink": false,
+      "syntax": "PASSED YAML parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 608,
+      "sha256": "6ffe0930bb9c96988df915e1a5a42850cb4c4e89fa5677ecb41513baab8e6695",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": ".mailmap",
+      "bytes": 1882,
+      "sha256": "cfdefe094614d8558397b6efc0242a9a06251771937dbc05756fe29f06e6e681",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "bytes": 5091,
+      "sha256": "d8d89f3cf684165c238f891f81f8ed75347380d986d463554d40727771a098b2",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "bytes": 2112,
+      "sha256": "c91fcd6b2f32e89857aace9e49d1980c704f1410b95c493ffe5634a6adb0c51e",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "Dockerfile",
+      "bytes": 458,
+      "sha256": "dab31edc173fc73abe55fc0133631afb89da5cefe32cedea78961124699f334f",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": "INCIDENT_RUNBOOK.md",
+      "bytes": 11288,
+      "sha256": "9d2cf94b3fa0ac0120daeddb4b32aca6f96671aca8b9267d6b06fab859ce98c5",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 3006,
+      "sha256": "136ae2854bcb9d6423a4293153ed5925cacdc30e537415cbd0a56dcf49983f49",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": "PRODUCTION.md",
+      "bytes": 2023,
+      "sha256": "0da5687226c26a6271158e2e5c6fb6e97f73890e78c9b59667f7e34c00a800a9",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "PRODUCT_VALIDATION.md",
+      "bytes": 1681,
+      "sha256": "f315705b105ea8d457df14c2952d0f447f841642c3c7f6185da3b806c172753d",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "PROVENANCE.md",
+      "bytes": 6914,
+      "sha256": "68e6620ad21436cf51d129554650b5564316bad1699f5791c426123573ef00e2",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "README.md",
+      "bytes": 5614,
+      "sha256": "c10572f5b2975146b5020d8072110ae65e76baf500de3aed5934a68a12208c2a",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "RESUME_EVIDENCE.md",
+      "bytes": 476,
+      "sha256": "491ad7ee9f11305997633006dcca9a92a2705e2bf65f40c3beaf302f581b15aa",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "RUNBOOK.md",
+      "bytes": 18925,
+      "sha256": "fbb97f4ae945bff17769ca3e02a0bae9f6aabc76869a8e28ea09e84f0e96d7ed",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "SECURITY.md",
+      "bytes": 2719,
+      "sha256": "6c715ffdefa52854a954016e605715feb43cb80e5f67fc33bc5f97a9c5b19482",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "SECURITY_AUDIT.md",
+      "bytes": 5752,
+      "sha256": "a9097dcf7115e64c9367cff0d6cbd2cd50ea28e2ab6ca24f99c3f4caeb0ca9d8",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "SECURITY_AUDIT_2026-09-30.md",
+      "bytes": 2278,
+      "sha256": "adb8323e4c699b45b5d689e255536923c0f5af706fcbdb7177c11d2467b5168e",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "THREAT_MODEL.md",
+      "bytes": 5745,
+      "sha256": "cd1751e42bdb999b7dc098fb2a7336784cdf08bf944c5be128e4e750f5ad09fe",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "VERIFIED_METRICS.md",
+      "bytes": 2380,
+      "sha256": "75296de22ea9f50eab1846b72dc57c32fbf706e8abb3b7913d3c862201500d0d",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "action.yml",
+      "bytes": 684,
+      "sha256": "0a88c2902a258a91d8cb8a8484da857418d9a3f7b4204c19b5926f4a1bab7df8",
+      "symlink": false,
+      "syntax": "PASSED YAML parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": "benchmarks/perf_gate.py",
+      "bytes": 7148,
+      "sha256": "6a82e447c5fcecc03fc5e83a92798514520ed7438691756a673a2c40f91ad521",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "dashboard/index.html",
+      "bytes": 418,
+      "sha256": "f7722b46fe2497457f8ed934036343fb8feba04b75699100a8e27de9973d3459",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": "docs/EVIDENCE.md",
+      "bytes": 1416,
+      "sha256": "d1140137e34cc9a19c33be744b27c5a9a137ef85a144ad7014ef5f94451bbaf2",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "docs/OPERATIONAL_IAM_REMEDIATION_MEASUREMENT.md",
+      "bytes": 1819,
+      "sha256": "c8f4e799b757f5c2a53b1b0ce0f3a0e30d3b5b81bb44e413b32603bfb85f396a",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "docs/PERFORMANCE_BASELINE.md",
+      "bytes": 1955,
+      "sha256": "050e47491f21b348bcce25142c0d68d6a2f609b367b7d8aa2567f095cc9da2bd",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "docs/RECRUITER_EVIDENCE_AUDIT_2026-10-09.md",
+      "bytes": 2310,
+      "sha256": "086ee7f4643a65f68141344ce2779fd5bfc878832de7868582103a6cf7ff3fda",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "docs/STUDIO.md",
+      "bytes": 12451,
+      "sha256": "188e8c22b22d08a367df04e32b87f3d00bc9282578fcc5f76c9c253626136b35",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "docs/aws-architecture.md",
+      "bytes": 7321,
+      "sha256": "6e5d7082a95531939b84e4c6c20fafa1e5045dc904b754d373ed321ab422885d",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "docs/aws-security-controls.md",
+      "bytes": 1834,
+      "sha256": "9b03046c6e2960b35965ed78211ae4393b4a691fb061a572b6d1eed294e5d941",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "docs/evidence/RESUME_EVIDENCE.md",
+      "bytes": 2146,
+      "sha256": "50a309d4c28cbc07e56cab6ef028c554df28367cb1091d6f5ca8249c18529088",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "docs/internal/REPOSITORY_AUDIT.md",
+      "bytes": 8469,
+      "sha256": "22b0e9e497ce3178f5ae5c8a8b2bd130532e80c46f4b3d5e0582dffbbb3cb816",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "docs/internal/RULE_INVENTORY_CORRECTION.md",
+      "bytes": 786,
+      "sha256": "9556e50e117849019e822e2d0c336dada042dad647de96ec71a1c63c966622e5",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "docs/internal/baseline-inventory.json",
+      "bytes": 21419,
+      "sha256": "03edac13d0bb5753c6927b6223cfb73352a2d7ca5a32cd490606a91b27afa679",
+      "symlink": false,
+      "syntax": "PASSED JSON parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": "docs/license-history/LICENSE-BEFORE-2026-10-13.txt",
+      "bytes": 1415,
+      "sha256": "073791bfb228c100614951cabf917d7f7423066e47be290f9317811497ea5972",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "evidence_policy.json",
+      "bytes": 3023,
+      "sha256": "ef446adf9da78c518f0544233ec36e699f956d4e52dd93af6fdb547e4663e3ed",
+      "symlink": false,
+      "syntax": "PASSED JSON parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": "examples/agent_policy_wildcard.json",
+      "bytes": 182,
+      "sha256": "9d15c19572ceb1b17cde0d31d9d37fe83d9dc64b14dce52e7ca750b3aefa23e5",
+      "symlink": false,
+      "syntax": "PASSED JSON parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": "examples/delegated_credentials/README.md",
+      "bytes": 4822,
+      "sha256": "0b1bf4bae31fb4ba8b37b0b77578ddbe18350335ac30273b0d389b18d6114fb4",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "examples/delegated_credentials/delegated_credentials.py",
+      "bytes": 11587,
+      "sha256": "72bbd212ff940c7fc4b557e98de9b51085bb38436d40a9bad1609a6289b2c0bc",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "examples/delegated_credentials/test_delegated_credentials.py",
+      "bytes": 7935,
+      "sha256": "f14b32f8cc81030c6d8705cc3c0d3983db4a05cee7b2de61291d3fa265b0498b",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "examples/overprivileged_agent_bad.json",
+      "bytes": 505,
+      "sha256": "197eb6f7cb22ed35df20196c7667d4821e3a034f64c139e5e86d155d0a15c9bd",
+      "symlink": false,
+      "syntax": "PASSED JSON parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": "examples/real_world/aws_bedrock_agent_default.json",
+      "bytes": 2155,
+      "sha256": "5e955789dcc381a23394f546ca997063a2cb9a0ebfad9ce8c6d9c7dc1e5499e9",
+      "symlink": false,
+      "syntax": "PASSED JSON parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": "examples/real_world/aws_sagemaker_full_access.json",
+      "bytes": 3557,
+      "sha256": "a376c2231e44f0741de79d85c98bef62b579e2c36008d4ff0d8c76115a4dec6a",
+      "symlink": false,
+      "syntax": "PASSED JSON parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": "examples/real_world/lambda_over_permissive.json",
+      "bytes": 2618,
+      "sha256": "f24f678a616c23731168c440f581d98d95bb95aebac039f356ed732a4a7c2027",
+      "symlink": false,
+      "syntax": "PASSED JSON parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": "examples/well_scoped_bedrock_agent.json",
+      "bytes": 1716,
+      "sha256": "46cf5f0488587c6701da41f44d73dd3c0275b426abd38dc2ea03ffe091410d0f",
+      "symlink": false,
+      "syntax": "PASSED JSON parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": "infra/terraform/environments/dev/main.tf",
+      "bytes": 1133,
+      "sha256": "8e9187b4dcb6d48daa77b20af61cb09ac33694ef20a001f025fa8f529f3ffdb8",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": "infra/terraform/modules/scanner-iam/main.tf",
+      "bytes": 4860,
+      "sha256": "d44ef90c1ccde487bb05b845771aeab8da8ce6b18b58f8a9ec42db665835f94f",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": "integrations/N8N_WORKFLOW.md",
+      "bytes": 2651,
+      "sha256": "11ceba8b590278b00d8026fba808c0c7376145eb412b1d6ae230a990102427ad",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "integrations/n8n-iam-posture-scan.json",
+      "bytes": 8398,
+      "sha256": "29ee3b571b78127d7333f6be9adffc725cc6af26039b61f7d736add19be1fb93",
+      "symlink": false,
+      "syntax": "PASSED JSON parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": "poster/01_research_brief.md",
+      "bytes": 2345,
+      "sha256": "93b67c2ad9ccb36e4183747e790e5539983feeeaf4f33fad6c98a09d413f960e",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "poster/02_claim_ledger.md",
+      "bytes": 1379,
+      "sha256": "145e9e99ddd1af6bbd5c57c73937309e92d4a78c0a375ea04c8a38b810e1a523",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "poster/03_verified_metrics.md",
+      "bytes": 1324,
+      "sha256": "018c1e479c74b7eddf4a4d3d13acdb4cb52707a608a0d57a7246991df1aaf32b",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "poster/13_reproducibility.md",
+      "bytes": 1344,
+      "sha256": "704fe2159b58b7937b2d64c1d91b8d616998c60c6c81d3498e4f7254d5c6a68a",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "poster/poster.png",
+      "bytes": 489142,
+      "sha256": "458923fe72cc1d444d9af769432762dc505a3b578f5a6c2adc0a3fa215cab03d",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": "poster/poster_36x48.pdf",
+      "bytes": 754074,
+      "sha256": "ef6dcdaa15d06d6947265f1f57ae3899dc7e79a1bbb19d813996f79f56bd2946",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": "poster/render_poster.py",
+      "bytes": 17704,
+      "sha256": "94c286a7947557cb7a5115158fc654663a2d6b70b050b079d8943b4227892ff6",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "pyproject.toml",
+      "bytes": 2203,
+      "sha256": "36b6918e93acd85b2b02c3d879848ee4016ccbffff3fa96210555d267a194966",
+      "symlink": false,
+      "syntax": "PASSED TOML parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": "requirements-studio-test.txt",
+      "bytes": 1331,
+      "sha256": "ee8573c181805eba70239832647c3300f5dfc435c169317bd0c5706462e00f0e",
+      "symlink": false,
+      "syntax": "READ text; facts/examples NOT VERIFIED by this script"
+    },
+    {
+      "path": "scripts/measure_iam_role_remediation.py",
+      "bytes": 3621,
+      "sha256": "ebe94a4694979acc2bae439de96f4da92a17643f6996ac43634c194b571ccb92",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "scripts/security_scan.py",
+      "bytes": 5457,
+      "sha256": "b899be8aeb7ea4383dd14dadf5130e0f5a23feb172585de1f15649383b14359a",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "scripts/studio_e2e.py",
+      "bytes": 12419,
+      "sha256": "aac40b059ad64e70a2473ea48c329c1c314fdffb9300bc1ae0d2d411ab1a6e8c",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "scripts/studio_verify.py",
+      "bytes": 7827,
+      "sha256": "eca7f15e7906e24ec9ee786c7ec09450fcac7d2ef7d3214dcd820978d00a783b",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "src/aws_agent_identity_guard/__init__.py",
+      "bytes": 209,
+      "sha256": "6a2a8564a979769074a5dfac74af850d9efdab100ef1d2a7328b5c0999a49a8c",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "src/aws_agent_identity_guard/access_analyzer_validation.py",
+      "bytes": 1950,
+      "sha256": "51714709dddd813721c73ac6ff50a98cdb94543f23f0042733202ad84e26ed99",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "src/aws_agent_identity_guard/cli.py",
+      "bytes": 12858,
+      "sha256": "4694f3fdbc33489eac921db6b0a6a4f876fc74b04ce7b70cb91d9c5624dc27d2",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "src/aws_agent_identity_guard/live_scanner.py",
+      "bytes": 24693,
+      "sha256": "ebc5e219d0b598236c3dc8b406f7730c1bdb789584a45da077714e3d37e3918f",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "src/aws_agent_identity_guard/remediate.py",
+      "bytes": 17435,
+      "sha256": "b9116f295e81dd03169a7370dc0c186869e3b257280ab62b7b54d3d3cf09acf1",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "src/aws_agent_identity_guard/scanner.py",
+      "bytes": 51556,
+      "sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "src/aws_agent_identity_guard/studio/__init__.py",
+      "bytes": 75,
+      "sha256": "b4f21660e109e42217f20eec61e938e891b86f296f57bc1f151a76fbdda5b55d",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "src/aws_agent_identity_guard/studio/__main__.py",
+      "bytes": 5790,
+      "sha256": "b20d2e7a3824fe07fcaead277e1eb5d2c4c18f04cb8022f79e5bb648bb783154",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "src/aws_agent_identity_guard/studio/analysis.py",
+      "bytes": 22103,
+      "sha256": "e7832aeb8db554c5642ae239027ef753f342c197aa345e3914419bc8dfbddfb6",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "src/aws_agent_identity_guard/studio/index.html",
+      "bytes": 4016,
+      "sha256": "8e5501402520237eb5049432df6e5a24ad799833cd9a79268d043e169c592e06",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": "src/aws_agent_identity_guard/studio/studio.css",
+      "bytes": 3092,
+      "sha256": "30df07ce64e87d96fd2b109c1225bbf36be950259c0d46d0e0bb066a81291684",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": "src/aws_agent_identity_guard/studio/studio.js",
+      "bytes": 7386,
+      "sha256": "a9b5e32486face33db451ae94a74f3ddbca33868a8f2dd6da4924de11c7f8393",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": "tests/test_access_analyzer_contract.py",
+      "bytes": 2226,
+      "sha256": "56bec9bb43ac90576b426b85892de5f82d96dd85f5f4911261184b597e45a7a3",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "tests/test_access_analyzer_validation.py",
+      "bytes": 2630,
+      "sha256": "c3031c400d5d7c5721236c50b7b5cbbbe7de3e0645f6623b478c4dd8f33698b2",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "tests/test_cli_output.py",
+      "bytes": 7423,
+      "sha256": "6d5ac9909c2acd50afbafadb917e3d005b1ac7d4d1bcecb6a6d88633610da704",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "tests/test_condition_structural.py",
+      "bytes": 15626,
+      "sha256": "16e3bc938c9c2089f45f962d19f90270f091cfe8cfc1b9b3700b6e6248938d84",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "tests/test_coverage_boost.py",
+      "bytes": 27726,
+      "sha256": "39fa20515c62db3b8e1e44da6c2ffd076110f503e69edd3f07d51b3567a9a6a5",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "tests/test_enforce_mode.py",
+      "bytes": 7106,
+      "sha256": "02ea75f1feed8d7b54422b11680787a151aea5178e117cfc5d89d9b70eaf6fbb",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "tests/test_failure_modes.py",
+      "bytes": 13435,
+      "sha256": "63c5f31f2b42b2c71e63edde0328909913fd1eaaaa0ebc948ccd4d9fe80a31f2",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "tests/test_iam_parser_fuzz.py",
+      "bytes": 9677,
+      "sha256": "ba0bafaa1fcf50d3101c29306b3c30cd4d5221d4bf7e74d3205c49eba447e92d",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "tests/test_killchain.py",
+      "bytes": 5051,
+      "sha256": "a20fcb79f85001782f8682c8d63045567af93269d5e7032c8d69e2cf00b25c07",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "tests/test_live_scanner.py",
+      "bytes": 11777,
+      "sha256": "2f1f4bb0533a3ecd045fad8696268a3c997673960f6a3bdf3499db00cb797b07",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "tests/test_measure_iam_remediation.py",
+      "bytes": 2561,
+      "sha256": "465090451cd94f79b615f861a4d3b54fb225cd7802f6c05006cef62b0b923bda",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "tests/test_real_world_policies.py",
+      "bytes": 41834,
+      "sha256": "ca0bc14229f96c5de27edc616d88ff745b5c180793191caed475a0686787791c",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "tests/test_scanner.py",
+      "bytes": 38152,
+      "sha256": "7d7a068c94958ad61f4a6d96b245ee449a18f88b0ec9f14d3bbb9bfd3867a5fa",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "tests/test_studio.py",
+      "bytes": 10237,
+      "sha256": "159d425ba241516fd816919163e496b0368877917064595ffee7c11e216009d3",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "uv.lock",
+      "bytes": 27159,
+      "sha256": "0a6c0eef8a980a60539178c3bf489ec4d8668a4a9790ee7eb6e45e11ea5f7546",
+      "symlink": false,
+      "syntax": "NOT APPLICABLE"
+    },
+    {
+      "path": "validation/__init__.py",
+      "bytes": 74,
+      "sha256": "7fbeb17c14322f776345670e4a843c646921aa22473611878bc2b9e503798eb9",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "validation/aws_access_analyzer_pilot.py",
+      "bytes": 1529,
+      "sha256": "36fdb1dbe6184f1a5c0eb717d20f8e9fe3bf6930de371b106556c0fbb38c4e2a",
+      "symlink": false,
+      "syntax": "PASSED Python AST (not executed)"
+    },
+    {
+      "path": "validation/policies/agent-overprivileged.json",
+      "bytes": 267,
+      "sha256": "281c3fbde29f0f4d7e413b544bbc333616afb787dad34571609212d536ed4f3e",
+      "symlink": false,
+      "syntax": "PASSED JSON parse (schema NOT VERIFIED)"
+    },
+    {
+      "path": "validation/policies/agent-scoped.json",
+      "bytes": 279,
+      "sha256": "a37d15d3d76055decce5b1ae782437b65443278f86d9df62ff40dc02c386e324",
+      "symlink": false,
+      "syntax": "PASSED JSON parse (schema NOT VERIFIED)"
+    }
+  ],
+  "errors": [],
+  "links": [
+    {
+      "source": "CHANGELOG.md",
+      "target": "https://keepachangelog.com/en/1.1.0/",
+      "kind": "external"
+    },
+    {
+      "source": "CONTRIBUTING.md",
+      "target": "LICENSE",
+      "kind": "local",
+      "exists": true
+    },
+    {
+      "source": "CONTRIBUTING.md",
+      "target": "SECURITY.md",
+      "kind": "local",
+      "exists": true
+    },
+    {
+      "source": "INCIDENT_RUNBOOK.md",
+      "target": "#1-false-positive-in-production-ci-gate",
+      "kind": "local"
+    },
+    {
+      "source": "INCIDENT_RUNBOOK.md",
+      "target": "#2-new-privilege-escalation-pattern-discovered",
+      "kind": "local"
+    },
+    {
+      "source": "INCIDENT_RUNBOOK.md",
+      "target": "#3-live-scanner-rate-limiting-by-aws",
+      "kind": "local"
+    },
+    {
+      "source": "INCIDENT_RUNBOOK.md",
+      "target": "#4-misleading-remediation-suggestion",
+      "kind": "local"
+    },
+    {
+      "source": "PROVENANCE.md",
+      "target": "https://github.com/poojakira",
+      "kind": "external"
+    },
+    {
+      "source": "PROVENANCE.md",
+      "target": "https://github.com/poojakira/aws-agent-identity-guard/commit/b4799d64eeefba1dfbced8cf8d303a6e07f18dbe",
+      "kind": "external"
+    },
+    {
+      "source": "README.md",
+      "target": "https://raw.githubusercontent.com/poojakira/aws-agent-identity-guard/refs/tags/evidence/local-workbench-20261116/release-evidence/browser/desktop.png",
+      "kind": "external"
+    },
+    {
+      "source": "README.md",
+      "target": "docs/STUDIO.md",
+      "kind": "local",
+      "exists": true
+    },
+    {
+      "source": "README.md",
+      "target": "docs/EVIDENCE.md",
+      "kind": "local",
+      "exists": true
+    },
+    {
+      "source": "README.md",
+      "target": "docs/internal/REPOSITORY_AUDIT.md",
+      "kind": "local",
+      "exists": true
+    },
+    {
+      "source": "README.md",
+      "target": "docs/internal/RULE_INVENTORY_CORRECTION.md",
+      "kind": "local",
+      "exists": true
+    },
+    {
+      "source": "README.md",
+      "target": "SECURITY.md",
+      "kind": "local",
+      "exists": true
+    },
+    {
+      "source": "README.md",
+      "target": "CHANGELOG.md",
+      "kind": "local",
+      "exists": true
+    },
+    {
+      "source": "RESUME_EVIDENCE.md",
+      "target": "docs/evidence/RESUME_EVIDENCE.md",
+      "kind": "local",
+      "exists": true
+    },
+    {
+      "source": "RUNBOOK.md",
+      "target": "#1-prerequisites",
+      "kind": "local"
+    },
+    {
+      "source": "RUNBOOK.md",
+      "target": "#2-installation",
+      "kind": "local"
+    },
+    {
+      "source": "RUNBOOK.md",
+      "target": "#3-configuration",
+      "kind": "local"
+    },
+    {
+      "source": "RUNBOOK.md",
+      "target": "#4-usage--static-scan",
+      "kind": "local"
+    },
+    {
+      "source": "RUNBOOK.md",
+      "target": "#5-usage--live-aws-scan",
+      "kind": "local"
+    },
+    {
+      "source": "RUNBOOK.md",
+      "target": "#6-usage--remediation",
+      "kind": "local"
+    },
+    {
+      "source": "RUNBOOK.md",
+      "target": "#7-interpreting-results",
+      "kind": "local"
+    },
+    {
+      "source": "RUNBOOK.md",
+      "target": "#8-exit-codes",
+      "kind": "local"
+    },
+    {
+      "source": "RUNBOOK.md",
+      "target": "#9-cicd-integration",
+      "kind": "local"
+    },
+    {
+      "source": "RUNBOOK.md",
+      "target": "#10-troubleshooting",
+      "kind": "local"
+    },
+    {
+      "source": "RUNBOOK.md",
+      "target": "#11-alerting--escalation",
+      "kind": "local"
+    },
+    {
+      "source": "RUNBOOK.md",
+      "target": "#12-maintenance",
+      "kind": "local"
+    },
+    {
+      "source": "VERIFIED_METRICS.md",
+      "target": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38462296804",
+      "kind": "external"
+    },
+    {
+      "source": "VERIFIED_METRICS.md",
+      "target": "https://github.com/poojakira/aws-agent-identity-guard/commit/4098ff55",
+      "kind": "external"
+    },
+    {
+      "source": "VERIFIED_METRICS.md",
+      "target": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38009457205",
+      "kind": "external"
+    },
+    {
+      "source": "docs/RECRUITER_EVIDENCE_AUDIT_2026-10-09.md",
+      "target": "https://github.com/poojakira/mcp-agent-security-gateway/actions/runs/38462601803",
+      "kind": "external"
+    },
+    {
+      "source": "docs/RECRUITER_EVIDENCE_AUDIT_2026-10-09.md",
+      "target": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38462296804",
+      "kind": "external"
+    },
+    {
+      "source": "docs/RECRUITER_EVIDENCE_AUDIT_2026-10-09.md",
+      "target": "https://github.com/poojakira/hf-model-provenance-scanner/actions/runs/38462464074",
+      "kind": "external"
+    },
+    {
+      "source": "docs/aws-architecture.md",
+      "target": "aws-security-controls.md",
+      "kind": "local",
+      "exists": true
+    },
+    {
+      "source": "examples/delegated_credentials/README.md",
+      "target": "https://github.com/getmoto/moto",
+      "kind": "external"
+    },
+    {
+      "source": "examples/delegated_credentials/README.md",
+      "target": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html",
+      "kind": "external"
+    },
+    {
+      "source": "poster/03_verified_metrics.md",
+      "target": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/37170669504",
+      "kind": "external"
+    },
+    {
+      "source": "poster/03_verified_metrics.md",
+      "target": "../VERIFIED_METRICS.md",
+      "kind": "local",
+      "exists": true
+    },
+    {
+      "source": "poster/13_reproducibility.md",
+      "target": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38497940763",
+      "kind": "external"
+    },
+    {
+      "source": "poster/13_reproducibility.md",
+      "target": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/37170669504",
+      "kind": "external"
+    }
+  ],
+  "limits": [
+    "Syntax checks are not behavioral tests.",
+    "External links and anchors not checked here.",
+    "No arbitrary scripts or models executed.",
+    "This script does not establish semantic correctness or security."
+  ]
+}

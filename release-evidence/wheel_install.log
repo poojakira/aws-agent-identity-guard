@@ -1,0 +1,11 @@
+Processing /workspace/work/evidence/aws-agent-identity-guard/final/artifacts/aws_agent_identity_guard-0.3.0-py3-none-any.whl
+Installing collected packages: aws-agent-identity-guard
+  Attempting uninstall: aws-agent-identity-guard
+    Found existing installation: aws-agent-identity-guard 0.3.0
+    Not uninstalling aws-agent-identity-guard at /workspace/work/candidates/aws-agent-identity-guard/src, outside environment /workspace/work/verification/iam-unrelated/.venv
+    Can't uninstall 'aws-agent-identity-guard'. No files were found to uninstall.
+Successfully installed aws-agent-identity-guard-0.3.0
+WARNING: The directory '/home/agent/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.
+
+[notice] A new release of pip is available: 25.0.1 -> 26.3
+[notice] To update, run: /workspace/work/verification/iam-unrelated/.venv/bin/python -m pip install --upgrade pip

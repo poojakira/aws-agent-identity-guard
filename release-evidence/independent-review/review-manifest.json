@@ -1,0 +1,36 @@
+{
+  "source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+  "source_clean": true,
+  "utc_end": "2026-11-17T21:26:11.004578+00:00",
+  "decision": "PARTIAL; original F1/F2 CLOSED at this source",
+  "checks": {
+    "python310": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "independent_passed": 38,
+    "independent_failed": 0,
+    "engineering_artifacts_verified": 42,
+    "actionlint_exit": 0,
+    "installed_wheel_http": "PASSED"
+  },
+  "artifacts": {
+    "REMEDIATION_REVIEW.md": "8c0074d14fc834a46927b97fe5bb0b28e184d32f6175b696cf1f74abb1849787",
+    "independent_checks.py": "d41c66a76bfc90ad1d5c407416761f3f5e8c55c4753561d914c8e38aa68ac82a",
+    "independent-checks.json": "34a4cd14f759c4efb94a4f7cfa3b86985f7b05aa4d5d7e3cd3e3d745158b94d2",
+    "independent-checks.log": "c3fb4920f7f95b4e35655799e7e3ac4dbf6c012d7e665c9e2a877cb03c773d22",
+    "list-only-review.json": "f4afe0dac32a40ea163dbb30df9713bb8a398a04d4176f1c32d985de11feb4bf",
+    "independent.sarif": "eb07b2621817dacf07ba1aa14698cd3c5e022cda401da55a0a992848c50d4fed",
+    "browser-evidence.json": "8eceac2659d19b3327525e49307fbebab7a3cf4f0c721d6ad05c29fed02497a5",
+    "browser-race.png": "483b272eb24c339e6db32d13cb039acca11a4babeea892b403862b05af0a1154",
+    "manual-policy-review.json": "3f5dff4a1305aa780408d035adc6836c93a08d495ea55fb5d248cabdbcb65201",
+    "manual-trust-review.json": "953ce87f553e9af00c1df9b2da9b88c9816c9cdba24bcf20f1ca0e69d563afb4",
+    "actionlint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "python310-junit.xml": "1da79ed9915a0e0c9329b9be1974325adb1a472ea04334e6284457f5259dfea9",
+    "python310-tests.log": "475bcfb56b286d857c4310602373e306e2cb722ad6df6053d0e1aff939c18220",
+    "wheel-provenance.json": "5d3f464e275645dcfc0db1d0b7986e502e8d78e15daa5117610f693a31f2e2db",
+    "wheel-install.log": "c7c02edcc5b6687db2c0c13b56054c4ff70c253b656a9d73e3533825dc1d210f"
+  }
+}

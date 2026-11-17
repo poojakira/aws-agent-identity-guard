@@ -1,0 +1,196 @@
+{
+  "source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+  "utc_start": "2026-11-17T21:24:07.851999+00:00",
+  "checks": [
+    {
+      "name": "final manifest artifact checksums",
+      "passed": true,
+      "artifacts": 42,
+      "mismatches": []
+    },
+    {
+      "name": "manifest source and clean checkout",
+      "passed": true
+    },
+    {
+      "name": "escaped structural key and exact statement span",
+      "passed": true,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/1",
+        "startLine": 5,
+        "endLine": 5,
+        "snippet": "{\"Sid\":\"second\",\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"iam:PassedToService\":\"lambda.amazonaws.com\"}}}"
+      }
+    },
+    {
+      "name": "finding location matches its actual statement AIG003",
+      "passed": true
+    },
+    {
+      "name": "finding location matches its actual statement AIG005",
+      "passed": true
+    },
+    {
+      "name": "Deny and conditions are explicit context",
+      "passed": true
+    },
+    {
+      "name": "canonical scanner produces displayed identity findings",
+      "passed": true
+    },
+    {
+      "name": "list-only findings do not assert arbitrary data reads",
+      "passed": true,
+      "findings": [
+        {
+          "rule_id": "AIG003",
+          "message": "Statement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope."
+        },
+        {
+          "rule_id": "AIG007",
+          "message": "Sensitive-data or metadata action 's3:ListBucket' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents."
+        }
+      ]
+    },
+    {
+      "name": "escaped duplicate key rejected",
+      "passed": true
+    },
+    {
+      "name": "trailing JSON rejected",
+      "passed": true
+    },
+    {
+      "name": "non-finite condition rejected",
+      "passed": true
+    },
+    {
+      "name": "too-deep JSON rejected",
+      "passed": true
+    },
+    {
+      "name": "oversized policy rejected",
+      "passed": true
+    },
+    {
+      "name": "non-object statement rejected",
+      "passed": true
+    },
+    {
+      "name": "non-string action rejected",
+      "passed": true
+    },
+    {
+      "name": "oversized object key rejected",
+      "passed": true
+    },
+    {
+      "name": "official schema bytes match pinned checksum",
+      "passed": true
+    },
+    {
+      "name": "actual identity and trust SARIF validate",
+      "passed": true
+    },
+    {
+      "name": "SARIF source regions match actual evidence",
+      "passed": true
+    },
+    {
+      "name": "graph nodes only reference supplied document statements",
+      "passed": true
+    },
+    {
+      "name": "same input and configuration hash reproducibly",
+      "passed": true
+    },
+    {
+      "name": "HTTP host",
+      "passed": true,
+      "actual": 403,
+      "expected": 403
+    },
+    {
+      "name": "HTTP origin",
+      "passed": true,
+      "actual": 403,
+      "expected": 403
+    },
+    {
+      "name": "HTTP outer duplicates",
+      "passed": true,
+      "actual": 400,
+      "expected": 400
+    },
+    {
+      "name": "HTTP outer extra target",
+      "passed": true,
+      "actual": 400,
+      "expected": 400
+    },
+    {
+      "name": "HTTP request body bound",
+      "passed": true,
+      "actual": 413,
+      "expected": 413
+    },
+    {
+      "name": "HTTP outer deep body",
+      "passed": true,
+      "actual": 400,
+      "expected": 400
+    },
+    {
+      "name": "browser displays actual supplied findings and safely renders HTML",
+      "passed": true
+    },
+    {
+      "name": "browser export source and input agree",
+      "passed": true
+    },
+    {
+      "name": "mobile essential layout bounds",
+      "passed": true
+    },
+    {
+      "name": "file-read completion invalidates intervening real review",
+      "passed": true,
+      "export_still_enabled": false,
+      "status": "Local file loaded into the editor. It has not been analyzed.",
+      "headline": "No analysis established"
+    },
+    {
+      "name": "trust file completion invalidates intervening real review",
+      "passed": true,
+      "status": "Local file loaded into the editor. It has not been analyzed."
+    },
+    {
+      "name": "obsolete policy upload does not replace newer manual review",
+      "passed": true
+    },
+    {
+      "name": "retained policy evidence matches newer manual input",
+      "passed": true
+    },
+    {
+      "name": "obsolete trust upload does not replace newer manual review",
+      "passed": true
+    },
+    {
+      "name": "retained trust evidence matches newer manual input",
+      "passed": true
+    },
+    {
+      "name": "no uncaught browser errors",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "all workflow schemas pass actionlint",
+      "passed": true,
+      "exit_code": 0
+    }
+  ],
+  "utc_end": "2026-11-17T21:24:15.994420+00:00"
+}

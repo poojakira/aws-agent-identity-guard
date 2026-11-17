@@ -1,0 +1,86 @@
+{
+  "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "aws-agent-identity-guard",
+          "version": "0.3.0",
+          "informationUri": "https://github.com/poojakira/aws-agent-identity-guard",
+          "rules": [
+            {
+              "id": "AIG007",
+              "name": "AIG007",
+              "shortDescription": {
+                "text": "Sensitive-data or metadata action 's3:ListBucket' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents."
+              },
+              "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+              "properties": {
+                "severity": "medium"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "AIG007",
+          "ruleIndex": 0,
+          "level": "warning",
+          "message": {
+            "text": "Sensitive-data or metadata action 's3:ListBucket' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "identity-policy.json",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 4,
+                  "endLine": 9
+                }
+              },
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "/Statement/0"
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "statementIndex": 0,
+            "remediation": "Add principal tags (aws:PrincipalTag/tenant, aws:PrincipalTag/agent-id) or resource tags to ensure the agent only accesses data belonging to its tenant.",
+            "scope": "static pattern; effective permission UNKNOWN",
+            "counterEvidence": {
+              "deny_statement_indices": [],
+              "conditions_present": false
+            }
+          }
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "identity-policy.json",
+            "uriBaseId": "%SRCROOT%"
+          }
+        }
+      ],
+      "properties": {
+        "scope": "STATIC_ONLY_CONTEXT_INCOMPLETE",
+        "inputSha256": "dcb472c88eadc3b3f89b2ecb6615c9b5ab220eeb44ece429a7f83401c0c9e12e",
+        "run_id": "ce31e115-a137-4592-b4f8-293453aa58e4",
+        "source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+        "source_status": "CLEAN",
+        "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+        "timestamp_utc": "2026-11-17T21:11:03.435242+00:00",
+        "configuration_sha256": "b7e00801abdc3999d3eec5e891d544e3391ea1a143ac8827a225c6fd95520bb4",
+        "input_sha256": "5940343f18163dddd8afa3a7c743dff8132fb86c57a2ed5058a39fecd032515b",
+        "app_version": "0.3.0"
+      }
+    }
+  ]
+}

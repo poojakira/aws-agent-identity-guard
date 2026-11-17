@@ -1,0 +1,55 @@
+{
+  "reviewed_source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+  "wheel_sha256": "7dada59d37c69785b450a91b9de5fb620890b980164695a32e009b23d31b31d9",
+  "utc": "2026-11-17T21:24:36.697975+00:00",
+  "health": {
+    "status": "ok",
+    "app_version": "0.3.0",
+    "source_commit": "UNKNOWN",
+    "source_status": "UNKNOWN",
+    "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+    "static_rule_count": 24,
+    "static_rule_ids": [
+      "AIG001",
+      "AIG002",
+      "AIG003",
+      "AIG004",
+      "AIG005",
+      "AIG006",
+      "AIG007",
+      "AIG008",
+      "AIG009",
+      "AIG010",
+      "AIG011",
+      "AIG012",
+      "AIG013",
+      "AIG014",
+      "AIG015",
+      "AIG016",
+      "AIG017",
+      "AIG018",
+      "AIG019",
+      "AIG020",
+      "AIG021",
+      "AIG-TP001",
+      "AIG-TP002",
+      "AIG-TP003"
+    ],
+    "live_context_rule_ids_not_run": [
+      "AIG-PB001"
+    ]
+  },
+  "actual_http_status": 200,
+  "actual_finding_ids": [
+    "AIG003",
+    "AIG007",
+    "AIG013"
+  ],
+  "canonical_messages": [
+    "Statement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope.",
+    "Sensitive-data or metadata action 's3:ListBucket' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents."
+  ],
+  "source_commit": "UNKNOWN",
+  "source_status": "UNKNOWN",
+  "passed": true
+}

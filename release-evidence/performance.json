@@ -1,0 +1,26 @@
+{
+  "metadata": {
+    "num_policies": 500,
+    "timestamp": "2026-11-17T21:11:10Z",
+    "python_version": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]"
+  },
+  "latency_ms": {
+    "min": 0.0025,
+    "max": 2.8127,
+    "mean": 0.376,
+    "median": 0.3238,
+    "p90": 0.71,
+    "p95": 0.878,
+    "p99": 1.7958,
+    "stddev": 0.3157
+  },
+  "throughput": {
+    "policies_per_second": 2656.12,
+    "total_seconds": 0.1882
+  },
+  "gates": {
+    "p95_under_10ms": true,
+    "throughput_over_1000": true
+  },
+  "passed": true
+}

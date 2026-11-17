@@ -1,0 +1,15 @@
+{
+  "source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+  "artifact_id": 14370469416,
+  "run_id": 44179660845,
+  "zip_sha256": "6a256f10cd69a8fc47fd9db6fdff245052c883ed58eafcaf45600addfa580641",
+  "all_embedded_digests_matched": true,
+  "verified_artifacts": 26,
+  "studio_checkout": "explicit candidate head",
+  "legacy_workflow_checkout": "default GitHub PR merge ref",
+  "pr_merge_sha": "9809b4de1d0526cc75d6476c5237eb97f90e322b",
+  "candidate_tree_sha": "7afafdababd63e06fe348025c7436b26def65ae4",
+  "merge_tree_sha": "7afafdababd63e06fe348025c7436b26def65ae4",
+  "merge_tree_equivalent": true,
+  "note": "Commit provenance and tree equivalence are distinct. Full local and new studio acceptance runs executed the actual clean candidate head. Other CI checks used the identical merge tree."
+}

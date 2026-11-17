@@ -1,0 +1,547 @@
+{
+  "app_version": "0.3.0",
+  "source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+  "source_status": "CLEAN",
+  "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+  "static_rule_count": 24,
+  "static_rule_ids": [
+    "AIG001",
+    "AIG002",
+    "AIG003",
+    "AIG004",
+    "AIG005",
+    "AIG006",
+    "AIG007",
+    "AIG008",
+    "AIG009",
+    "AIG010",
+    "AIG011",
+    "AIG012",
+    "AIG013",
+    "AIG014",
+    "AIG015",
+    "AIG016",
+    "AIG017",
+    "AIG018",
+    "AIG019",
+    "AIG020",
+    "AIG021",
+    "AIG-TP001",
+    "AIG-TP002",
+    "AIG-TP003"
+  ],
+  "live_context_rule_ids_not_run": [
+    "AIG-PB001"
+  ],
+  "run_id": "4c898053-0159-4aa3-935b-b273e3424e72",
+  "timestamp_utc": "2026-11-17T21:24:13.982121+00:00",
+  "configuration": {
+    "mode": "static-identity-and-optional-trust",
+    "compare": true,
+    "max_document_bytes": 32768,
+    "max_statements": 32,
+    "max_depth": 16
+  },
+  "configuration_sha256": "b7e00801abdc3999d3eec5e891d544e3391ea1a143ac8827a225c6fd95520bb4",
+  "input_sha256": "33faf35c8e02086351d9bd36554356729e997d112b53148bfe863e9a562a527a",
+  "findings": [
+    {
+      "rule_id": "AIG007",
+      "severity": "medium",
+      "message": "Sensitive-data or metadata action 's3:ListBucket' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents.",
+      "remediation": "Add principal tags (aws:PrincipalTag/tenant, aws:PrincipalTag/agent-id) or resource tags to ensure the agent only accesses data belonging to its tenant.",
+      "statement_index": 0,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 4,
+        "endLine": 8,
+        "snippet": "{\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::manual-review-bucket\"\n    }"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "7469ba96fcc1bbd0f4c27fc228524c46caa6f5d72025923957b27d4f2cfa770a"
+    },
+    {
+      "rule_id": "AIG-TP003",
+      "severity": "medium",
+      "message": "AWS service-principal trust to ['lambda.amazonaws.com'] has no aws:SourceArn, aws:SourceAccount, aws:SourceOrgID, or aws:SourceOrgPaths condition. Where the service supports these keys, source scoping reduces cross-service confused-deputy risk.",
+      "remediation": "Check the trusted service's documentation. Where supported, constrain the trust with the most specific aws:SourceArn or an appropriate aws:SourceAccount/aws:SourceOrg* condition.",
+      "statement_index": 0,
+      "location": {
+        "source": "trust-policy.json",
+        "json_pointer": "/Statement",
+        "startLine": 2,
+        "endLine": 8,
+        "snippet": "{\n    \"Effect\": \"Allow\",\n    \"Action\": \"sts:AssumeRole\",\n    \"Principal\": {\n      \"Service\": \"lambda.amazonaws.com\"\n    }\n  }"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "663444ce66627f7751df99dcb4b412a661f9bf8cf8895f551d69e5b5579f4431"
+    }
+  ],
+  "sources": [
+    {
+      "name": "identity-policy.json",
+      "sha256": "8a0941a59e8372267e1931cdfd4dac06c51940d9aa6b84985a5a813e3bdb8dc2",
+      "text": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::manual-review-bucket\"\n    }\n  ]\n}"
+    },
+    {
+      "name": "trust-policy.json",
+      "sha256": "60a6f5f2867c03656ac33521ae039c39999d18461190a310a06ab9dd8e223c53",
+      "text": "{\n  \"Statement\": {\n    \"Effect\": \"Allow\",\n    \"Action\": \"sts:AssumeRole\",\n    \"Principal\": {\n      \"Service\": \"lambda.amazonaws.com\"\n    }\n  }\n}"
+    }
+  ],
+  "statements": [
+    {
+      "id": "identity-policy.json#/Statement/0",
+      "index": 0,
+      "effect": "Allow",
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 4,
+        "endLine": 8,
+        "snippet": "{\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::manual-review-bucket\"\n    }"
+      },
+      "condition": {}
+    },
+    {
+      "id": "trust-policy.json#/Statement",
+      "index": 0,
+      "effect": "Allow",
+      "location": {
+        "source": "trust-policy.json",
+        "json_pointer": "/Statement",
+        "startLine": 2,
+        "endLine": 8,
+        "snippet": "{\n    \"Effect\": \"Allow\",\n    \"Action\": \"sts:AssumeRole\",\n    \"Principal\": {\n      \"Service\": \"lambda.amazonaws.com\"\n    }\n  }"
+      },
+      "condition": {}
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "identity-policy.json",
+        "kind": "document",
+        "label": "identity-policy.json"
+      },
+      {
+        "id": "identity-policy.json#/Statement/0",
+        "kind": "statement",
+        "label": "Statement 0: Allow",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 8,
+          "snippet": "{\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::manual-review-bucket\"\n    }"
+        }
+      },
+      {
+        "id": "identity-policy.json#/Statement/0/Action",
+        "kind": "Action",
+        "label": "\"s3:ListBucket\"",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 8,
+          "snippet": "{\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::manual-review-bucket\"\n    }"
+        }
+      },
+      {
+        "id": "identity-policy.json#/Statement/0/Resource",
+        "kind": "Resource",
+        "label": "\"arn:aws:s3:::manual-review-bucket\"",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 8,
+          "snippet": "{\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::manual-review-bucket\"\n    }"
+        }
+      },
+      {
+        "id": "trust-policy.json",
+        "kind": "document",
+        "label": "trust-policy.json"
+      },
+      {
+        "id": "trust-policy.json#/Statement",
+        "kind": "statement",
+        "label": "Statement 0: Allow",
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 2,
+          "endLine": 8,
+          "snippet": "{\n    \"Effect\": \"Allow\",\n    \"Action\": \"sts:AssumeRole\",\n    \"Principal\": {\n      \"Service\": \"lambda.amazonaws.com\"\n    }\n  }"
+        }
+      },
+      {
+        "id": "trust-policy.json#/Statement/Action",
+        "kind": "Action",
+        "label": "\"sts:AssumeRole\"",
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 2,
+          "endLine": 8,
+          "snippet": "{\n    \"Effect\": \"Allow\",\n    \"Action\": \"sts:AssumeRole\",\n    \"Principal\": {\n      \"Service\": \"lambda.amazonaws.com\"\n    }\n  }"
+        }
+      },
+      {
+        "id": "trust-policy.json#/Statement/Principal",
+        "kind": "Principal",
+        "label": "{\"Service\": \"lambda.amazonaws.com\"}",
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 2,
+          "endLine": 8,
+          "snippet": "{\n    \"Effect\": \"Allow\",\n    \"Action\": \"sts:AssumeRole\",\n    \"Principal\": {\n      \"Service\": \"lambda.amazonaws.com\"\n    }\n  }"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "from": "identity-policy.json",
+        "to": "identity-policy.json#/Statement/0",
+        "label": "contains",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 8,
+          "snippet": "{\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::manual-review-bucket\"\n    }"
+        }
+      },
+      {
+        "from": "identity-policy.json#/Statement/0",
+        "to": "identity-policy.json#/Statement/0/Action",
+        "label": "Action pattern",
+        "effect": "Allow",
+        "conditions_present": false,
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 8,
+          "snippet": "{\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::manual-review-bucket\"\n    }"
+        }
+      },
+      {
+        "from": "identity-policy.json#/Statement/0",
+        "to": "identity-policy.json#/Statement/0/Resource",
+        "label": "Resource pattern",
+        "effect": "Allow",
+        "conditions_present": false,
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 8,
+          "snippet": "{\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::manual-review-bucket\"\n    }"
+        }
+      },
+      {
+        "from": "trust-policy.json",
+        "to": "trust-policy.json#/Statement",
+        "label": "contains",
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 2,
+          "endLine": 8,
+          "snippet": "{\n    \"Effect\": \"Allow\",\n    \"Action\": \"sts:AssumeRole\",\n    \"Principal\": {\n      \"Service\": \"lambda.amazonaws.com\"\n    }\n  }"
+        }
+      },
+      {
+        "from": "trust-policy.json#/Statement",
+        "to": "trust-policy.json#/Statement/Action",
+        "label": "Action pattern",
+        "effect": "Allow",
+        "conditions_present": false,
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 2,
+          "endLine": 8,
+          "snippet": "{\n    \"Effect\": \"Allow\",\n    \"Action\": \"sts:AssumeRole\",\n    \"Principal\": {\n      \"Service\": \"lambda.amazonaws.com\"\n    }\n  }"
+        }
+      },
+      {
+        "from": "trust-policy.json#/Statement",
+        "to": "trust-policy.json#/Statement/Principal",
+        "label": "Principal pattern",
+        "effect": "Allow",
+        "conditions_present": false,
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 2,
+          "endLine": 8,
+          "snippet": "{\n    \"Effect\": \"Allow\",\n    \"Action\": \"sts:AssumeRole\",\n    \"Principal\": {\n      \"Service\": \"lambda.amazonaws.com\"\n    }\n  }"
+        }
+      }
+    ],
+    "scope": "Supplied relationships only; no effective grants or reachability inferred"
+  },
+  "sarif": {
+    "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+      {
+        "tool": {
+          "driver": {
+            "name": "aws-agent-identity-guard",
+            "version": "0.3.0",
+            "informationUri": "https://github.com/poojakira/aws-agent-identity-guard",
+            "rules": [
+              {
+                "id": "AIG007",
+                "name": "AIG007",
+                "shortDescription": {
+                  "text": "Sensitive-data or metadata action 's3:ListBucket' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "medium"
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "ruleId": "AIG007",
+            "ruleIndex": 0,
+            "level": "warning",
+            "message": {
+              "text": "Sensitive-data or metadata action 's3:ListBucket' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 4,
+                    "endLine": 8
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/0"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "Add principal tags (aws:PrincipalTag/tenant, aws:PrincipalTag/agent-id) or resource tags to ensure the agent only accesses data belonging to its tenant.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          }
+        ],
+        "artifacts": [
+          {
+            "location": {
+              "uri": "identity-policy.json",
+              "uriBaseId": "%SRCROOT%"
+            }
+          }
+        ],
+        "properties": {
+          "scope": "STATIC_ONLY_CONTEXT_INCOMPLETE",
+          "inputSha256": "8a0941a59e8372267e1931cdfd4dac06c51940d9aa6b84985a5a813e3bdb8dc2",
+          "run_id": "4c898053-0159-4aa3-935b-b273e3424e72",
+          "source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+          "source_status": "CLEAN",
+          "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+          "timestamp_utc": "2026-11-17T21:24:13.982121+00:00",
+          "configuration_sha256": "b7e00801abdc3999d3eec5e891d544e3391ea1a143ac8827a225c6fd95520bb4",
+          "input_sha256": "33faf35c8e02086351d9bd36554356729e997d112b53148bfe863e9a562a527a",
+          "app_version": "0.3.0"
+        }
+      },
+      {
+        "tool": {
+          "driver": {
+            "name": "aws-agent-identity-guard",
+            "version": "0.3.0",
+            "informationUri": "https://github.com/poojakira/aws-agent-identity-guard",
+            "rules": [
+              {
+                "id": "AIG-TP003",
+                "name": "AIGTP003",
+                "shortDescription": {
+                  "text": "AWS service-principal trust to ['lambda.amazonaws.com'] has no aws:SourceArn, aws:SourceAccount, aws:SourceOrgID, or aws:SourceOrgPaths condition. Where the service supports these keys, source scoping reduces cross-service confused-deputy risk."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "medium"
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "ruleId": "AIG-TP003",
+            "ruleIndex": 0,
+            "level": "warning",
+            "message": {
+              "text": "AWS service-principal trust to ['lambda.amazonaws.com'] has no aws:SourceArn, aws:SourceAccount, aws:SourceOrgID, or aws:SourceOrgPaths condition. Where the service supports these keys, source scoping reduces cross-service confused-deputy risk."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "trust-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 2,
+                    "endLine": 8
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "Check the trusted service's documentation. Where supported, constrain the trust with the most specific aws:SourceArn or an appropriate aws:SourceAccount/aws:SourceOrg* condition.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          }
+        ],
+        "artifacts": [
+          {
+            "location": {
+              "uri": "trust-policy.json",
+              "uriBaseId": "%SRCROOT%"
+            }
+          }
+        ],
+        "properties": {
+          "scope": "STATIC_ONLY_CONTEXT_INCOMPLETE",
+          "inputSha256": "60a6f5f2867c03656ac33521ae039c39999d18461190a310a06ab9dd8e223c53",
+          "run_id": "4c898053-0159-4aa3-935b-b273e3424e72",
+          "source_commit": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+          "source_status": "CLEAN",
+          "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+          "timestamp_utc": "2026-11-17T21:24:13.982121+00:00",
+          "configuration_sha256": "b7e00801abdc3999d3eec5e891d544e3391ea1a143ac8827a225c6fd95520bb4",
+          "input_sha256": "33faf35c8e02086351d9bd36554356729e997d112b53148bfe863e9a562a527a",
+          "app_version": "0.3.0"
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "Patterns are review signals, not effective permissions or proven exploitability.",
+    "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+    "SCPs, boundaries, session/resource policies and condition semantics are unknown.",
+    "No AWS call is made. AIG-PB001 requires live role context and is not run here.",
+    "No findings means no configured pattern matched; it does not prove least privilege or safety."
+  ],
+  "effective_permissions": "UNKNOWN",
+  "delta": {
+    "comparison_performed": true,
+    "before_count": 2,
+    "after_count": 2,
+    "added": [
+      {
+        "rule_id": "AIG-TP003",
+        "severity": "medium",
+        "message": "AWS service-principal trust to ['lambda.amazonaws.com'] has no aws:SourceArn, aws:SourceAccount, aws:SourceOrgID, or aws:SourceOrgPaths condition. Where the service supports these keys, source scoping reduces cross-service confused-deputy risk.",
+        "remediation": "Check the trusted service's documentation. Where supported, constrain the trust with the most specific aws:SourceArn or an appropriate aws:SourceAccount/aws:SourceOrg* condition.",
+        "statement_index": 0,
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 2,
+          "endLine": 8,
+          "snippet": "{\n    \"Effect\": \"Allow\",\n    \"Action\": \"sts:AssumeRole\",\n    \"Principal\": {\n      \"Service\": \"lambda.amazonaws.com\"\n    }\n  }"
+        },
+        "scope": "static pattern; effective permission UNKNOWN",
+        "counter_evidence": {
+          "deny_statement_indices": [],
+          "conditions_present": false
+        },
+        "assumptions": [
+          "Patterns are review signals, not effective permissions or proven exploitability.",
+          "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+          "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+        ],
+        "fingerprint": "663444ce66627f7751df99dcb4b412a661f9bf8cf8895f551d69e5b5579f4431"
+      }
+    ],
+    "removed": [
+      {
+        "rule_id": "AIG-TP002",
+        "severity": "medium",
+        "message": "AWS-principal trust to ['arn:aws:iam::111122223333:role/IndependentTrust'] has no sts:ExternalId condition. ExternalId is recommended when a third party assumes roles for multiple customers, but it is not required for every same-account or cross-account trust relationship.",
+        "remediation": "If this principal belongs to a third-party/shared service, require the provider's unique sts:ExternalId. Otherwise document the trust model and use the condition keys appropriate to your account/organization boundary.",
+        "statement_index": 0,
+        "location": {
+          "source": "trust-policy.json",
+          "json_pointer": "/Statement",
+          "startLine": 2,
+          "endLine": 8,
+          "snippet": "{\n    \"Effect\": \"Allow\",\n    \"Action\": \"sts:AssumeRole\",\n    \"Principal\": {\n      \"AWS\": \"arn:aws:iam::111122223333:role/IndependentTrust\"\n    }\n  }"
+        },
+        "scope": "static pattern; effective permission UNKNOWN",
+        "counter_evidence": {
+          "deny_statement_indices": [],
+          "conditions_present": false
+        },
+        "assumptions": [
+          "Patterns are review signals, not effective permissions or proven exploitability.",
+          "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+          "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+        ],
+        "fingerprint": "6452643171096089e2c3a9d228a0483c1d6f51cbf73b22906e8893029d0f340e"
+      }
+    ],
+    "interpretation": "Rule/severity/message/statement-position changes; not measured AWS risk reduction"
+  },
+  "before_input_sha256": [
+    "8a0941a59e8372267e1931cdfd4dac06c51940d9aa6b84985a5a813e3bdb8dc2",
+    "cfa1695c96662e399b7b8a4d55df30eb64c5500baf4cca63544aa874bd5feefe"
+  ],
+  "human_report": "IAM Permission Engineering Studio — static review\nRun: 4c898053-0159-4aa3-935b-b273e3424e72\nSource: 970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc (CLEAN)\nEngine version: 0.3.0\nEffective permissions: UNKNOWN\n\nPatterns are review signals, not effective permissions or proven exploitability.\nExplicit Deny and conditions are counter-evidence; their intersections are not evaluated.\nSCPs, boundaries, session/resource policies and condition semantics are unknown.\nNo AWS call is made. AIG-PB001 requires live role context and is not run here.\nNo findings means no configured pattern matched; it does not prove least privilege or safety.\n\nFindings:\nMEDIUM AIG007 identity-policy.json:4 /Statement/0\nSensitive-data or metadata action 's3:ListBucket' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents.\nRemediation: Add principal tags (aws:PrincipalTag/tenant, aws:PrincipalTag/agent-id) or resource tags to ensure the agent only accesses data belonging to its tenant.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:ListBucket\",\n      \"Resource\": \"arn:aws:s3:::manual-review-bucket\"\n    }\n\nMEDIUM AIG-TP003 trust-policy.json:2 /Statement\nAWS service-principal trust to ['lambda.amazonaws.com'] has no aws:SourceArn, aws:SourceAccount, aws:SourceOrgID, or aws:SourceOrgPaths condition. Where the service supports these keys, source scoping reduces cross-service confused-deputy risk.\nRemediation: Check the trusted service's documentation. Where supported, constrain the trust with the most specific aws:SourceArn or an appropriate aws:SourceAccount/aws:SourceOrg* condition.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\n    \"Effect\": \"Allow\",\n    \"Action\": \"sts:AssumeRole\",\n    \"Principal\": {\n      \"Service\": \"lambda.amazonaws.com\"\n    }\n  }\n\nDelta: {\"comparison_performed\": true, \"before_count\": 2, \"after_count\": 2, \"interpretation\": \"Rule/severity/message/statement-position changes; not measured AWS risk reduction\"}\nConfiguration SHA256: b7e00801abdc3999d3eec5e891d544e3391ea1a143ac8827a225c6fd95520bb4\nInput SHA256: 33faf35c8e02086351d9bd36554356729e997d112b53148bfe863e9a562a527a"
+}

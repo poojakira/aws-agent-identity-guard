@@ -1,0 +1,34 @@
+{
+  "repository": "poojakira/aws-agent-identity-guard",
+  "utc": "2026-11-17T21:28:59.643529+00:00",
+  "branch": "fix/poster-source-provenance-20261014",
+  "previous_sha": "a153605608c5be4158437c8a0849fa59267e78d4",
+  "archive_tag": "archive/iam/poster-source-provenance-20261117",
+  "merged_pr": 64,
+  "squash_merge_commit": "da0b9f1e453ae0e640af9734dc88a3bed14ea7b2",
+  "exact_delta_paths_present_in_main": [
+    "poster/01_research_brief.md",
+    "poster/poster.png",
+    "poster/poster_36x48.pdf",
+    "poster/render_poster.py"
+  ],
+  "deployment_references": [],
+  "protection": "branch API false; detailed protection API unavailable",
+  "open_pr_dependencies": false,
+  "active_ci": false,
+  "workflow_references": false,
+  "bundle_verified": true,
+  "command": [
+    "git",
+    "push",
+    "--force-with-lease=refs/heads/fix/poster-source-provenance-20261014:a153605608c5be4158437c8a0849fa59267e78d4",
+    "origin",
+    ":refs/heads/fix/poster-source-provenance-20261014"
+  ],
+  "exit_code": 0,
+  "output": "To https://github.com/poojakira/aws-agent-identity-guard.git\n - [deleted]         fix/poster-source-provenance-20261014\n",
+  "remote_ref_after": "",
+  "recovery_command": "git push origin a153605608c5be4158437c8a0849fa59267e78d4:refs/heads/fix/poster-source-provenance-20261014",
+  "disposition": "DELETED; original tip retained by public recovery tag",
+  "recovery_bundle": "Verified private local recovery bundle retained, not published"
+}
