@@ -123,6 +123,23 @@ def main():
             page.set_viewport_size({"width": 390, "height": 844})
             assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
             page.screenshot(path=str(output / "mobile.png"), full_page=True)
+
+            def change_editor_before_real_response(route):
+                actual_response = route.fetch()
+                page.locator("#policy").fill(
+                    json.dumps(
+                        {"Statement": [{"Effect": "Allow", "Action": "iam:*", "Resource": "*"}]}
+                    )
+                )
+                route.fulfill(response=actual_response)
+
+            # Delay the actual backend response while the operator changes input.
+            # The response is not fabricated; its old input must not become current evidence.
+            page.route("**/api/review", change_editor_before_real_response, times=1)
+            page.get_by_role("button", name="Review IAM change", exact=True).click()
+            expect(page.locator("#review")).to_be_enabled(timeout=15000)
+            expect(page.locator("#json")).to_be_disabled()
+            assert "changed during review" in page.locator("#status").inner_text()
             page.locator("#policy").fill('{"Statement":[3]}')
             page.get_by_role("button", name="Review IAM change", exact=True).click()
             expect(page.locator("#review")).to_be_enabled(timeout=15000)
@@ -147,6 +164,7 @@ def main():
                         "safe HTML-shaped principal rendering",
                         "mobile bounds",
                         "malformed input removes stale output",
+                        "delayed real response is discarded after input changes",
                         "no browser errors",
                     ],
                 },

@@ -61,6 +61,10 @@ Controls: fixed IPv4 loopback binding, exact single Host and checked Origin, bou
 
 Inputs remain in browser/backend process memory for processing and are not written by the studio. Downloaded exports remain wherever the operator saves them. No localStorage, external fonts, analytics or third-party API is used. Browser tab closure or Clear previous review removes the comparison reference. Normal shutdown is Ctrl+C; no database, migration or backup is required. Port can change with `--port NUMBER`; bind address cannot. Never expose this through a public tunnel or proxy. Rollback uses a prior reviewed checkout after preserving local edits; no history rewrite is required.
 
+## Security autopsy: stale asynchronous evidence
+
+A delayed actual backend response initially replaced the cleared evidence after an operator edited the policy during a scan. That could pair old findings with a newer editor. The browser now tracks input/configuration revisions and discards responses when the submitted snapshot is no longer current. The real-browser regression delays an actual engine response, changes the editor, then requires exports to remain disabled and an explicit rerun message. No engine result is mocked and no assertion is relaxed.
+
 ## Development, verification and remaining gates
 
 Use Python 3.10+ for runtime; the pinned verification snapshot targets Linux x86_64/Python 3.12. Install `requirements-studio-test.txt` plus `-e .`. Existing CLI/live paths remain available with their own prerequisites and tests. No live credentials should be supplied to run the studio. The historical three credential-dependent validation tests are skips, not successful AWS checks.
