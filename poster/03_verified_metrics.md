@@ -1,3 +1,5 @@
+> Historical snapshot: metrics, dates and validation claims below belong to their cited earlier sources. They do not attest to the local studio candidate. See README and docs/EVIDENCE.md for current scope; missing run provenance remains NOT VERIFIED.
+
 # Verified Metrics - Poster 02
 
 **Main code snapshot:** `718582f5fd8419b0b8c2ca21361f7b0c715cb54b`  

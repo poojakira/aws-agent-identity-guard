@@ -290,9 +290,9 @@ def test_aig_pb001_does_not_fire_when_boundary_present():
     assert high_crit, "Expected the wildcard policy to still produce high/critical findings"
 
     pb_findings = [f for f in findings if f["rule_id"] == "AIG-PB001"]
-    assert (
-        not pb_findings
-    ), f"AIG-PB001 must NOT fire when a permissions boundary is attached, got: {pb_findings}"
+    assert not pb_findings, (
+        f"AIG-PB001 must NOT fire when a permissions boundary is attached, got: {pb_findings}"
+    )
 
 
 @mock_aws

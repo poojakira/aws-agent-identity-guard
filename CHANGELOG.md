@@ -1,3 +1,13 @@
+# Local studio candidate — unreleased
+
+- Add actual browser policy upload/edit/review and before/after evidence around canonical static engines.
+- Add bounded structural input validation, exact source locations, supplied-only graph, canonical SARIF with schema verification, and text/evidence exports.
+- Distinguish24static rules from the additional live-context boundary-presence rule; retain effective-permission uncertainty.
+- Retire hardcoded dashboard results; add local threat/operations documentation and source-scoped evidence workflow.
+- Align existing declared Ruff0.17.1 with CI and apply formatting without changing assertions or engine behavior.
+
+Historical entries below describe earlier snapshots and do not attest to this candidate. Their historical metrics and verification wording remain NOT VERIFIED unless linked to an accessible matching run.
+
 # Changelog
 
 ## [Unreleased]

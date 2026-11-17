@@ -143,12 +143,13 @@ guard tool when used in CI/CD pipelines and on-demand live-scanning.
    ```python
    # tests/test_scanner.py
    def test_detects_new_escalation():
-       document = { ... }  # The vulnerable pattern
+       document = {...}  # The vulnerable pattern
        findings = scan_policy_document(document)
        assert any(f["rule_id"] == "AIG022" for f in findings)
 
+
    def test_no_false_positive_on_safe_variant():
-       document = { ... }  # Similar but safe pattern
+       document = {...}  # Similar but safe pattern
        findings = scan_policy_document(document)
        assert not any(f["rule_id"] == "AIG022" for f in findings)
    ```
@@ -206,9 +207,8 @@ guard tool when used in CI/CD pipelines and on-demand live-scanning.
    ```python
    # boto3 config
    from botocore.config import Config
-   config = Config(
-       retries={"max_attempts": 10, "mode": "adaptive"}
-   )
+
+   config = Config(retries={"max_attempts": 10, "mode": "adaptive"})
    ```
 
 2. **Reduce API call volume:**
@@ -301,7 +301,7 @@ misleading suggestion, not the tool mutating infrastructure.
    ```python
    # tests/test_scanner.py
    def test_remediation_text_present_for_finding():
-       document = { ... }
+       document = {...}
        findings = scan_policy_document(document)
        assert findings  # at least one finding
        # --remediate output is rendered by the CLI from these findings
