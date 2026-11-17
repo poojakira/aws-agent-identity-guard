@@ -85,6 +85,7 @@ def main():
             )
             expect(page.locator("#policy")).to_have_value(own_raw)
             expect(page.locator("#json")).to_be_disabled()
+            assert page.locator("#location").inner_text() == "No current statement selected."
             review()
             second = json.loads(export("Export evidence JSON", "changed-review.json").read_text())
             assert second["sources"][0]["sha256"] == hashlib.sha256(own_raw.encode()).hexdigest()
@@ -119,6 +120,8 @@ def main():
             )
             validator.validate(trust_sarif)
             assert len(trust_sarif["runs"]) == 2
+            page.locator("#findings button").first.click()
+            assert json.loads(page.locator("#evidence").inner_text())["Effect"] == "Allow"
             page.screenshot(path=str(output / "desktop.png"), full_page=True)
             page.set_viewport_size({"width": 390, "height": 844})
             assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")

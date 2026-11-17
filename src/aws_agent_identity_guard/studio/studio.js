@@ -3,7 +3,7 @@ const sample={Version:'2012-10-17',Statement:[{Sid:'SyntheticBroadAgent',Effect:
 let report,previous,revision=0;
 function node(tag,text,cls){const item=document.createElement(tag);item.textContent=text;if(cls)item.className=cls;return item;}
 function select(location){$('location').textContent=`${location.snapshot||'Current'}: ${location.source}:${location.startLine}–${location.endLine} ${location.json_pointer||'/ (policy-level finding)'}`;$('evidence').textContent=location.snippet;$('evidence-box').focus();}
-function emptyResults(){report=undefined;$('findings').replaceChildren();$('delta-findings').replaceChildren();$('graph').textContent='No current successful analysis.';$('headline').textContent='No analysis established';$('delta').textContent='';$('provenance').textContent='';$('evidence').textContent='No current statement evidence.';for(const id of ['sarif','human','json'])$(id).disabled=true;}
+function emptyResults(){report=undefined;$('findings').replaceChildren();$('delta-findings').replaceChildren();$('graph').textContent='No current successful analysis.';$('headline').textContent='No analysis established';$('delta').textContent='';$('provenance').textContent='';$('location').textContent='No current statement selected.';$('evidence').textContent='No current statement evidence.';for(const id of ['sarif','human','json'])$(id).disabled=true;}
 function invalidate(){revision+=1;emptyResults();}
 function show(data){
   report=data;$('headline').textContent=`${data.findings.length} static pattern finding(s) · effective permissions UNKNOWN`;
