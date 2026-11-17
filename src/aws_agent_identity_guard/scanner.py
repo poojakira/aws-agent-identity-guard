@@ -512,11 +512,12 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                 Finding(
                     "AIG003",
                     "high",
-                    "Agent policy grants access to all resources in the account. "
-                    "Combined with tool-execution actions, this means the agent "
-                    "can invoke any Lambda, read any secret, or run tasks anywhere.",
-                    "Bind permissions to specific ARNs or use resource tags and "
-                    "conditions (aws:ResourceTag) to limit blast radius.",
+                    "Statement uses Resource:*. Its resource scope is broad for "
+                    "the listed actions; it does not grant unlisted actions or "
+                    "establish effective access. Some actions require this scope.",
+                    "Check each listed action's resource-level support. Where supported, "
+                    "use specific ARNs or applicable resource-tag conditions; otherwise "
+                    "review service-specific conditions and required context.",
                     index,
                 )
             )
@@ -601,9 +602,10 @@ def scan_policy_document(document: dict[str, Any]) -> list[Finding]:
                     Finding(
                         "AIG007",
                         "medium",
-                        f"Sensitive data action '{action}' has no principal-tag or "
-                        "resource-tag condition. Without ABAC controls, any session "
-                        "using this role can read all accessible secrets/data.",
+                        f"Sensitive-data or metadata action '{action}' has no principal-tag "
+                        "or resource-tag condition. Capabilities remain limited to the "
+                        "listed actions and supplied context; listing does not itself "
+                        "authorize reading secret values or object contents.",
                         "Add principal tags (aws:PrincipalTag/tenant, "
                         "aws:PrincipalTag/agent-id) or resource tags to ensure "
                         "the agent only accesses data belonging to its tenant.",

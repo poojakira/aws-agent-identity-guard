@@ -40,6 +40,22 @@ def test_actual_engine_is_source_of_identity_and_trust_findings():
     assert report["live_context_rule_ids_not_run"] == ["AIG-PB001"]
 
 
+def test_metadata_listing_findings_do_not_invent_cross_service_or_content_access():
+    for action in ["s3:ListBucket", "s3:GetObject"]:
+        report = review_change({"policy": json.dumps(policy(action=action))})
+        findings = {item["rule_id"]: item for item in report["findings"]}
+        # Preserve the actual static detectors and severity while qualifying claims.
+        assert findings["AIG003"]["severity"] == "high"
+        assert findings["AIG007"]["severity"] == "medium"
+        for rule in ["AIG003", "AIG007"]:
+            message = findings[rule]["message"].lower()
+            assert "listed actions" in message
+            assert "can invoke any lambda" not in message
+            assert "can read all accessible secrets/data" not in message
+        assert "does not grant unlisted actions" in findings["AIG003"]["message"]
+        assert "listing does not itself authorize reading" in findings["AIG007"]["message"]
+
+
 def test_structural_source_location_is_not_confused_by_strings_or_single_statement():
     raw = (
         '{\n "Id": "Statement is just text here",\n "Statement": [\n  '

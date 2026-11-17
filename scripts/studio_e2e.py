@@ -143,6 +143,71 @@ def main():
             expect(page.locator("#review")).to_be_enabled(timeout=15000)
             expect(page.locator("#json")).to_be_disabled()
             assert "changed during review" in page.locator("#status").inner_text()
+
+            # Delay only the browser's actual File.text read. The review still
+            # reaches the real backend while the previous editor text is visible.
+            page.evaluate("""() => {
+              window.originalFileText = File.prototype.text;
+              window.pendingPolicyFiles = [];
+              File.prototype.text = function() {
+                return window.originalFileText.call(this).then(text =>
+                  new Promise(resolve => window.pendingPolicyFiles.push(() => resolve(text))));
+              };
+            }""")
+            uploaded_trust = json.dumps(
+                {
+                    "Statement": {
+                        "Effect": "Allow",
+                        "Action": "sts:AssumeRole",
+                        "Principal": {"AWS": "arn:aws:iam::123456789012:role/Synthetic"},
+                    }
+                }
+            )
+            for input_id, editor_id, uploaded in [
+                ("policy-file", "policy", own_raw),
+                ("trust-file", "trust", uploaded_trust),
+            ]:
+                page.locator("#policy").fill(
+                    json.dumps(
+                        sample_policy := {
+                            "Statement": [
+                                {"Effect": "Allow", "Action": "iam:PassRole", "Resource": "*"}
+                            ]
+                        }
+                    )
+                )
+                page.locator("#trust").fill("")
+                page.locator("#" + input_id).set_input_files(
+                    {
+                        "name": "delayed.json",
+                        "mimeType": "application/json",
+                        "buffer": uploaded.encode(),
+                    }
+                )
+                page.wait_for_function("window.pendingPolicyFiles.length === 1")
+                review()
+                expect(page.locator("#json")).to_be_enabled()
+                page.evaluate("window.pendingPolicyFiles.shift()()")
+                expect(page.locator("#" + editor_id)).to_have_value(uploaded)
+                for export_id in ["json", "sarif", "human"]:
+                    expect(page.locator("#" + export_id)).to_be_disabled()
+                assert page.locator("#location").inner_text() == "No current statement selected."
+
+                # A later edit must also supersede an earlier delayed file read.
+                page.locator("#" + input_id).set_input_files(
+                    {
+                        "name": "obsolete.json",
+                        "mimeType": "application/json",
+                        "buffer": uploaded.encode(),
+                    }
+                )
+                page.wait_for_function("window.pendingPolicyFiles.length === 1")
+                newer_text = json.dumps(sample_policy) if editor_id == "policy" else ""
+                page.locator("#" + editor_id).fill(newer_text)
+                page.evaluate("window.pendingPolicyFiles.shift()()")
+                expect(page.locator("#" + editor_id)).to_have_value(newer_text)
+                expect(page.locator("#json")).to_be_disabled()
+            page.evaluate("() => { File.prototype.text = window.originalFileText; }")
             page.locator("#policy").fill('{"Statement":[3]}')
             page.get_by_role("button", name="Review IAM change", exact=True).click()
             expect(page.locator("#review")).to_be_enabled(timeout=15000)
@@ -168,6 +233,8 @@ def main():
                         "mobile bounds",
                         "malformed input removes stale output",
                         "delayed real response is discarded after input changes",
+                        "delayed identity/trust file completion invalidates real scan exports",
+                        "later edits supersede obsolete asynchronous file reads",
                         "no browser errors",
                     ],
                 },

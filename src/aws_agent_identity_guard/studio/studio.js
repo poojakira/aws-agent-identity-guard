@@ -20,7 +20,20 @@ function show(data){
 $('sample').addEventListener('click',()=>{invalidate();$('policy').value=JSON.stringify(sample,null,2);$('trust').value='';$('status').textContent='Synthetic example loaded. Run the engine to analyze it.';});
 $('clear').addEventListener('click',()=>{invalidate();previous=undefined;$('status').textContent='Previous review cleared. No inputs are stored on the backend.';});
 for(const id of ['policy','trust'])$(id).addEventListener('input',()=>{invalidate();$('status').textContent='Input changed. Run a new review; previous successful input is available for comparison.';});
-for(const [input,target] of [['policy-file','policy'],['trust-file','trust']])$(input).addEventListener('change',async()=>{const file=$(input).files[0];if(!file)return;invalidate();if(file.size>32768){$('status').textContent='File exceeds the 32768-byte limit.';return;}$(target).value=await file.text();$('status').textContent='Local file loaded into the editor. It has not been analyzed.';});
+for(const [input,target] of [['policy-file','policy'],['trust-file','trust']])$(input).addEventListener('change',async()=>{
+  const file=$(input).files[0];if(!file)return;
+  invalidate();const fileRevision=revision;
+  if(file.size>32768){$('status').textContent='File exceeds the 32768-byte limit.';return;}
+  try{
+    const text=await file.text();
+    // A newer file choice or edit takes precedence over this asynchronous read.
+    if(revision!==fileRevision)return;
+    // A real review may have completed while the file was loading. Its results
+    // cannot describe the new editor contents, even if no input event fired.
+    invalidate();$(target).value=text;
+    $('status').textContent='Local file loaded into the editor. It has not been analyzed.';
+  }catch(error){if(revision===fileRevision){invalidate();$('status').textContent='The local file could not be read. Select it again.';}}
+});
 $('compare').addEventListener('change',()=>{invalidate();$('status').textContent='Comparison option changed. Run a new review.';});
 $('review').addEventListener('click',async()=>{
   $('review').disabled=true;emptyResults();$('status').textContent='Running the actual local static scanners…';
