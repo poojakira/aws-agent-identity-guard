@@ -134,10 +134,13 @@ def test_malformed_and_unsupported_inputs_fail_closed(raw):
 
 
 def test_byte_statement_string_and_configuration_bounds():
+    long_key = policy()
+    long_key["Statement"][0]["Condition"] = {"StringEquals": {"k" * 4097: "value"}}
     for raw in [
         " " * 32769,
         json.dumps({"Statement": policy()["Statement"] * 33}),
         json.dumps(policy("a" * 4097)),
+        json.dumps(long_key),
     ]:
         with pytest.raises(InputError):
             review_change({"policy": raw})

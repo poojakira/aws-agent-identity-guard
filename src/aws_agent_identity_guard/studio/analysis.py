@@ -135,6 +135,8 @@ class Document:
                     if self.raw[index : index + 1] != '"':
                         raise InputError("Object keys must be JSON strings")
                     key, index = self.decoder.raw_decode(self.raw, index)
+                    if len(key) > 4096:
+                        raise InputError("Individual object keys are limited to 4096 characters")
                     if key in result:
                         raise InputError("Duplicate JSON object keys are not supported")
                     index = self.skip(index)
