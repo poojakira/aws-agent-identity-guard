@@ -151,7 +151,11 @@ def main():
               window.pendingPolicyFiles = [];
               File.prototype.text = function() {
                 return window.originalFileText.call(this).then(text =>
-                  new Promise(resolve => window.pendingPolicyFiles.push(() => resolve(text))));
+                  new Promise(resolve => {
+                    window.pendingPolicyFiles.push(() => resolve(text));
+                    document.documentElement.setAttribute('data-pending-policy-files',
+                      String(window.pendingPolicyFiles.length));
+                  }));
               };
             }""")
             uploaded_trust = json.dumps(
@@ -184,10 +188,13 @@ def main():
                         "buffer": uploaded.encode(),
                     }
                 )
-                page.wait_for_function("window.pendingPolicyFiles.length === 1")
+                expect(page.locator("html")).to_have_attribute("data-pending-policy-files", "1")
                 review()
                 expect(page.locator("#json")).to_be_enabled()
-                page.evaluate("window.pendingPolicyFiles.shift()()")
+                page.evaluate("""() => {
+                  window.pendingPolicyFiles.shift()();
+                  document.documentElement.setAttribute('data-pending-policy-files', '0');
+                }""")
                 expect(page.locator("#" + editor_id)).to_have_value(uploaded)
                 for export_id in ["json", "sarif", "human"]:
                     expect(page.locator("#" + export_id)).to_be_disabled()
@@ -201,10 +208,13 @@ def main():
                         "buffer": uploaded.encode(),
                     }
                 )
-                page.wait_for_function("window.pendingPolicyFiles.length === 1")
+                expect(page.locator("html")).to_have_attribute("data-pending-policy-files", "1")
                 newer_text = json.dumps(sample_policy) if editor_id == "policy" else ""
                 page.locator("#" + editor_id).fill(newer_text)
-                page.evaluate("window.pendingPolicyFiles.shift()()")
+                page.evaluate("""() => {
+                  window.pendingPolicyFiles.shift()();
+                  document.documentElement.setAttribute('data-pending-policy-files', '0');
+                }""")
                 expect(page.locator("#" + editor_id)).to_have_value(newer_text)
                 expect(page.locator("#json")).to_be_disabled()
             page.evaluate("() => { File.prototype.text = window.originalFileText; }")
