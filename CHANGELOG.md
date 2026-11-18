@@ -1,3 +1,11 @@
+# Documentation reconciliation — unreleased
+
+- Reconcile all README, API, threat, operations, security, testing, optional-integration and evidence guidance against actual interfaces.
+- Separate 24 static rules from the live-context twenty-fifth ID; correct legacy skip reasons, exit-status interpretation, live completeness and deterministic remediation output.
+- Correct OIDC versus account-AssumeRole/ExternalId documentation and mark the delegated example's mocked/client-side guard limitation; retain runtime code and tests unchanged.
+- Record completed implementation-source review/branch cleanup, preserve historical evidence, and require fresh proof for later documentation heads.
+- Refresh source-scoped poster labels/artifacts without claiming production, live-AWS or new-head results from old snapshots.
+
 # Local studio candidate — unreleased
 
 - Add actual browser policy upload/edit/review and before/after evidence around canonical static engines.

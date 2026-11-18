@@ -1,77 +1,23 @@
-# n8n Workflow Integration
+# n8n integration template — not activation-ready evidence
 
-Scheduled n8n workflow for continuous IAM posture monitoring of AI agent roles.
+`integrations/n8n-iam-posture-scan.json` is an optional workflow template, not a running monitor or a studio dependency. It declares a weekday 06:00 cron (n8n timezone/configuration applies), command execution, finding categorization, Slack webhook posts and Jira issue creation. No n8n import/activation, AWS scan, Slack message or Jira ticket was executed by this documentation pass. Such actions require explicit authorization, approved target identities, secrets and report-sharing policy; this guide grants none.
 
-## Pipeline: Cron → Scan → Alert → Remediation Ticket
+## Source behavior and gaps
 
-**File:** `integrations/n8n-iam-posture-scan.json`
+| Template component | Checked-in behavior | Review needed before use |
+|---|---|---|
+| Command node | `aws-agent-identity-guard --live-scan --format json` | High/critical findings return exit 1 and can stop command-node execution; capture findings and tool failures distinctly |
+| Parse/classify | Reads stdout and severity lists | Does not validate `scan_complete`, `errors` or truncation; a partial result can be misleading |
+| Clean branch | Posts a success-style Slack message | Zero high/critical patterns is not complete IAM authorization or evidence that no action is needed |
+| Remediation node | Maps finding strings into suggestion records | Does not invoke the canonical IaC generator or prove a fixed policy |
+| Slack/Jira paths | Sends policy/account/role context to configured external services | Redaction, service permissions, n8n credential bindings and per-action authorization; both branches reaching Jira can create duplicate tickets |
 
-### What it does
+Before activation, review an approved copy's exit propagation, enforce/completeness handling, error routing, deduplication, delivery failures and downstream transformations with synthetic data. Do not make essential checks non-blocking to produce a clean branch. The template is not proven compatible with a particular n8n/runtime version, and importing JSON is not end-to-end verification.
 
-1. **Scheduled trigger** — runs every weekday at 6 AM (configurable cron)
-2. **Live IAM scan** — executes `aws-agent-identity-guard --live-scan --format json` against the current AWS account
-3. **Parse & categorize** — groups findings by role, separates critical/high from medium
-4. **Route by severity:**
-   - **Critical/High found:** Alert Slack → Generate remediations → Create Jira ticket
-   - **Clean:** Post summary to Slack (X roles scanned, 0 critical/high)
+## Prerequisites for an independently authorized deployment
 
-### Import into n8n
+An operator would need a suitable n8n worker/command-execution environment, reviewed scanner source/distribution with the Boto3 live extra, an approved read-only AWS SDK identity, and separately approved Slack/Jira destinations/credential bindings. `SLACK_WEBHOOK_URL`, `JIRA_BASE_URL`, `JIRA_PROJECT_KEY` and the n8n HTTP-basic credential referenced by the Jira node are configuration placeholders, not permission or complete auth setup. Keep secret values in the target runtime's secret store, never in workflow source or logs.
 
-```bash
-n8n import:workflow --input integrations/n8n-iam-posture-scan.json
-```
+`--role-name` selects an **exact** role name; `bedrock-agent-*` is not a supported wildcard/multi-account scan command. The scanner does not traverse Organizations or automatically assume cross-account roles. A separate operator-managed invocation/credential context is required for each approved account. No combination with another security product is required or established.
 
-### Prerequisites
-
-1. `aws-agent-identity-guard` installed on the n8n worker:
-   ```bash
-   pip install aws-agent-identity-guard[live]
-   ```
-
-2. AWS credentials configured for the n8n worker (env vars, instance profile, or SSO)
-
-3. IAM permissions for the scanner identity (read-only):
-   ```
-   iam:ListRoles, iam:GetRole, iam:ListRolePolicies, iam:GetRolePolicy,
-   iam:ListAttachedRolePolicies, iam:GetPolicy, iam:GetPolicyVersion,
-   iam:ListUsers, iam:ListUserPolicies, sts:GetCallerIdentity
-   ```
-
-### Required credentials
-
-| Credential | Environment Variable | Purpose |
-|-----------|---------------------|---------|
-| Slack webhook | `SLACK_WEBHOOK_URL` | Alert `#cloud-security` |
-| Jira API | `JIRA_BASE_URL`, `JIRA_PROJECT_KEY` | Remediation tickets |
-| AWS (scanner) | Standard AWS credential chain | IAM read access |
-
-### What the alert looks like
-
-```
-🚨 Agent IAM Posture Alert
-Account: 111122223333
-Roles Scanned: 47
-Critical: 2 | High: 5 | Medium: 12
-
-Top findings:
-• AIG004 on `bedrock-agent-prod`: iam:PassRole without PassedToService...
-• AIG011 on `data-pipeline-role`: cloudtrail:StopLogging in agent runtime...
-• AIG008 on `mcp-server-role`: bedrock:CreateAgent in runtime role...
-```
-
-### Customization
-
-- Change cron to `0 */4 * * *` for every-4-hours scanning
-- Add a `--role-name` filter to scan specific agent roles only
-- Chain with the model provenance scan workflow for full ML security posture
-- Add AWS Config rule creation for continuous monitoring (beyond scheduled scans)
-
-### Multi-account scanning
-
-For AWS Organizations, run one workflow per account or use cross-account assume-role:
-
-```bash
-aws-agent-identity-guard --live-scan --role-name bedrock-agent-* --format json
-```
-
-Deploy the n8n worker in a security tooling account with cross-account read roles in each target account.
+Use [the live-collection contract](../RUNBOOK.md#optional-live-collection), [AWS trust distinctions](../docs/aws-architecture.md), [threat model](../THREAT_MODEL.md), and [release/evidence gates](../docs/EVIDENCE.md). The template remains NOT VERIFIED for live delivery and requires remediation/review of these integration gaps before relying on it.

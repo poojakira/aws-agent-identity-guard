@@ -1,4 +1,6 @@
-# Verified reduction in high-risk IAM roles
+# Method for measuring an authorized live-role remediation
+
+This is an unexecuted operational measurement procedure, not an observed percentage, AWS approval or a studio feature.
 
 1. With an explicitly authorized **read-only** AWS account connection, run the repository's live scanner and save full JSON account snapshots as `before.json` and `after.json` in a controlled, private evidence location, not Git.
 2. Verify both scans are complete, from the same AWS account, with identical role ARN sets and no collection errors. Keep snapshots and time boundaries auditable.

@@ -1,4 +1,4 @@
-> Historical snapshot: metrics, dates and validation claims below belong to their cited earlier sources. They do not attest to the local studio candidate. See README and docs/EVIDENCE.md for current scope; missing run provenance remains NOT VERIFIED.
+> **Historical/source-bounded record.** Statements below retain their cited source/date or author-recorded context. They do not attest to a later documentation head, deployment or field outcome. External historical assertions remain unverified in this pass. See [current evidence status](docs/EVIDENCE.md).
 
 # Project History and Repository Provenance
 

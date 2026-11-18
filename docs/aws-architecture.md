@@ -1,132 +1,37 @@
-# AWS Architecture — AWS Agent Identity Guard
+# AWS integration architecture
 
-## Purpose
+## Actual product and optional boundaries
 
-This document describes how `aws-agent-identity-guard` can be deployed as an automated security
-gate in an AWS-integrated CI/CD pipeline, and how the live scanning mode authenticates to AWS
-without long-lived credentials.
+The local studio and static CLI run without AWS. Their [architecture](STUDIO.md#architecture-and-adr) is input → structural/static review → evidence, not an account service. The optional collector uses Boto3 IAM/STS reads and invokes the same canonical patterns. No AWS deployment or cloud command was executed by this documentation pass.
 
----
-
-## Deployment Model
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                       GitHub Actions (CI/CD)                        │
-│                                                                     │
-│  ┌────────────────────────────────────────────────────────────┐    │
-│  │  Push / PR event                                            │    │
-│  │  → Lint job (ruff)                                         │    │
-│  │  → Security job (bandit, pip-audit)                        │    │
-│  │  → Test job (pytest)                                       │    │
-│  │  → [Optional] Live scan job                                │    │
-│  │       │                                                    │    │
-│  │       └──── OIDC token ──────────────────────────────┐    │    │
-│  └────────────────────────────────────────────────────── │ ───┘    │
-└────────────────────────────────────────────────────────── │ ────────┘
-                                                           │
-                    ┌──────────────────────────────────────▼──────────┐
-                    │           AWS STS (OIDC federation)              │
-                    │  AssumeRoleWithWebIdentity                       │
-                    │  Trust policy: github.com/poojakira/aws-agent... │
-                    │  + sts:ExternalId condition                      │
-                    └──────────────────────────────────────────────────┘
-                                           │
-                    ┌──────────────────────▼──────────────────────────┐
-                    │       aws-agent-identity-guard-dev-scanner-role  │
-                    │                                                  │
-                    │  Policy: scanner-policy (read-only)              │
-                    │  iam:ListRoles, iam:GetRole, iam:GetPolicy, ...  │
-                    │  sts:GetCallerIdentity                           │
-                    └──────────────────────────────────────────────────┘
-                                           │
-              ┌────────────────────────────┼───────────────────────────┐
-              ▼                            ▼                           ▼
-     ┌─────────────────┐        ┌──────────────────┐       ┌──────────────────┐
-     │ IAM ListRoles / │        │ IAM GetPolicy /  │       │ CloudWatch Logs  │
-     │ ListUsers       │        │ GetPolicyVersion │       │ (scan evidence)  │
-     └─────────────────┘        └──────────────────┘       └──────────────────┘
+```mermaid
+flowchart LR
+    Operator[Authorized operator or CI] -->|Existing approved SDK credentials| SDK[Boto3 session]
+    SDK --> STS[STS GetCallerIdentity]
+    SDK --> IAM[IAM roles/users/policies/tags reads]
+    IAM --> Scanner[Canonical static rules and live boundary-presence check]
+    Scanner --> Report[Report plus errors/completeness]
+    Report --> Store[Operator-controlled private output/CI artifact]
 ```
 
----
+The ordinary collector does not stream CloudWatch logs, query CloudTrail events, publish ASFF/Security Hub, traverse Organizations accounts, or continuously monitor requests. No complete IAM entitlement graph or authorization intersection evaluation is implemented. Region is SDK configuration; IAM is a global service. [RUNBOOK.md](../RUNBOOK.md#optional-live-collection) lists actual commands/read permissions and completeness behavior.
 
-## AWS Services Used
+## Checked-in Terraform: account-principal AssumeRole
 
-| Service | Justification | Usage |
-|---------|--------------|-------|
-| **AWS IAM** | Core subject of the scanner | Read-only enumeration of roles, users, policies |
-| **AWS STS** | Temporary credential issuance | OIDC federation from GitHub Actions; `GetCallerIdentity` to resolve account ID |
-| **CloudWatch Logs** | Evidence retention | Scan event logging in live mode |
+`infra/terraform/modules/scanner-iam/main.tf` declares a scanner role/policy attachment and a CloudWatch log group with retention. Its trust is an AWS account principal performing **`sts:AssumeRole` with `sts:ExternalId`**, not a GitHub OIDC provider. The module requires explicit trusted account, external identifier, environment and tags. The policy includes IAM enumeration reads and STS caller identity with wildcard resources where configured; it is not resource-wildcard-free or proof of least privilege for every environment.
 
-Services **not used** (and why):
-- **S3** — Not needed for a CLI tool; scan artifacts are stored in CI artifact storage.
-- **DynamoDB** — No persistent finding database at this scale.
-- **Security Hub** — Future work: ASFF output format is prepared in code but publication not yet automated.
+`infra/terraform/environments/dev/main.tf` supplies the module and shows a **commented** S3/DynamoDB backend example. Commented backend configuration does not establish encrypted remote state or locking. Creating a log group does not wire application log shipping. Terraform configuration exists; current plan/apply, remote state, credentials, IAM effects and log delivery remain NOT VERIFIED. No `terraform apply` is required to use the studio.
 
----
+Do not paste these configuration values or an apply command into a public issue. Review the actual provider version, module, trust and permissions against the target account before any independently authorized plan/application. An ExternalId is a deputy/customer discriminator, not a replacement for authentication or a universal secret credential.
 
-## IAM Roles
+## Distinct proposed OIDC federation
 
-### `aws-agent-identity-guard-{env}-scanner-role`
+GitHub Actions OIDC uses an approved federated provider and **`sts:AssumeRoleWithWebIdentity`**. Restrict supported provider token claims such as audience and the exact allowed repository/ref or environment subject, under the operator's deployment policy. That STS API has **no ExternalId parameter**; do not add an `sts:ExternalId` condition as if it were supplied by this web-identity exchange.
 
-- **Purpose:** Read-only IAM enumeration
-- **Trust:** GitHub Actions OIDC endpoint (`token.actions.githubusercontent.com`) scoped to this repository and `agent/security-hardening-v1` branch
-- **Permissions:** `iam:ListRoles`, `iam:ListUsers`, `iam:GetRole`, `iam:GetPolicy`, `iam:GetPolicyVersion`, `iam:ListAttachedRolePolicies`, `iam:GetRolePolicy`, `iam:ListUserPolicies`, `iam:ListAttachedUserPolicies`, `iam:ListUserTags`, `sts:GetCallerIdentity`
-- **No write permissions** to IAM or any other service
-- **Confused-deputy protection:** `sts:ExternalId` condition required
+The Terraform module above does not implement this OIDC setup. The [delegated-credentials teaching example](../examples/delegated_credentials/README.md) also must not be deployed as a real OIDC trust artifact: it deliberately compares an ExternalId-like value in local Python under moto, which does not prove AWS server-side enforcement. The repository's standard offline verification does not require a configured provider, new key or live account.
 
----
+## Evidence, costs and operations
 
-## GitHub Actions OIDC Setup
+Retain full completeness/error fields and source/version/configuration information in private reports. Logs/findings can disclose policies, role names, ARNs and account relationships; choose access/retention/encryption deliberately. AWS/CI/storage API usage, quotas and cost depend on the actual account and configured services. No measured cost, operational scale, free-deployment guarantee, uptime or customer adoption is established here.
 
-```yaml
-# In the live-scan CI job:
-- uses: aws-actions/configure-aws-credentials@v4
-  with:
-    role-to-assume: ${{ vars.AWS_SCANNER_ROLE_ARN }}
-    role-external-id: ${{ secrets.AWS_SCANNER_EXTERNAL_ID }}
-    aws-region: us-east-1
-```
-
-Trust policy for the role (example):
-```json
-{
-  "Effect": "Allow",
-  "Principal": {
-    "Federated": "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com"
-  },
-  "Action": "sts:AssumeRoleWithWebIdentity",
-  "Condition": {
-    "StringEquals": {
-      "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-      "token.actions.githubusercontent.com:sub": "repo:poojakira/aws-agent-identity-guard:ref:refs/heads/agent/security-hardening-v1"
-    }
-  }
-}
-```
-
----
-
-## Cost Estimate
-
-For a CI pipeline running 20 scans/day against an account with ~100 IAM roles:
-
-| Service | Usage | Estimated Cost |
-|---------|-------|---------------|
-| IAM API calls | ~300 read calls/scan × 20 = 6,000/day | Free (IAM API has no per-call cost) |
-| STS AssumeRole | 20/day | Free |
-| CloudWatch Logs | ~10 KB/scan × 20 = 200 KB/day | < $0.01/month |
-| **Total** | | **< $0.10/month** |
-
----
-
-## Security Controls
-
-See [docs/aws-security-controls.md](aws-security-controls.md) for the full control mapping.
-
-Key controls:
-- No permanent AWS credentials stored anywhere
-- Scanner role has `sts:ExternalId` condition (confused-deputy prevention)
-- GitHub Actions OIDC scoped to this repository and branch
-- All IAM permissions are read-only with no resource wildcards that could be abused
-- Terraform state encrypted in S3 (when deployed) with DynamoDB locking
+See [security controls](aws-security-controls.md), [threat model](../THREAT_MODEL.md), [release gates](../PRODUCTION.md), and [source-scoped evidence](EVIDENCE.md). Activating cloud integrations, external telemetry or report sharing requires separate explicit authorization and validation.

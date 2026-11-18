@@ -1,55 +1,24 @@
-# Security Policy
+# Security policy
 
-## Supported Versions
+## Scope and support
 
-| Version | Supported |
-|---------|-----------|
-| `main` branch | ✅ Active |
-| Older tags | ❌ No patch support |
+Software/studio version is 0.3.0. Main is the integration branch; no backport, acknowledgment deadline or fix-time commitment is published. Release status is **PARTIAL**. See [exact-source evidence](docs/EVIDENCE.md) before inferring support from a version or workflow name.
 
-## Reporting a Vulnerability
+The local studio invokes actual static scanners without AWS credentials or third-party runtime dependencies. Its loopback/Host/Origin, parsing bounds, rate/socket limits and safe rendering are a local single-operator boundary, not authentication against another OS user or a multi-tenant service. CLI parsing has a different, less bounded contract. Optional Boto3 collection requires explicit credentials and IAM/STS access. Rule-based remediation prints suggestions; it does not apply changes.
 
-**Do not open a public GitHub issue for security vulnerabilities.**
+## Vulnerability reporting
 
-Email: `security@poojakiran.dev` (or open a private GitHub Security Advisory).
+Report privately using the repository's GitHub security-advisory channel if available, or contact the maintainer through [the repository owner's profile](https://github.com/poojakira). Do not put credentials or exploitable details into a public issue. Include the affected commit/version, prerequisites, minimal synthetic reproduction, actual/expected behavior and impact. The project does not establish a staffed on-call service or a 72-hour/14-day SLA.
 
-Include:
-- A description of the vulnerability
-- Steps to reproduce
-- Affected versions
-- Potential impact
+## Credentials and policy privacy
 
-You will receive a response within **72 hours**. If confirmed, a fix will be developed within **14 days** for critical/high severity.
+- Never commit real keys, passwords, session tokens, private keys, populated environment files or user policy inputs.
+- Studio operation needs no AWS credentials. Use synthetic data for evaluation.
+- Optional live work uses an operator-owned approved SDK credential provider. Prefer short-lived credentials; protect process memory, logs and artifacts.
+- Revoke/rotate exposed credentials at their provider first, then preserve evidence and address source/history/artifact exposure under a reviewed recovery plan. Deleting a file or rewriting history does not revoke a credential.
+- Policy reports may reveal account/resource relationships, identities and internal names. Restrict storage/sharing rather than calling ARNs or generated reports non-sensitive by default.
+- No live credential checking or external validation is required to classify a secret-scan heuristic.
 
-## Scope
+## Residual risk
 
-This tool is a **static IAM policy linter**. Its attack surface is:
-
-1. **CLI input parsing** — `argparse` on local file paths. Path traversal is not possible since the tool only reads the specified file.
-2. **JSON parsing** — `json.loads` on policy document content. No arbitrary code execution path exists.
-3. **Live scanning mode** — Uses Boto3 with the standard AWS credential chain. The tool only calls read-only IAM APIs. It does not modify any AWS resources.
-4. **SARIF output** — Writes structured JSON to a file. Output is not executed.
-
-## Out of Scope
-
-- Denial of service against the local CLI process
-- AWS account compromise through the scanner identity (mitigated by read-only IAM policy)
-- Vulnerabilities in third-party dependencies (report upstream; we track via `pip-audit`)
-
-## Security Controls
-
-- No runtime dependencies (static analysis only)
-- Live scanning requires explicit `[live]` install and AWS credentials
-- CI runs `bandit`, `pip-audit`, and `ruff` on every pull request
-- GitHub Actions pinned to commit SHAs
-- Workflow permissions: `contents: read` minimum
-
-<!-- credential-response:start -->
-## Credential and secret handling
-
-- Real API keys, tokens, passwords, private keys, cloud credentials, and populated environment files must never be committed.
-- Local users must create their own `.env` from the repository's safe template when environment variables are needed, and must supply **their own** credentials. CI/CD credentials belong in GitHub repository/environment secrets or an external secret manager, not in source or workflow YAML.
-- If a real credential is exposed, treat it as compromised even if the commit is quickly deleted. **Revoke or rotate the credential at its provider first.** Then remove it from the current tree, reachable Git history, logs/artifacts, examples, screenshots, and documentation as applicable.
-- Rewriting Git history or deleting a file does **not** revoke a credential. Provider-side rotation/revocation is required.
-- Placeholder/test credentials must be clearly marked and must not be valid for real services.
-<!-- credential-response:end -->
+Findings are heuristics, not effective-permission or exploitability proofs. Deny/SCP/boundary/session/resource intersections, service-specific condition semantics and complete live inventory remain unknown. A dependency audit, pinned Actions SHA or schema test reduces specific risk; none proves absence of supply-chain compromise or vulnerabilities. Large CLI inputs, local-process access, compromised hosts and maliciously replaced outputs remain concerns. Unkeyed hashes provide byte correspondence, not an independently signed attestation. Consult [the threat model](THREAT_MODEL.md), [operations](RUNBOOK.md), [release gates](PRODUCTION.md) and [studio contract](docs/STUDIO.md).

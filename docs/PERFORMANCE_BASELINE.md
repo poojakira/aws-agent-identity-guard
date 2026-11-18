@@ -2,7 +2,7 @@
 
 ## Evidence policy
 
-The repository makes **two performance-gate claims**:
+The checked-in synthetic benchmark defines two regression thresholds. A fresh actual run is required to claim they passed at a candidate:
 
 | Metric | Enforced threshold | Source |
 |---|---:|---|

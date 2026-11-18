@@ -1,60 +1,13 @@
 > **READ [LICENSE](LICENSE) BEFORE COPYING OR CHANGING ANYTHING.** This is an owner-maintained, proprietary repository. **Unsolicited code/documentation contributions are not accepted.** The development instructions below apply **only to people who have received prior written authorization** from Pooja Kiran. Public viewing/forking under GitHub's Terms, applicable law, third-party rights, and prior valid licenses remain unaffected. Any accepted external work requires an agreed written copyright license or assignment; a PR alone does not transfer ownership. For permission contact poojakiranbhardwaj@gmail.com.
 
-# Contributing
+# Authorized development
 
-These technical instructions apply only to approved contributors.
+These instructions apply only to contributors covered by the written authorization above. Read [LICENSE](LICENSE) and [SECURITY.md](SECURITY.md); a PR alone does not transfer rights.
 
-## Development Setup
+Use [README development setup](README.md#develop-and-verify) and the clean-source studio verifier. The canonical rules live in `scanner.py`, optional collection/completeness in `live_scanner.py`, CLI/export in `cli.py`, rule-based suggestions in `remediate.py`, and browser parsing/evidence in `studio/`. Trust-policy checks belong to `scan_trust_policy`, not an invented separate rules API.
 
-```bash
-git clone https://github.com/poojakira/aws-agent-identity-guard
-cd aws-agent-identity-guard
-pip install -e ".[dev]"
-```
+Before proposing a rule change, document its supported pattern and counter-context, choose an unused ID, preserve existing severities/thresholds unless a reviewed semantic correction requires otherwise, and add positive/negative tests. Keep 24 static IDs distinct from the live-context AIG-PB001 rule. Findings must not claim effective grants or exploitability from incomplete context.
 
-## Running Tests
+Run complete regression, browser/schema/export, lint/format/type/security, package and existing performance gates at the actual candidate. `tests/test_live_scanner.py` uses mocked AWS; its passing tests do not establish live-account validation. The separate delegated-credentials demo is also mocked and needs its explicit test command. Record missing prerequisites/skips, exact source and out-of-tree evidence; never copy an older green count into a new-head headline.
 
-```bash
-# All tests (static rules only — no AWS credentials required)
-pytest tests/test_scanner.py -v
-
-# Live scanner tests (requires moto; no real AWS calls)
-pytest tests/test_live_scanner.py -v
-
-# All tests
-pytest -v
-```
-
-## Linting and Formatting
-
-```bash
-ruff check src tests
-ruff format src tests
-```
-
-## Static Security Scan
-
-```bash
-bandit -r src/ -ll
-pip-audit --skip-editable
-```
-
-## Adding a New Rule
-
-1. Add a constant or helper in `scanner.py` if needed.
-2. Add the rule logic in `scan_policy_document()` or `scan_trust_policy()`.
-3. Use the next available rule ID (`AIGNNN` for identity policies, `AIG-TP001` format for trust policies).
-4. Add a test in `tests/test_scanner.py` with at least one triggering fixture and one non-triggering fixture.
-5. Document the rule in `SECURITY_AUDIT.md` under "New Rules Added."
-
-## Pull Request Guidelines
-
-- One PR per feature or bug fix.
-- Tests must pass on Python 3.10, 3.11, and 3.12.
-- No new runtime dependencies without justification.
-- README updates must match the implementation.
-- Do not weaken existing assertions or add `# noqa` without explanation.
-
-## Security Issues
-
-See [SECURITY.md](SECURITY.md) for vulnerability reporting. Do not open public issues for security bugs.
+Update current task/API/threat/operations/evidence docs in the same series, preserve legal/history records with context, and use synthetic inputs. Default merge, package/container release, AWS resources, external validation or notifications are separate reviewed actions. Preserve active/unique branches and follow [the evidence/release policy](docs/EVIDENCE.md).

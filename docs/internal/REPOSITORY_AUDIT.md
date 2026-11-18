@@ -1,3 +1,5 @@
+> **Historical/source-bounded record.** Statements below retain their cited source/date or author-recorded context. They do not attest to a later documentation head, deployment or field outcome. External historical assertions remain unverified in this pass. See [current evidence status](../EVIDENCE.md).
+
 # Read-only forensic baseline: poojakira/aws-agent-identity-guard
 
 UTC: 2026-11-17T02:26:33.787101+00:00. Audit role: independent forensic reviewer. Decision: PARTIAL baseline; product release NOT VERIFIED.

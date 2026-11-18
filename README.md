@@ -1,12 +1,12 @@
 # AWS Agent Identity Guard
 
-IAM Permission Engineering Studio is a local policy-review tool for cloud developers and security reviewers. Paste or upload an IAM identity policy and optional role trust policy, run the actual repository scanner, inspect exact statement evidence, then edit and compare results.
+IAM Permission Engineering Studio helps cloud developers and security reviewers inspect a proposed IAM change without AWS access. Paste or upload an identity policy and optional role trust policy, invoke the real static scanners, inspect exact statement evidence, then edit and compare findings.
 
-**Complete-contract release status: PARTIAL.** This candidate implements a real local workflow; it is not production approval. Current test results belong in generated evidence tied to the checked-out commit. Historical metrics elsewhere do not attest to this candidate.
+**Release decision: PARTIAL.** The local browser workflow functions within its supported structural/static scope. Effective permissions, proven exploitability, authenticated multi-user hosting and deployment-specific approval remain unverified or unimplemented. Findings are review signals, not authorization decisions.
 
 ## Start locally
 
-Requires Python 3.10+ and a browser. The studio has no runtime dependency, AWS credential requirement or paid service.
+Prerequisites: Python 3.10 or newer, pip and a browser. The static engine/studio has no third-party runtime dependency, AWS credential requirement or paid-service requirement. Initial installation may download packaging tools.
 
 ```sh
 python -m venv .venv
@@ -15,31 +15,45 @@ python -m pip install -e .
 python -m aws_agent_identity_guard.studio
 ```
 
-Open **http://127.0.0.1:8762**. The server accepts only the exact IPv4 loopback origin. Stop with Ctrl+C. Do not expose it with a tunnel or reverse proxy.
+On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1`. Open **http://127.0.0.1:8762**. To avoid an occupied port, use `python -m aws_agent_identity_guard.studio --port 8765` and open the printed address. The service binds only to IPv4 loopback and accepts its exact origin. Stop with Ctrl+C; do not expose it through a tunnel or reverse proxy.
 
-1. Load the labeled synthetic example, or paste/upload your own bounded identity JSON.
-2. Add optional trust JSON. Click **Review IAM change** and select a finding to inspect its exact source statement, line, rationale, remediation and context.
-3. Edit the policy and review again. Added/removed pattern findings link to After/Before source evidence.
-4. Inspect the supplied-only relationship graph. Export SARIF 2.1.0, a text review, or complete evidence JSON. Exports contain supplied policy context; review before sharing.
+## Complete a real policy review
 
-![Actually running IAM studio with candidate evidence](https://raw.githubusercontent.com/poojakira/aws-agent-identity-guard/refs/tags/evidence/local-workbench-20261116/release-evidence/browser/desktop.png)
+1. Select **Load synthetic example**, or paste/upload a permitted identity policy. Keep credentials and secrets out of inputs.
+2. Optionally expand **Optional role trust policy** and supply trust JSON. Select **Review IAM change**.
+3. Select a finding to inspect its exact statement, source lines, rationale, remediation and supplied counter-context. The graph displays supplied statements and patterns only.
+4. Edit the policy and review again. Added/removed pattern findings link to After/Before evidence; the delta is not measured risk reduction.
+5. Export **SARIF 2.1.0**, a text review or evidence JSON. Exports contain supplied policy context, so review them before sharing. Clearing the previous review or closing the tab removes the in-memory comparison reference.
 
-The image belongs to separately generated exact-source evidence, avoiding a source commit claiming to contain its own post-execution hash.
+![Actual studio showing source-linked policy findings](https://raw.githubusercontent.com/poojakira/aws-agent-identity-guard/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/browser/desktop.png)
 
-## What is supported
+This screenshot belongs to tested implementation source `970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc`; its immutable evidence archive is not a software release.
 
-- **24 static rules:** AIG001–AIG021 and AIG-TP001–003, checked against the actual engine inventory. The product has an additional live-context rule, AIG-PB001, which checks missing boundary presence and does not run from static policy alone.
-- Real canonical identity/trust scanners, exact structural source spans, source/configuration/input hashes and honest CLEAN/DIRTY/UNKNOWN provenance.
-- Bounded JSON input, explicit unsupported-structure errors, edit/rescan comparison, supplied-only graph, safe rendering and schema-tested SARIF exports.
-- Existing CLI and optional live-account/remediation adapters retain their separate interfaces and prerequisites. The studio neither invokes them nor claims their external validation.
+## Supported scope and uncertainty
 
-Findings are patterns, **not effective permissions or proven exploitability**. Explicit Deny and conditions are displayed; their intersections, SCPs, permissions boundaries, session/resource policies and service-specific applicability are not evaluated. Effective permissions remain UNKNOWN. A zero finding count does not prove safety. AIG-PB001 presence checks do not prove boundary effectiveness. No live AWS validation or real-world accuracy rate is claimed.
+- **24 static rules:** AIG001–AIG021 and AIG-TP001–003. A separate live-context AIG-PB001 checks missing boundary presence on flagged roles; it does not run from supplied policy alone. The product-wide inventory is 25 IDs, not 25 static rules.
+- Canonical identity/trust scanners, bounded structural parsing, exact source spans, input/configuration/rule hashes and CLEAN/DIRTY/UNKNOWN provenance.
+- Upload/editor review, explicit errors, supplied-only graph, before/after comparison, safely rendered findings and schema-checked SARIF/text/JSON exports.
+- Separate CLI, optional read-only AWS collection, rule-based remediation templates and validation adapters retain their own prerequisites. The studio does not invoke AWS.
 
-Inputs stay in local process/browser memory; the backend does not persist them or use third-party APIs. Each document is limited to 32768 UTF-8 bytes, depth16 and32statements; action/resource/principal lists to64values. This is a single-user local tool, not authenticated multi-tenant hosting.
+Deny statements and conditions are visible context; the scanner does not evaluate their intersections with Allow, SCPs, boundaries, sessions, resource policies or service-specific applicability. Effective permissions remain **UNKNOWN**. Some canonical messages describe potential capabilities broadly; validate the actual listed actions and all applicable context before concluding a grant or exploit. No finding does not prove least privilege or safety. Boundary presence does not prove effectiveness.
 
-## Development and verification
+Each studio document is limited to 32,768 UTF-8 bytes, depth 16 and 32 statements; action/resource/principal lists have at most 64 values. The backend retains no policy database. Inputs exist in browser/backend memory; explicit exports persist on the operator's disk. The trusted host/operator remain part of the boundary.
 
-The pinned test snapshot targets Linux x86_64/Python3.12. Runtime remains Python3.10+; platform/version tests must identify their actual environment.
+## Verification and evidence
+
+The prior published implementation-source run at **`970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc`** recorded **267 passed, 3 skipped, 77.14791851195749% statement coverage**. The three skips are absent legacy `TestRulesModule` API tests, not live-AWS checks. Focused independent review passed 38 observations and 23 Python 3.10 tests at that source. Seven associated hosted workflows passed; the actual-head studio run and identical-tree legacy merge checks are distinguished in the report. These results do not attest to later documentation commits.
+
+- [Published assessment and exact-source proof](https://github.com/poojakira/aws-agent-identity-guard/blob/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/RELEASE_ASSESSMENT.md)
+- [Published manifest and artifact hashes](https://github.com/poojakira/aws-agent-identity-guard/blob/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/manifest.json)
+- [Current procedure, branch disposition and later-head evidence status](docs/EVIDENCE.md)
+- [Review proposal: PR #75](https://github.com/poojakira/aws-agent-identity-guard/pull/75)
+
+A later head requires its own generated verification manifest. The planned non-release archive is `evidence/docs-reconciliation-20261118`; the name alone proves neither publication nor a passing run.
+
+## Develop and verify
+
+The direct/transitive verification snapshot targets Linux x86_64/Python 3.12; wheel hashes are not locked. Runtime supports Python 3.10+. Fetch the official schema only for verification, not normal operation:
 
 ```sh
 python -m pip install -r requirements-studio-test.txt
@@ -49,17 +63,17 @@ echo 'c3b4bb2d6093897483348925aaa73af03b3e3f4bd4ca38cef26dcb4212a2682e  /tmp/iam
 python scripts/studio_verify.py --output /tmp/iam-studio-evidence --schema /tmp/iam-sarif-schema.json --chromium /usr/bin/chromium
 ```
 
-The browser gate needs Chromium at the chosen path; CI installs the tested Playwright browser. The verifier requires a clean source and generates commands/times, JUnit, coverage, scan exports, screenshots, builds, audit results and hashes outside the checkout. It preserves the existing minimum test-collection and performance gates. Three legacy rule-contract tests skip because their optional rules module is absent; no live AWS validation is claimed. The official schema is downloaded only for verification, never by the running studio. No schema source is vendored or relicensed.
+The verifier needs a clean checkout and an existing Chromium at the chosen path. It runs complete regression, lint/format/type/security, actual browser/export/schema checks, build, dependency audit and the existing synthetic performance gate, then records actual commands, UTC times, outcomes and hashes outside the checkout. Existing gates remain unchanged. For focused development use `SARIF_SCHEMA_PATH=/tmp/iam-sarif-schema.json python -m pytest tests/test_studio.py`; without the schema prerequisite that schema check is skipped explicitly.
 
-For focused development: `SARIF_SCHEMA_PATH=/tmp/iam-sarif-schema.json python -m pytest tests/test_studio.py`. Without that prerequisite, the schema test is explicitly skipped. The existing static CLI remains `aws-agent-identity-guard POLICY.json --format sarif`.
+## Documentation index
 
-## Documentation
+| Task | Guide |
+|---|---|
+| Browser product, architecture, API, user/developer workflow and limits | [Studio](docs/STUDIO.md) |
+| CLI, optional live collection, remediation, failures and rollback | [Runbook](RUNBOOK.md) |
+| Threat boundaries and vulnerability reporting | [Threat model](THREAT_MODEL.md), [security](SECURITY.md) |
+| Evidence, historical metrics, branch/release state | [Evidence](docs/EVIDENCE.md), [source-scoped metrics](VERIFIED_METRICS.md), [release gates](PRODUCTION.md) |
+| Optional AWS trust/configuration and n8n template | [AWS architecture](docs/aws-architecture.md), [controls](docs/aws-security-controls.md), [n8n](integrations/N8N_WORKFLOW.md) |
+| Contribution terms and documentation audit | [Contributing](CONTRIBUTING.md), [audit ledger](docs/DOCUMENTATION_AUDIT.md) |
 
-- [Product, architecture, threat model, API, user/developer guides and operations](docs/STUDIO.md)
-- [Evidence, release boundary and remaining gates](docs/EVIDENCE.md)
-- [Read-only baseline audit](docs/internal/REPOSITORY_AUDIT.md)
-- [Static versus live rule-inventory correction](docs/internal/RULE_INVENTORY_CORRECTION.md)
-- [Security reporting](SECURITY.md)
-- [Changelog](CHANGELOG.md)
-
-Legacy CLI/live documents and dated evidence retain their context. Full historical fact/example/diagram reconciliation and safe branch consolidation remain incomplete; all unique/ambiguous branches are held. No release tag, public service, default-branch rewrite or branch deletion is performed by this candidate.
+Historical records retain their original sources/dates; documentary review does not establish field accuracy, live account coverage or operational approval. Main remains unchanged; active/unique branches are preserved. See the exact completed cleanup and recovery references in the evidence guide.
