@@ -1,0 +1,10 @@
+#!/workspace/work/tooling/venv/bin/python
+import sys
+from pathlib import Path
+from urllib.parse import urlsplit,unquote
+from playwright.sync_api import sync_playwright
+root=Path('/workspace/work/candidates/aws-agent-identity-guard');args=sys.argv[1:];source=Path(unquote(urlsplit(args[-1]).path));assert source==root/'poster/_poster_render.html';pdf=next(x.split('=',1)[1] for x in args if x.startswith('--print-to-pdf='));assert pdf==str(root/'poster/poster_36x48.pdf');html=source.read_text();Path('/workspace/work/doc-reconciliation/aws-agent-identity-guard/rendered-poster.html').write_text(html)
+with sync_playwright() as p:
+ browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
+ page=browser.new_page(viewport={'width':1800,'height':2400},device_scale_factor=1);page.set_content(html,wait_until='load',timeout=15000);page.evaluate('document.fonts.ready');page.pdf(path=pdf,prefer_css_page_size=True,print_background=True);browser.close()
+print('Rendered trusted own generated HTML using normal Chromium PDF API')

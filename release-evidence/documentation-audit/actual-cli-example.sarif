@@ -1,0 +1,258 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "aws-agent-identity-guard",
+          "version": "0.3.0",
+          "informationUri": "https://github.com/poojakira/aws-agent-identity-guard",
+          "rules": [
+            {
+              "id": "AIG002",
+              "name": "AIG002",
+              "shortDescription": {
+                "text": "Agent policy grants wildcard service or full-account actions. An autonomous agent with '*' can do anything including deleting the account's entire infrastructure."
+              },
+              "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+              "properties": {
+                "severity": "critical"
+              }
+            },
+            {
+              "id": "AIG003",
+              "name": "AIG003",
+              "shortDescription": {
+                "text": "Statement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope."
+              },
+              "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+              "properties": {
+                "severity": "high"
+              }
+            },
+            {
+              "id": "AIG004",
+              "name": "AIG004",
+              "shortDescription": {
+                "text": "iam:PassRole without iam:PassedToService condition. An agent with unconstrained PassRole can escalate privileges by passing a high-privilege role to any service it can invoke."
+              },
+              "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+              "properties": {
+                "severity": "critical"
+              }
+            },
+            {
+              "id": "AIG006",
+              "name": "AIG006",
+              "shortDescription": {
+                "text": "Tool execution action 'lambda:InvokeFunction' targets Resource: '*'. The agent can invoke ANY function, endpoint, or task in the account - not just its intended tools."
+              },
+              "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+              "properties": {
+                "severity": "high"
+              }
+            },
+            {
+              "id": "AIG005",
+              "name": "AIG005",
+              "shortDescription": {
+                "text": "Agent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path."
+              },
+              "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+              "properties": {
+                "severity": "critical"
+              }
+            },
+            {
+              "id": "AIG013",
+              "name": "AIG013",
+              "shortDescription": {
+                "text": "Statement has Resource: '*' and zero Condition keys. Agent policies should use conditions for tenant isolation (aws:PrincipalTag), request scoping (aws:RequestedRegion), or session binding (aws:TokenIssueTime)."
+              },
+              "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+              "properties": {
+                "severity": "medium"
+              }
+            },
+            {
+              "id": "AIG016",
+              "name": "AIG016",
+              "shortDescription": {
+                "text": "Lambda invoke without function-name resource scoping. The agent can invoke ANY Lambda in the account - including admin utilities, data pipelines, or credential-rotation functions."
+              },
+              "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+              "properties": {
+                "severity": "high"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "AIG002",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {
+            "text": "Agent policy grants wildcard service or full-account actions. An autonomous agent with '*' can do anything including deleting the account's entire infrastructure."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/agent_policy_wildcard.json",
+                  "uriBaseId": "%SRCROOT%"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "statementIndex": 0,
+            "remediation": "Scope actions to the exact APIs the agent tool calls. Use service-level wildcards only in dev environments with a permission boundary as a safety net."
+          }
+        },
+        {
+          "ruleId": "AIG003",
+          "ruleIndex": 1,
+          "level": "error",
+          "message": {
+            "text": "Statement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/agent_policy_wildcard.json",
+                  "uriBaseId": "%SRCROOT%"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "statementIndex": 0,
+            "remediation": "Check each listed action's resource-level support. Where supported, use specific ARNs or applicable resource-tag conditions; otherwise review service-specific conditions and required context."
+          }
+        },
+        {
+          "ruleId": "AIG004",
+          "ruleIndex": 2,
+          "level": "error",
+          "message": {
+            "text": "iam:PassRole without iam:PassedToService condition. An agent with unconstrained PassRole can escalate privileges by passing a high-privilege role to any service it can invoke."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/agent_policy_wildcard.json",
+                  "uriBaseId": "%SRCROOT%"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "statementIndex": 0,
+            "remediation": "Add a Condition: {StringEquals: {iam:PassedToService: 'bedrock.amazonaws.com'}} (or whichever service runs the agent). Also restrict the Resource to specific role ARNs."
+          }
+        },
+        {
+          "ruleId": "AIG006",
+          "ruleIndex": 3,
+          "level": "error",
+          "message": {
+            "text": "Tool execution action 'lambda:InvokeFunction' targets Resource: '*'. The agent can invoke ANY function, endpoint, or task in the account - not just its intended tools."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/agent_policy_wildcard.json",
+                  "uriBaseId": "%SRCROOT%"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "statementIndex": 0,
+            "remediation": "Restrict to specific ARNs: the Lambda functions, ECS tasks, or Bedrock agents this tool is allowed to call. Use resource tags for dynamic scoping."
+          }
+        },
+        {
+          "ruleId": "AIG005",
+          "ruleIndex": 4,
+          "level": "error",
+          "message": {
+            "text": "Agent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/agent_policy_wildcard.json",
+                  "uriBaseId": "%SRCROOT%"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "statementIndex": 0,
+            "remediation": "Separate agent runtime roles from IAM administration. Agent runtime identities should NEVER have iam:* or policy-modification permissions."
+          }
+        },
+        {
+          "ruleId": "AIG013",
+          "ruleIndex": 5,
+          "level": "warning",
+          "message": {
+            "text": "Statement has Resource: '*' and zero Condition keys. Agent policies should use conditions for tenant isolation (aws:PrincipalTag), request scoping (aws:RequestedRegion), or session binding (aws:TokenIssueTime)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/agent_policy_wildcard.json",
+                  "uriBaseId": "%SRCROOT%"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "statementIndex": 0,
+            "remediation": "Add at minimum: aws:RequestedRegion to limit geographic blast radius, and aws:PrincipalTag/tenant for multi-tenant isolation."
+          }
+        },
+        {
+          "ruleId": "AIG016",
+          "ruleIndex": 6,
+          "level": "error",
+          "message": {
+            "text": "Lambda invoke without function-name resource scoping. The agent can invoke ANY Lambda in the account - including admin utilities, data pipelines, or credential-rotation functions."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/agent_policy_wildcard.json",
+                  "uriBaseId": "%SRCROOT%"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "statementIndex": 0,
+            "remediation": "Scope to the specific tool functions: arn:aws:lambda:REGION:ACCOUNT:function:agent-tool-* using a naming convention and wildcard suffix."
+          }
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "examples/agent_policy_wildcard.json",
+            "uriBaseId": "%SRCROOT%"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,510 @@
+{
+  "repository": "poojakira/aws-agent-identity-guard",
+  "source_commit": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+  "branch": "codex/local-workbench-20261116",
+  "clean_before": true,
+  "utc_start": "2026-11-18T19:47:24.251310+00:00",
+  "python": "3.12.14",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "run_id": "local-2026-11-18T19:47:24.252523+00:00",
+  "version": "0.3.0",
+  "static_rule_count": 24,
+  "additional_live_context_rule_count": 1,
+  "test_environment_pins_sha256": "ee8573c181805eba70239832647c3300f5dfc435c169317bd0c5706462e00f0e",
+  "official_schema_sha256": "c3b4bb2d6093897483348925aaa73af03b3e3f4bd4ca38cef26dcb4212a2682e",
+  "decision": "PARTIAL",
+  "runs": [
+    {
+      "name": "dependencies",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "pip",
+        "freeze",
+        "--all"
+      ],
+      "utc_start": "2026-11-18T19:47:24.253471+00:00",
+      "utc_end": "2026-11-18T19:47:24.531240+00:00",
+      "exit_code": 0,
+      "log": "dependencies.log"
+    },
+    {
+      "name": "lint",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "."
+      ],
+      "utc_start": "2026-11-18T19:47:24.531275+00:00",
+      "utc_end": "2026-11-18T19:47:24.632446+00:00",
+      "exit_code": 0,
+      "log": "lint.log"
+    },
+    {
+      "name": "format",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "utc_start": "2026-11-18T19:47:24.632484+00:00",
+      "utc_end": "2026-11-18T19:47:24.668966+00:00",
+      "exit_code": 0,
+      "log": "format.log"
+    },
+    {
+      "name": "regression",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "pytest",
+        "-p",
+        "pytest_cov",
+        "tests/",
+        "-q",
+        "--cov=aws_agent_identity_guard",
+        "--cov-report=json:/workspace/work/evidence/aws-agent-identity-guard/docs-reconciliation/coverage.json",
+        "--cov-report=term-missing",
+        "--junitxml=/workspace/work/evidence/aws-agent-identity-guard/docs-reconciliation/junit.xml"
+      ],
+      "utc_start": "2026-11-18T19:47:24.668990+00:00",
+      "utc_end": "2026-11-18T19:47:37.374743+00:00",
+      "exit_code": 0,
+      "log": "regression.log"
+    },
+    {
+      "name": "typecheck_studio",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "pyright",
+        "--pythonpath",
+        "/workspace/work/envs/iam/bin/python",
+        "src/aws_agent_identity_guard/studio"
+      ],
+      "utc_start": "2026-11-18T19:47:37.374773+00:00",
+      "utc_end": "2026-11-18T19:47:43.761828+00:00",
+      "exit_code": 0,
+      "log": "typecheck_studio.log"
+    },
+    {
+      "name": "bandit",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "bandit",
+        "-r",
+        "src",
+        "-ll",
+        "-f",
+        "json",
+        "-o",
+        "/workspace/work/evidence/aws-agent-identity-guard/docs-reconciliation/bandit.json"
+      ],
+      "utc_start": "2026-11-18T19:47:43.761858+00:00",
+      "utc_end": "2026-11-18T19:47:44.031037+00:00",
+      "exit_code": 0,
+      "log": "bandit.log"
+    },
+    {
+      "name": "browser",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "scripts/studio_e2e.py",
+        "--output",
+        "/workspace/work/evidence/aws-agent-identity-guard/docs-reconciliation/browser",
+        "--schema",
+        "/workspace/work/references/sarif-schema-2.1.0.json",
+        "--chromium",
+        "/usr/bin/chromium"
+      ],
+      "utc_start": "2026-11-18T19:47:44.031068+00:00",
+      "utc_end": "2026-11-18T19:47:47.259611+00:00",
+      "exit_code": 0,
+      "log": "browser.log"
+    },
+    {
+      "name": "build",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "build",
+        "--outdir",
+        "/workspace/work/evidence/aws-agent-identity-guard/docs-reconciliation/artifacts"
+      ],
+      "utc_start": "2026-11-18T19:47:47.259859+00:00",
+      "utc_end": "2026-11-18T19:47:50.708053+00:00",
+      "exit_code": 0,
+      "log": "build.log"
+    },
+    {
+      "name": "dependency_audit",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "pip_audit",
+        "--skip-editable",
+        "--cache-dir",
+        "/workspace/work/evidence/aws-agent-identity-guard/iam-studio-tool-cache-4411c0792b02/pip-audit",
+        "--format",
+        "json",
+        "--output",
+        "/workspace/work/evidence/aws-agent-identity-guard/docs-reconciliation/pip-audit.json"
+      ],
+      "utc_start": "2026-11-18T19:47:50.708372+00:00",
+      "utc_end": "2026-11-18T19:47:53.144418+00:00",
+      "exit_code": 0,
+      "log": "dependency_audit.log"
+    },
+    {
+      "name": "performance_existing_gate",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "benchmarks/perf_gate.py",
+        "--policies",
+        "500",
+        "--output",
+        "/workspace/work/evidence/aws-agent-identity-guard/docs-reconciliation/performance.json"
+      ],
+      "utc_start": "2026-11-18T19:47:53.144464+00:00",
+      "utc_end": "2026-11-18T19:47:53.478405+00:00",
+      "exit_code": 0,
+      "log": "performance_existing_gate.log"
+    }
+  ],
+  "limitations": [
+    "Static patterns do not establish effective IAM permissions or exploitability",
+    "No live AWS validation; actual skip names and reasons are recorded separately",
+    "No public or multi-user deployment approval",
+    "Full historical document and branch reconciliation remains incomplete",
+    "Installed wheels cannot attest to source Git metadata and report UNKNOWN"
+  ],
+  "tests": {
+    "tests": 270,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 3,
+    "passed": 267
+  },
+  "skipped_tests": [
+    {
+      "name": "test_get_rules_returns_list",
+      "class": "tests.test_coverage_boost.TestRulesModule",
+      "reason": "rules module not importable"
+    },
+    {
+      "name": "test_each_rule_has_required_fields",
+      "class": "tests.test_coverage_boost.TestRulesModule",
+      "reason": "rules module not importable"
+    },
+    {
+      "name": "test_evaluate_rule_with_safe_policy",
+      "class": "tests.test_coverage_boost.TestRulesModule",
+      "reason": "rules module not importable"
+    }
+  ],
+  "coverage": {
+    "covered_lines": 871,
+    "num_statements": 1129,
+    "percent_covered": 77.14791851195749,
+    "percent_covered_display": "77",
+    "missing_lines": 258,
+    "excluded_lines": 6,
+    "percent_statements_covered": 77.14791851195749,
+    "percent_statements_covered_display": "77"
+  },
+  "clean_after": true,
+  "utc_end": "2026-11-18T19:47:53.484197+00:00",
+  "checks_passed": true,
+  "artifacts": {
+    "RELEASE_ASSESSMENT.md": {
+      "bytes": 10056,
+      "sha256": "5cd1dd191f4c48658b46b611cc0d680e49fe009dfc8daf7a61a1d2c2893b402c"
+    },
+    "actionlint.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/aws_agent_identity_guard-0.3.0-py3-none-any.whl": {
+      "bytes": 52157,
+      "sha256": "a25a3feeaddb56551f6708981b88ec15291bfa28c518571c49ffa1177dc8988f"
+    },
+    "artifacts/aws_agent_identity_guard-0.3.0.tar.gz": {
+      "bytes": 86254,
+      "sha256": "008e1d600de79d9c2f196423a1cbad32cf586fa05c0896a098a0e7b9db9535b1"
+    },
+    "bandit.json": {
+      "bytes": 3557,
+      "sha256": "2fdfcb76266e349a7feae6dec340dc6acfae0280f3d63ce094156ef026f974d0"
+    },
+    "bandit.log": {
+      "bytes": 275,
+      "sha256": "e55faf1cbc7c22fd8244d3609e6633f3d17bf9d01191a16b209f50d168afe060"
+    },
+    "browser/browser-result.json": {
+      "bytes": 1458,
+      "sha256": "7cc31a03c27b18aeb90f81afddcb2cc9354cb1721e62693a08cfcbbd1f8dc8f9"
+    },
+    "browser/changed-review.json": {
+      "bytes": 27186,
+      "sha256": "8dbd35af8b02ebbb5a9d0ef5321a8fc773245b2b9927238492e17978b51fa163"
+    },
+    "browser/desktop.png": {
+      "bytes": 424063,
+      "sha256": "54535aee8eddd1bbec0324d0b05bec62ccc79c8f87f9b85775dfbbc2d767596c"
+    },
+    "browser/first-review.json": {
+      "bytes": 43506,
+      "sha256": "dcbb815911c57c59694c585e596f4c3502f7973b0b43615a873e44462d64844b"
+    },
+    "browser/identity-and-trust.sarif": {
+      "bytes": 6564,
+      "sha256": "e91d3eb02acbe54ccb88f0536ee25c44bb26cdc9b1b04d3e59ec2ff01b34b786"
+    },
+    "browser/mobile.png": {
+      "bytes": 396066,
+      "sha256": "3e1b85ffd47dd15664b933f7c297bd5a37dbe3d413fed8d1724204171f0e9996"
+    },
+    "browser/review.sarif": {
+      "bytes": 3283,
+      "sha256": "e4abe2ce8979c90e28183960d5044f7a556d7582b3bc801edca428ff60c30143"
+    },
+    "browser/review.txt": {
+      "bytes": 1692,
+      "sha256": "70c80c95064a4c7f494c7f8e36a23ded452838dcfb9ab7a2a3d57aae4a27189d"
+    },
+    "browser.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "build.log": {
+      "bytes": 14233,
+      "sha256": "f04710abce2f632e9516c60aa5242c161c05e02fa1b178653705e5182d4a1bcc"
+    },
+    "candidate-type-validation.json": {
+      "bytes": 41239,
+      "sha256": "d972ba364b92a9a2fc327d91fc8684e285f0626fbe962bb463453680e5c40621"
+    },
+    "candidate-type-validation.log": {
+      "bytes": 127,
+      "sha256": "e9ce5e339a7aaef375ec6697413c075428d4aa32453ceda87286c576f6a05d6d"
+    },
+    "coverage-data": {
+      "bytes": 53248,
+      "sha256": "2324b7fea8534645314c504059043f8206b8910957506f9b54c795fea791c583"
+    },
+    "coverage.json": {
+      "bytes": 51639,
+      "sha256": "3cfeb726867f234930ef17fa95eb12310b5e87b4a89164ae48072e7a770b614b"
+    },
+    "dependencies.log": {
+      "bytes": 1195,
+      "sha256": "bee5c1c57336779557833fb105e34218a2fa07882e562b2f2f1a6b1adebf70fc"
+    },
+    "dependency_audit.log": {
+      "bytes": 31,
+      "sha256": "15950a68a7ed99c59779717acefdceb3f69cfd31bde67d2c954f2a3cea4d7955"
+    },
+    "documentation-audit/FINAL_HANDOFF.json": {
+      "bytes": 9599,
+      "sha256": "b4672841b54f33b21af31a61e4e2cfdc34a2cee03dd433087d8c116bfc564014"
+    },
+    "documentation-audit/actual-api-example.json": {
+      "bytes": 23138,
+      "sha256": "02778c22642d982e756a4b411da14bc4a77ad40229c37adce8833bb3b9d66356"
+    },
+    "documentation-audit/actual-cli-example.sarif": {
+      "bytes": 10313,
+      "sha256": "16a107eb16aa99ab51d9e3e62753950dd83fa2b41b335fcea0cfe75b8df114f1"
+    },
+    "documentation-audit/check_examples.py": {
+      "bytes": 3531,
+      "sha256": "58e0408fdf17bf52b9cc43b2f6418563c3b1486471dd79636c99ebf5c0a7b9be"
+    },
+    "documentation-audit/chromium-playwright-wrapper": {
+      "bytes": 1065,
+      "sha256": "37842f69ae131630d210e5d28aa5ebc10f5aa445eb68ed45724fffbae186fe79"
+    },
+    "documentation-audit/document-ledger.json": {
+      "bytes": 7302,
+      "sha256": "6b7680149468db3eb0d8eab9c2834c91b69249371eca09cdc726880a0deb2ea5"
+    },
+    "documentation-audit/example-checks.json": {
+      "bytes": 4123,
+      "sha256": "141c6fd073007a53a696700b1977df02d95b97fa88343777d5a1c49ccf381b50"
+    },
+    "documentation-audit/external-http-final.json": {
+      "bytes": 4773,
+      "sha256": "216b82f0ba107bf02036d41c92847da7f8fd22f02a0cc3c5e95fd9333432c262"
+    },
+    "documentation-audit/final-head-workflow-dispatch.json": {
+      "bytes": 2313,
+      "sha256": "9302c4594a9e31ef4dde7a021074b3823354dcd1d090017af936027bef184731"
+    },
+    "documentation-audit/hosted-poster-head.json": {
+      "bytes": 288,
+      "sha256": "1a6db9c3ce175112265a95c2e1043d8133b308b8d2a9c7f3dca13c4e9d759175"
+    },
+    "documentation-audit/hosted-workflow-approval.json": {
+      "bytes": 1073,
+      "sha256": "897959176274224f096a02423321bebc24a1ab3b9b8181ce47468c695e06b791"
+    },
+    "documentation-audit/mock-example-junit.xml": {
+      "bytes": 1208,
+      "sha256": "abea94c5e380465b279a1a6fe8c9f8e27f2cf1e8c00cb90d91506eadef3772c3"
+    },
+    "documentation-audit/mock-example-tests.log": {
+      "bytes": 80,
+      "sha256": "700bc0322b00f8e8db3ce495047983b54ab27ab59ed1fedac05f3aeba47dae24"
+    },
+    "documentation-audit/parent-links-final.json": {
+      "bytes": 5672,
+      "sha256": "e12a53fee01894ffeaf890f6ff6edac925e93a979f2046051ef23f4125ab64d9"
+    },
+    "documentation-audit/poster-generation.json": {
+      "bytes": 1453,
+      "sha256": "4ef51f448575db7742abfbb4aa39f6f6003f19b5d23522d3375887db79ecf38d"
+    },
+    "documentation-audit/poster-render-1.log": {
+      "bytes": 61,
+      "sha256": "e8d3aee9d7a93e03befc8fcc6814fa1a1da1d967c2060d2854df28e1e0719bd9"
+    },
+    "documentation-audit/poster-render-2.log": {
+      "bytes": 61,
+      "sha256": "e8d3aee9d7a93e03befc8fcc6814fa1a1da1d967c2060d2854df28e1e0719bd9"
+    },
+    "documentation-audit/poster-text.txt": {
+      "bytes": 3646,
+      "sha256": "6f403f2aef3554cb63b46b3903d64b7ae033dc40c393172b081f0ef4ac721d70"
+    },
+    "documentation-audit/sts-sdk-model-check.json": {
+      "bytes": 513,
+      "sha256": "91f7c187fed03d2c9ea2545f2854c69833a2679c63a477aff4d461ec17a3b837"
+    },
+    "environment_sbom.log": {
+      "bytes": 295,
+      "sha256": "048ad3c7763fa426656e0b0b871c2b1232840a0720bfdc227c238aa0be0e54dd"
+    },
+    "format.log": {
+      "bytes": 27,
+      "sha256": "43476fb9601a542841f6cba73a03155ef5792f5324f2380538c7f276a7b8ed2f"
+    },
+    "javascript_syntax.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "junit.xml": {
+      "bytes": 36266,
+      "sha256": "b6ea216529d4e811f794f509a7914bda5e0e9228bfb77bd94ac61bed7f9dcdcb"
+    },
+    "lint.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "performance.json": {
+      "bytes": 531,
+      "sha256": "a507a2d59d1216bdbaed45d3aba4e5b28735861bb09a9b4144fc3c86fa997efb"
+    },
+    "performance_existing_gate.log": {
+      "bytes": 408,
+      "sha256": "159c4b8c57f6389d48951e5124a79dddf5344e45fc3ef606f9555a5937134aab"
+    },
+    "pip-audit.json": {
+      "bytes": 3835,
+      "sha256": "12292ddb833a573e09fe680640073d79369133a36a2d53877bd571a8f4a66342"
+    },
+    "product-matrix.json": {
+      "bytes": 2540,
+      "sha256": "b79ee760c5d346691c61c0b7368b81349d43294edde18e1ff2c9faae0bda0b9a"
+    },
+    "python310-junit.xml": {
+      "bytes": 4279,
+      "sha256": "ec00f6c9702b70e3ea010227fe45fd07b8711b45597cdd62c64a23ffb0927e62"
+    },
+    "python310_studio.log": {
+      "bytes": 80,
+      "sha256": "475bcfb56b286d857c4310602373e306e2cb722ad6df6053d0e1aff939c18220"
+    },
+    "regression.log": {
+      "bytes": 2101,
+      "sha256": "ec131ec3d847060029b0c77c93a154458c72a53168cd0a8f8b4102cd725f1302"
+    },
+    "remote-ci/artifact-verification.json": {
+      "bytes": 1509,
+      "sha256": "d5217813dac251e9cb56357d9b648a1ee7bbd8da0497353873ec4b7f1d6a4112"
+    },
+    "remote-ci/ci-manifest.json": {
+      "bytes": 9153,
+      "sha256": "9f2eaf914f098c1f5bd3d1f50649482d2892a67be310195f2de7a837d28d16a7"
+    },
+    "remote-ci/final-run-status.json": {
+      "bytes": 4730,
+      "sha256": "088ed3aa553320ed1c7dd74aac42169905acbd46784fc27d754254ea7ac987ed"
+    },
+    "remote-ci/studio-artifact.zip": {
+      "bytes": 1021511,
+      "sha256": "f0f176f7ad8b9c21b5d75dcf38abf97acf147c7565971739a244f779798c4d0e"
+    },
+    "repository_security.log": {
+      "bytes": 38,
+      "sha256": "f71dbebc48b5c072923efef7ced205cd98c6b99d14b8669372d83df3312af9a6"
+    },
+    "secrets-scan.json": {
+      "bytes": 25940,
+      "sha256": "dfd325b090e2855aeb7cc0e09d45e9b200eff2c830361b1da2785cb33658f45a"
+    },
+    "secrets-triage.json": {
+      "bytes": 17938,
+      "sha256": "a87c6339432872f349572c52f45dc758f2651a6e8c75007950abe53da0cae98d"
+    },
+    "security-checks.json": {
+      "bytes": 1415,
+      "sha256": "37faddf38da474e661c065a2a859e54bb74fce9cacda7b4f7fa9fd76a6296ca5"
+    },
+    "supplemental-runs.json": {
+      "bytes": 3651,
+      "sha256": "28a8c672f53d3e7b3467293c3c206dc409718cbca3ff770bb63e64b02d036d13"
+    },
+    "test-environment-sbom.json": {
+      "bytes": 11306,
+      "sha256": "1d55fb6a87d7cb170cadb763bc16ac52943b3d2a4519357d90df639ee0f76f21"
+    },
+    "tracked_type_validation.log": {
+      "bytes": 127,
+      "sha256": "e9ce5e339a7aaef375ec6697413c075428d4aa32453ceda87286c576f6a05d6d"
+    },
+    "typecheck_studio.log": {
+      "bytes": 37,
+      "sha256": "6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332"
+    },
+    "wheel-smoke.json": {
+      "bytes": 1454,
+      "sha256": "b73a58b4c1a4f87b899e402c5511a98838904d7d49e2311d9c089880c13edbaa"
+    },
+    "wheel_install.log": {
+      "bytes": 1057,
+      "sha256": "eea2d5a0a826fa04787cc0bf0e985ce04af27370ee683f88a41e9c8aa5b477c6"
+    }
+  },
+  "documentation_phase": {
+    "initial_implementation_source": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+    "initial_docs_source": "8a919d8ec41a6590f808b53d364d5b07b2c21ba7",
+    "final_source": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+    "original_text_documents_read": 32,
+    "files_reconciled": 33,
+    "current_markdown_documents": 31,
+    "local_targets": 81,
+    "documentation_checks": 18,
+    "separate_moto_example_tests": 6,
+    "offline_workflow_definitions": 6,
+    "observed_successful_executions": 13,
+    "archive_tag": "evidence/docs-reconciliation-20261118",
+    "independent_runtime_review": "Historical970donly; documentationauthor/parentreviewseparate; currentprimaryfulltestsarefresh"
+  },
+  "finalized_utc": "2026-11-18T20:21:14.482682+00:00"
+}

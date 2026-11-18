@@ -1,0 +1,9 @@
+{
+  "initial_docs_source": "8a919d8ec41a6590f808b53d364d5b07b2c21ba7",
+  "final_source": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+  "changed_files": [
+    "poster/poster.png",
+    "poster/poster_36x48.pdf"
+  ],
+  "scope": "GeneratedPNG/PDFonly, no runtime/docsprose/workflowchanges"
+}

@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-18T19:40:17.011028+00:00",
+  "botocore": "1.44.4",
+  "method": "Installed local SDK service-model inspection; no client/credential/network operation",
+  "AssumeRole_has_ExternalId": true,
+  "AssumeRoleWithWebIdentity_has_ExternalId": false,
+  "recovered_harness_attempt": {
+    "command": "host python local SDK model inspection",
+    "result": "ModuleNotFoundError: botocore",
+    "resolution": "Used existing IAM verification environment containing botocore; no install/source change"
+  }
+}

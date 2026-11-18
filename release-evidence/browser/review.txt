@@ -1,0 +1,28 @@
+IAM Permission Engineering Studio — static review
+Run: 24afa338-bcc7-43cb-9159-145f22889f97
+Source: 4411c0792b0279c3bbd60e4af84210b3a551540a (CLEAN)
+Engine version: 0.3.0
+Effective permissions: UNKNOWN
+
+Patterns are review signals, not effective permissions or proven exploitability.
+Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.
+SCPs, boundaries, session/resource policies and condition semantics are unknown.
+No AWS call is made. AIG-PB001 requires live role context and is not run here.
+No findings means no configured pattern matched; it does not prove least privilege or safety.
+
+Findings:
+MEDIUM AIG007 identity-policy.json:4 /Statement/0
+Sensitive-data or metadata action 's3:ListBucket' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents.
+Remediation: Add principal tags (aws:PrincipalTag/tenant, aws:PrincipalTag/agent-id) or resource tags to ensure the agent only accesses data belonging to its tenant.
+Counter-evidence: {"deny_statement_indices": [], "conditions_present": false}
+Evidence:
+{
+      "Sid": "SyntheticUserUpload",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::synthetic-user-bucket"
+    }
+
+Delta: {"comparison_performed": true, "before_count": 8, "after_count": 1, "interpretation": "Rule/severity/message/statement-position changes; not measured AWS risk reduction"}
+Configuration SHA256: b7e00801abdc3999d3eec5e891d544e3391ea1a143ac8827a225c6fd95520bb4
+Input SHA256: 5940343f18163dddd8afa3a7c743dff8132fb86c57a2ed5058a39fecd032515b

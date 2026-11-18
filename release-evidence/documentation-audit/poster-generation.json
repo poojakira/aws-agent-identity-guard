@@ -1,0 +1,36 @@
+{
+  "utc": "2026-11-18T19:35:24.987423+00:00",
+  "source_state": "Pre-freeze documentation working tree; not current-head full-suite evidence",
+  "actual_project_renderer": true,
+  "method": "Own generated trusted HTML provided to Playwright set_content via external POSTER_BROWSER wrapper; real Chromium PDF followed by project realPyMuPDF rasterization",
+  "host_pymupdf": "1.26.6",
+  "wrapper_playwright": "1.65.2",
+  "chromium": "Chromium 156.0.8078.79 built on Debian GNU/Linux 13 (trixie)",
+  "first_hashes": {
+    "poster/poster_36x48.pdf": "7d5bf2a89cb31661f63d6bbd1cfe5bd6560890b858a55c663d4148bc0230be6e",
+    "poster/poster.png": "dca4d8f256e598bb8bbde83d28db79bb1679502f9ea2ca83bd64e4ed2c5f8cf5"
+  },
+  "second": {
+    "poster/poster.png": {
+      "bytes": 496272,
+      "sha256": "dca4d8f256e598bb8bbde83d28db79bb1679502f9ea2ca83bd64e4ed2c5f8cf5"
+    },
+    "poster/poster_36x48.pdf": {
+      "bytes": 741258,
+      "sha256": "ccfd2882b6643dcbc265a0646ecaa8083584374f7200d9670dbfc204bd4f4e20"
+    }
+  },
+  "png_identical": true,
+  "pdf_byte_identical": false,
+  "pdf_pages": 1,
+  "pdf_inches": [
+    36,
+    48
+  ],
+  "png_pixels": [
+    1800,
+    2400
+  ],
+  "visual_text_review": "Historicalheader/date/source,24static+1livecontext,legacy-skips,actualevidencepanel allvisible",
+  "limitations": "Trusted-document build workaround only; no browserpolicy/HOME/productcontrol change. Local repeatability is not hosted Chrome/font parity."
+}

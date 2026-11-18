@@ -1,0 +1,109 @@
+{
+  "source_commit": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+  "runs": [
+    {
+      "name": "python310_studio",
+      "command": [
+        "/workspace/work/envs/iam310/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_studio.py",
+        "-q",
+        "--junitxml=/workspace/work/evidence/aws-agent-identity-guard/docs-reconciliation/python310-junit.xml"
+      ],
+      "utc_start": "2026-11-18T19:48:40.167531+00:00",
+      "utc_end": "2026-11-18T19:48:42.091705+00:00",
+      "exit_code": 0,
+      "log": "python310_studio.log"
+    },
+    {
+      "name": "wheel_install",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "pip",
+        "--python",
+        "/workspace/work/verification/iam-unrelated/.venv/bin/python",
+        "install",
+        "--no-deps",
+        "--force-reinstall",
+        "/workspace/work/evidence/aws-agent-identity-guard/docs-reconciliation/artifacts/aws_agent_identity_guard-0.3.0-py3-none-any.whl"
+      ],
+      "utc_start": "2026-11-18T19:48:42.091750+00:00",
+      "utc_end": "2026-11-18T19:48:43.945046+00:00",
+      "exit_code": 0,
+      "log": "wheel_install.log"
+    },
+    {
+      "name": "actionlint",
+      "command": [
+        "/workspace/work/tooling/actionlint/actionlint",
+        "-no-color"
+      ],
+      "utc_start": "2026-11-18T19:48:43.945084+00:00",
+      "utc_end": "2026-11-18T19:48:43.956304+00:00",
+      "exit_code": 0,
+      "log": "actionlint.log"
+    },
+    {
+      "name": "repository_security",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "scripts/security_scan.py"
+      ],
+      "utc_start": "2026-11-18T19:48:43.956339+00:00",
+      "utc_end": "2026-11-18T19:48:44.005724+00:00",
+      "exit_code": 0,
+      "log": "repository_security.log"
+    },
+    {
+      "name": "javascript_syntax",
+      "command": [
+        "node",
+        "--check",
+        "src/aws_agent_identity_guard/studio/studio.js"
+      ],
+      "utc_start": "2026-11-18T19:48:44.005765+00:00",
+      "utc_end": "2026-11-18T19:48:44.035156+00:00",
+      "exit_code": 0,
+      "log": "javascript_syntax.log"
+    },
+    {
+      "name": "tracked_type_validation",
+      "command": [
+        "/workspace/work/tooling/venv/bin/python",
+        "/workspace/work/validate_inventory.py",
+        "/workspace/work/candidates/aws-agent-identity-guard",
+        "/workspace/work/evidence/aws-agent-identity-guard/docs-reconciliation/candidate-type-validation.json"
+      ],
+      "utc_start": "2026-11-18T19:48:44.035197+00:00",
+      "utc_end": "2026-11-18T19:48:44.157089+00:00",
+      "exit_code": 0,
+      "log": "tracked_type_validation.log"
+    },
+    {
+      "name": "environment_sbom",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "pip_audit",
+        "--skip-editable",
+        "--cache-dir",
+        "/workspace/work/evidence/aws-agent-identity-guard/iam-studio-tool-cache-4411c0792b02/pip-audit",
+        "--format",
+        "cyclonedx-json",
+        "--output",
+        "/workspace/work/evidence/aws-agent-identity-guard/docs-reconciliation/test-environment-sbom.json"
+      ],
+      "utc_start": "2026-11-18T19:48:44.157132+00:00",
+      "utc_end": "2026-11-18T19:48:44.948329+00:00",
+      "exit_code": 0,
+      "log": "environment_sbom.log"
+    }
+  ],
+  "node": "v24.22.1",
+  "chromium": "Chromium 156.0.8078.79 built on Debian GNU/Linux 13 (trixie)",
+  "actionlint": "1.7.7",
+  "wheel_sha256": "a25a3feeaddb56551f6708981b88ec15291bfa28c518571c49ffa1177dc8988f",
+  "sbom_scope": "Installed verification/test environment; editable source audited separately, not a container/OS SBOM"
+}

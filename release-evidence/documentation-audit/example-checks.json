@@ -1,0 +1,147 @@
+{
+  "utc": "2026-11-18T19:51:01.828714+00:00",
+  "scope": "Document syntax plus named actual offline examples only; shell syntax is not all commands executed and source status is explicitly observed",
+  "checks": [
+    {
+      "document": "README.md",
+      "check": "shell syntax only, not execution",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "document": "README.md",
+      "check": "shell syntax only, not execution",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "document": "RUNBOOK.md",
+      "check": "shell syntax only, not execution",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "document": "RUNBOOK.md",
+      "check": "shell syntax only, not execution",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "document": "RUNBOOK.md",
+      "check": "shell syntax only, not execution",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "document": "SECURITY_AUDIT.md",
+      "check": "shell syntax only, not execution",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "document": "docs/PERFORMANCE_BASELINE.md",
+      "check": "shell syntax only, not execution",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "document": "docs/PERFORMANCE_BASELINE.md",
+      "check": "shell syntax only, not execution",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "document": "docs/STUDIO.md",
+      "check": "JSON example syntax",
+      "exit_code": 0
+    },
+    {
+      "document": "docs/internal/REPOSITORY_AUDIT.md",
+      "check": "shell syntax only, not execution",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "document": "examples/delegated_credentials/README.md",
+      "check": "shell syntax only, not execution",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "document": "poster/01_research_brief.md",
+      "check": "shell syntax only, not execution",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "document": "poster/13_reproducibility.md",
+      "check": "shell syntax only, not execution",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "document": "docs/STUDIO.md",
+      "check": "actual documented API envelope through own fresh loopback server and canonical static scanners",
+      "observed_source": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "observed_source_status": "CLEAN",
+      "finding_count": 4,
+      "effective_permissions": "UNKNOWN",
+      "exit_code": 0
+    },
+    {
+      "document": "RUNBOOK.md",
+      "check": "actual CLI version example, local synthetic fixture; finding exit1 is expected",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "aws_agent_identity_guard.cli",
+        "--version"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0
+    },
+    {
+      "document": "RUNBOOK.md",
+      "check": "actual CLI json example, local synthetic fixture; finding exit1 is expected",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "aws_agent_identity_guard.cli",
+        "examples/agent_policy_wildcard.json",
+        "--format",
+        "json"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1
+    },
+    {
+      "document": "RUNBOOK.md",
+      "check": "actual CLI sarif example, local synthetic fixture; finding exit1 is expected",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "aws_agent_identity_guard.cli",
+        "examples/agent_policy_wildcard.json",
+        "--format",
+        "sarif",
+        "--output",
+        "/workspace/work/doc-reconciliation/aws-agent-identity-guard/actual-cli-example.sarif"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1
+    },
+    {
+      "document": "RUNBOOK.md",
+      "check": "actual CLI remediation example, local synthetic fixture; finding exit1 is expected",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "aws_agent_identity_guard.cli",
+        "examples/agent_policy_wildcard.json",
+        "--remediate"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+SECURITY ENGINEERING RESEARCH POSTER
+Static Security Analysis of AWS IAM Policies for AI Workload
+Identities
+Detecting Excessive Privilege and Identity-Pivot Risks Before Deployment
+github.com/poojakira/aws-agent-identity-guard - public, default branch main.
+EVIDENCE POSTURE
+Historical source snapshot
+October 14, 2026 code/run only; later
+studio/documentation-head evidence is separate.
+247
+Tests collected
+244
+Tests passed
+3
+Tests skipped (legacy rules API absent)
+25
+Product IDs (24 static + 1 live-context)
+SYSTEM VIEW
+Architecture and Threat-Control Flow
+Trust Boundary
+Input surface
+Supplied IAM identity/trust JSON or explicitly
+collected role/policy context.
+Control surface
+Deterministic IAM patterns; collection
+errors/completeness remain explicit.
+Evidence surface
+Source-scoped findings and reports; no effective-
+permission proof.
+This diagram describes the tested repository path, not a
+universal deployment guarantee.
+Research Contribution
+A deterministic, non-executing IAM linter specialized for AI-agent roles with 25 product rule IDs (24 static plus
+one live-context boundary-presence rule) spanning identity/trust patterns and role context, emitting text, JSON,
+and SARIF for pre-deployment review and CI gating.
+Evidence for cited source
+EV-01
+247 collected: 244 passed, 3 skipped, 0 failures/errors.
+EV-02
+25 product rule IDs comprise 24 static checks and one live-
+context boundary-presence check.
+EV-03
+Separately anchored earlier synthetic performance gate over
+500 policies (not a measured result in the current test count):
+0.8397 ms p95 and 2,573 policies/sec, both passing
+configured gates.
+EV-04
+Ruff/format and security-audit jobs complete successfully.
+Method and Control Path
+01
+Parse one IAM policy document without executing cloud actions.
+02
+Classify statements and trust-policy structure.
+03
+Apply deterministic rule checks for privilege escalation, excessive privilege, trust
+weaknesses, audit tampering, and missing boundaries.
+04
+Emit findings with stable rule IDs and severity.
+05
+Return CI-friendly exit codes and optional SARIF.
+Limitations and Residual Risk
+Performance values are CI microbenchmarks on synthetic policies, not
+production SLOs.
+The tool is a static analyzer, not a runtime authorization proxy.
+It does not prove account-wide effective permissions or every cross-resource
+escalation path.
+The 3 skipped tests are legacy rules-module API tests (rules module not
+importable), as recorded in the cited source; they are not live-AWS checks.
+Reproducibility
+Expected test evidence: 244 passed, 3 skipped (Oct 14
+2026 CI run 38497940763). Measured code snapshot:
+718582f5fd8419b0b8c2ca21361f7b0c715cb54b Evidence CI run:
+38497940763
+Evidence Provenance
+Claim discipline
+Metrics come from the repository's verified metrics and research brief.
+Scope discipline
+Benchmarks are reported only at their documented fixture, dataset, or
+test scope.
+Reproduction
+PDF and PNG are generated locally from committed evidence without
+paid services.
+Evidence-backed security engineering
+README, verified metrics, tests, CI, and committed artifacts remain authoritative. Poster layout emphasizes architecture, controls, evidence, limitations, and reproduction rather than unsupported
+efficacy claims.
+36 x 48 in
+PDF + PNG parity
+Parse one IAM policy document without executing cloud actions.
+01
+Classify statements and trust-policy structure.
+02
+Apply deterministic rule checks for privilege escalation,
+excessive privilege, trust weaknesses, audit tampering, and
+missing boundaries.
+03
+Emit findings with stable rule IDs and severity.
+04
+Return CI-friendly exit codes and optional SARIF.
+05
+→
+↓
+→
+↓

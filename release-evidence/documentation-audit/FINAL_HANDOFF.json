@@ -1,0 +1,187 @@
+{
+  "repository": "poojakira/aws-agent-identity-guard",
+  "source": "8a919d8ec41a6590f808b53d364d5b07b2c21ba7",
+  "source_status": "CLEAN",
+  "utc": "2026-11-18T19:41:26.319208+00:00",
+  "decision": "Documentation reconciliation complete within local recorded scope; full contract PARTIAL. Exact-new-head full suite/browser/security/build/hosted checks belong to parent and are not claimed here.",
+  "diff": "8a919d8 docs: reconcile IAM guidance and source-scoped evidence\n CHANGELOG.md                                    |   8 +\n CONTRIBUTING.md                                 |  59 +--\n INCIDENT_RUNBOOK.md                             | 363 +-------------\n PRODUCTION.md                                   |  33 +-\n PRODUCT_VALIDATION.md                           |   2 +-\n PROVENANCE.md                                   |   2 +-\n README.md                                       |  74 +--\n RESUME_EVIDENCE.md                              |   2 +-\n RUNBOOK.md                                      | 636 ++----------------------\n SECURITY.md                                     |  61 +--\n SECURITY_AUDIT.md                               |   2 +-\n SECURITY_AUDIT_2026-09-30.md                    |   2 +\n THREAT_MODEL.md                                 | 155 ++----\n VERIFIED_METRICS.md                             |  44 +-\n docs/DOCUMENTATION_AUDIT.md                     |  74 +++\n docs/EVIDENCE.md                                |  41 +-\n docs/OPERATIONAL_IAM_REMEDIATION_MEASUREMENT.md |   4 +-\n docs/PERFORMANCE_BASELINE.md                    |   2 +-\n docs/RECRUITER_EVIDENCE_AUDIT_2026-10-09.md     |   8 +-\n docs/STUDIO.md                                  |   6 +-\n docs/aws-architecture.md                        | 139 +-----\n docs/aws-security-controls.md                   |  44 +-\n docs/evidence/RESUME_EVIDENCE.md                |   4 +-\n docs/internal/REPOSITORY_AUDIT.md               |   2 +\n examples/delegated_credentials/README.md        | 109 +---\n integrations/N8N_WORKFLOW.md                    |  84 +---\n poster/01_research_brief.md                     |  14 +-\n poster/02_claim_ledger.md                       |   8 +-\n poster/03_verified_metrics.md                   |  12 +-\n poster/13_reproducibility.md                    |   8 +-\n poster/poster.png                               | Bin 489142 -> 496272 bytes\n poster/poster_36x48.pdf                         | Bin 754074 -> 741258 bytes\n poster/render_poster.py                         |   6 +-\n 33 files changed, 428 insertions(+), 1580 deletions(-)\n",
+  "all_original_text_documents_read": 32,
+  "markdown_documents_parsed": 31,
+  "local_link_targets": 81,
+  "local_link_errors": 0,
+  "documentation_checks_passed": 18,
+  "mocked_example_tests_passed": 6,
+  "mocked_example_scope": "Separate from main suite; local guard/moto behavior only, no realSTS enforcement proof",
+  "poster": {
+    "utc": "2026-11-18T19:35:24.987423+00:00",
+    "source_state": "Pre-freeze documentation working tree; not current-head full-suite evidence",
+    "actual_project_renderer": true,
+    "method": "Own generated trusted HTML provided to Playwright set_content via external POSTER_BROWSER wrapper; real Chromium PDF followed by project realPyMuPDF rasterization",
+    "host_pymupdf": "1.26.6",
+    "wrapper_playwright": "1.65.2",
+    "chromium": "Chromium 156.0.8078.79 built on Debian GNU/Linux 13 (trixie)",
+    "first_hashes": {
+      "poster/poster_36x48.pdf": "7d5bf2a89cb31661f63d6bbd1cfe5bd6560890b858a55c663d4148bc0230be6e",
+      "poster/poster.png": "dca4d8f256e598bb8bbde83d28db79bb1679502f9ea2ca83bd64e4ed2c5f8cf5"
+    },
+    "second": {
+      "poster/poster.png": {
+        "bytes": 496272,
+        "sha256": "dca4d8f256e598bb8bbde83d28db79bb1679502f9ea2ca83bd64e4ed2c5f8cf5"
+      },
+      "poster/poster_36x48.pdf": {
+        "bytes": 741258,
+        "sha256": "ccfd2882b6643dcbc265a0646ecaa8083584374f7200d9670dbfc204bd4f4e20"
+      }
+    },
+    "png_identical": true,
+    "pdf_byte_identical": false,
+    "pdf_pages": 1,
+    "pdf_inches": [
+      36,
+      48
+    ],
+    "png_pixels": [
+      1800,
+      2400
+    ],
+    "visual_text_review": "Historicalheader/date/source,24static+1livecontext,legacy-skips,actualevidencepanel allvisible",
+    "limitations": "Trusted-document build workaround only; no browserpolicy/HOME/productcontrol change. Local repeatability is not hosted Chrome/font parity."
+  },
+  "runtime_rules_tests_gates_unchanged": true,
+  "legal_license_and_dependency_snapshot_preserved": true,
+  "parent_primary_evidence": "NOT EXECUTED by this agent; parent will run exact frozen new head",
+  "prior_implementation_evidence_source": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+  "planned_nonrelease_tag": "evidence/docs-reconciliation-20261118",
+  "remote_writes": false,
+  "remaining": [
+    "Full new-head regression/browser/export/build/security checks pending parent",
+    "Hosted poster Chrome/fonts can alter artifacts/head; inspect bot commits and rerun actualfinalhead",
+    "External historical truth/anchor validity, live AWS/Terraform/n8n delivery/permissions/operational approval not established",
+    "Known mocked example WebIdentity/ExternalId mismatch documented without runtime change",
+    "Timestamped remediation output is not byte-identical despite fixedruletemplate selection"
+  ],
+  "audit_artifacts": {
+    "actual-api-example.json": {
+      "bytes": 23138,
+      "sha256": "aef603ede7a6649091b51059de9e505342648f2721cc29b61d7ae364d11642a1"
+    },
+    "actual-cli-example.sarif": {
+      "bytes": 10313,
+      "sha256": "16a107eb16aa99ab51d9e3e62753950dd83fa2b41b335fcea0cfe75b8df114f1"
+    },
+    "check_examples.py": {
+      "bytes": 3531,
+      "sha256": "58e0408fdf17bf52b9cc43b2f6418563c3b1486471dd79636c99ebf5c0a7b9be"
+    },
+    "chromium-playwright-wrapper": {
+      "bytes": 1065,
+      "sha256": "37842f69ae131630d210e5d28aa5ebc10f5aa445eb68ed45724fffbae186fe79"
+    },
+    "cli-help.txt": {
+      "bytes": 1564,
+      "sha256": "49e63a2423494f9f4f0d59cf9282011623d440bb559bc1d864fb6645080c4796"
+    },
+    "cli-json.log": {
+      "bytes": 3296,
+      "sha256": "9058e76cb0bf93144b4c40e0ac44eedb7b9d2709f9f8cac1bb689b3fe6d7f39f"
+    },
+    "cli-remediation.log": {
+      "bytes": 5972,
+      "sha256": "aec31742a03ad25eaacc978a1a5b589205b24c3d769710497881a6f8fd12f951"
+    },
+    "cli-sarif.log": {
+      "bytes": 96,
+      "sha256": "d236f37bb533337a3084d26312b1960b01491b78b3fa1b28ccc42e51c7d960f4"
+    },
+    "cli-version.log": {
+      "bytes": 31,
+      "sha256": "949b3c4efc91745593705f569075f76464739c0ccc04ee41a3d7a151df74f9d1"
+    },
+    "document-ledger.json": {
+      "bytes": 7302,
+      "sha256": "6b7680149468db3eb0d8eab9c2834c91b69249371eca09cdc726880a0deb2ea5"
+    },
+    "example-checks.json": {
+      "bytes": 4123,
+      "sha256": "fa8da16e82337608e5c7d82031bf653735cf84651c416df561da8383e554ab07"
+    },
+    "external-http-final.json": {
+      "bytes": 4773,
+      "sha256": "216b82f0ba107bf02036d41c92847da7f8fd22f02a0cc3c5e95fd9333432c262"
+    },
+    "inventory-final.json": {
+      "bytes": 41239,
+      "sha256": "f082474cbbce7d23af031104b39e0bc87a51cb6d21dd00fe446a5fd09dbbb1c7"
+    },
+    "local-links-before-stage.json": {
+      "bytes": 6590,
+      "sha256": "3cc86d37ad0c3c4f10ca895e8a8e02f02d43a4c3d3d4a65bdd90babba2278a01"
+    },
+    "local-links-final.json": {
+      "bytes": 5672,
+      "sha256": "7212c8dd5b6a0d23d3b34114c7d23c4048b4d97f55fcf0020b39fca014111e16"
+    },
+    "make_ledger.py": {
+      "bytes": 16864,
+      "sha256": "fa0c01a42693e570a40a3057d3787aff5ed10f6877211bb6edaaa06a20663609"
+    },
+    "mock-example-junit.xml": {
+      "bytes": 1208,
+      "sha256": "abea94c5e380465b279a1a6fe8c9f8e27f2cf1e8c00cb90d91506eadef3772c3"
+    },
+    "mock-example-tests.log": {
+      "bytes": 80,
+      "sha256": "700bc0322b00f8e8db3ce495047983b54ab27ab59ed1fedac05f3aeba47dae24"
+    },
+    "parent-links-final.json": {
+      "bytes": 5672,
+      "sha256": "c4afeb01e5c0a619bec295ad2b2e7009a3ddc0987ae7e477b415080eb427f9d9"
+    },
+    "poster-first-output.json": {
+      "bytes": 383,
+      "sha256": "f868eee2411b4ee0d44dac3dffed8c4002616eb4c9c28db3732377f083c0ad8c"
+    },
+    "poster-generation.json": {
+      "bytes": 1453,
+      "sha256": "4ef51f448575db7742abfbb4aa39f6f6003f19b5d23522d3375887db79ecf38d"
+    },
+    "poster-render-1.log": {
+      "bytes": 61,
+      "sha256": "e8d3aee9d7a93e03befc8fcc6814fa1a1da1d967c2060d2854df28e1e0719bd9"
+    },
+    "poster-render-2.log": {
+      "bytes": 61,
+      "sha256": "e8d3aee9d7a93e03befc8fcc6814fa1a1da1d967c2060d2854df28e1e0719bd9"
+    },
+    "poster-text.txt": {
+      "bytes": 3646,
+      "sha256": "6f403f2aef3554cb63b46b3903d64b7ae033dc40c393172b081f0ef4ac721d70"
+    },
+    "rendered-poster.html": {
+      "bytes": 13090,
+      "sha256": "54110075ab39f6b7f85fb6bf97684a45a314a8591cd3f53207ffacc42387765c"
+    },
+    "sts-sdk-model-check.json": {
+      "bytes": 513,
+      "sha256": "91f7c187fed03d2c9ea2545f2854c69833a2679c63a477aff4d461ec17a3b837"
+    },
+    "studio-help.txt": {
+      "bytes": 162,
+      "sha256": "e046eda59059345c1aee0b236fac5ab41547de150dacc02b935fd015db6d6221"
+    },
+    "update_docs.py": {
+      "bytes": 45124,
+      "sha256": "d2d43596ff7c183420ef14bf79a9f4b8e3b0aa8eb2c1872862528322f046852f"
+    },
+    "update_optional.py": {
+      "bytes": 18134,
+      "sha256": "bb1ccecbea66e33980aecc0d70b0d35ffc8d9661fb49dd7325a94dd8cb4c7b17"
+    }
+  },
+  "external_http_head": {
+    "unique_links": 14,
+    "returned_200": 14,
+    "scope": "Reachability only; content/claim and external anchor not verified"
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "source_commit": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+  "capabilities": [
+    {
+      "capability": "Actual local browser identity/trust review with source statement evidence",
+      "status": "TESTED",
+      "code": [
+        "src/aws_agent_identity_guard/studio/analysis.py",
+        "src/aws_agent_identity_guard/scanner.py"
+      ],
+      "evidence": [
+        "junit.xml",
+        "browser/browser.json"
+      ]
+    },
+    {
+      "capability": "Edit/rerun delta, supplied-only graph, stale read/response cancellation",
+      "status": "TESTED",
+      "code": [
+        "src/aws_agent_identity_guard/studio/studio.js"
+      ],
+      "evidence": [
+        "browser/browser.json",
+        "browser/desktop.png"
+      ]
+    },
+    {
+      "capability": "Actual JSON/text/SARIF exports; official SARIF2.1.0 schema",
+      "status": "TESTED",
+      "code": [
+        "src/aws_agent_identity_guard/studio/analysis.py"
+      ],
+      "evidence": [
+        "browser/browser.json",
+        "browser/"
+      ]
+    },
+    {
+      "capability": "New installed wheel HTTP/assets/static scan under unrelated real Git; sourceUNKNOWN",
+      "status": "TESTED",
+      "evidence": [
+        "wheel-smoke.json",
+        "supplemental-runs.json"
+      ]
+    },
+    {
+      "capability": "All-document local reconciliation",
+      "status": "REVIEWED;32originaltextdocuments,33changedfiles,31Markdown81localtargets0errors",
+      "evidence": [
+        "documentation-audit/document-ledger.json",
+        "documentation-audit/parent-links-final.json",
+        "documentation-audit/example-checks.json"
+      ]
+    },
+    {
+      "capability": "Optional mocked delegated-credential teaching example",
+      "status": "Sixmoto tests passed separately; no realSTS/webidentityExternalIdcontrol established",
+      "evidence": [
+        "documentation-audit/mock-example-junit.xml",
+        "documentation-audit/sts-sdk-model-check.json"
+      ]
+    },
+    {
+      "capability": "Effective-permission/deny/SCP/boundary/session/resource-policy intersections, proven exploitability or live account coverage",
+      "status": "NOT IMPLEMENTED / NOT VERIFIED in local static flow",
+      "evidence": [
+        "RELEASE_ASSESSMENT.md"
+      ]
+    },
+    {
+      "capability": "Terraform deployment, OIDC federation, n8n/cloud/Slack/Jira activation or production approval",
+      "status": "NOT VERIFIED; templates/knownintegrationgaps documented; no such external actions executed",
+      "evidence": [
+        "RELEASE_ASSESSMENT.md"
+      ]
+    }
+  ]
+}

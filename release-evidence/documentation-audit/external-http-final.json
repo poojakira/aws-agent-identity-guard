@@ -1,0 +1,90 @@
+{
+  "utc": "2026-11-18T19:40:53.731323+00:00",
+  "source": "8a919d8ec41a6590f808b53d364d5b07b2c21ba7",
+  "results": [
+    {
+      "url": "https://github.com/poojakira",
+      "status": 200,
+      "final_url": "https://github.com/poojakira",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    },
+    {
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/36781556871",
+      "status": 200,
+      "final_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/36781556871",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    },
+    {
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/37170669504",
+      "status": 200,
+      "final_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/37170669504",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    },
+    {
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38009457205",
+      "status": 200,
+      "final_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38009457205",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    },
+    {
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38462296804",
+      "status": 200,
+      "final_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38462296804",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    },
+    {
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38497940763",
+      "status": 200,
+      "final_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38497940763",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    },
+    {
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/blob/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/RELEASE_ASSESSMENT.md",
+      "status": 200,
+      "final_url": "https://github.com/poojakira/aws-agent-identity-guard/blob/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/RELEASE_ASSESSMENT.md",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    },
+    {
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/blob/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/manifest.json",
+      "status": 200,
+      "final_url": "https://github.com/poojakira/aws-agent-identity-guard/blob/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/manifest.json",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    },
+    {
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/commit/b4799d64eeefba1dfbced8cf8d303a6e07f18dbe",
+      "status": 200,
+      "final_url": "https://github.com/poojakira/aws-agent-identity-guard/commit/b4799d64eeefba1dfbced8cf8d303a6e07f18dbe",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    },
+    {
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/pull/75",
+      "status": 200,
+      "final_url": "https://github.com/poojakira/aws-agent-identity-guard/pull/75",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    },
+    {
+      "url": "https://github.com/poojakira/hf-model-provenance-scanner/actions/runs/38462464074",
+      "status": 200,
+      "final_url": "https://github.com/poojakira/hf-model-provenance-scanner/actions/runs/38462464074",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    },
+    {
+      "url": "https://github.com/poojakira/mcp-agent-security-gateway/actions/runs/38462601803",
+      "status": 200,
+      "final_url": "https://github.com/poojakira/mcp-agent-security-gateway/actions/runs/38462601803",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    },
+    {
+      "url": "https://keepachangelog.com/en/1.1.0/",
+      "status": 200,
+      "final_url": "https://keepachangelog.com/en/1.1.0/",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/poojakira/aws-agent-identity-guard/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/browser/desktop.png",
+      "status": 200,
+      "final_url": "https://raw.githubusercontent.com/poojakira/aws-agent-identity-guard/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/browser/desktop.png",
+      "scope": "HTTP reachability only; content/claim and external anchor not verified"
+    }
+  ]
+}

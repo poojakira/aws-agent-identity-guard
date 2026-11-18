@@ -1,0 +1,64 @@
+{
+  "result": "passed",
+  "source_commit": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+  "utc_start": "2026-11-18T19:48:45.014983+00:00",
+  "utc_end": "2026-11-18T19:48:45.091703+00:00",
+  "command": [
+    "/workspace/work/verification/iam-unrelated/.venv/bin/python",
+    "-I",
+    "-m",
+    "aws_agent_identity_guard.studio",
+    "--port",
+    "0"
+  ],
+  "unrelated_git_head": "92b8bcb2e7cdbda625a157a92928cb9ce618c2ac",
+  "health": {
+    "status": "ok",
+    "app_version": "0.3.0",
+    "source_commit": "UNKNOWN",
+    "source_status": "UNKNOWN",
+    "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+    "static_rule_count": 24,
+    "static_rule_ids": [
+      "AIG001",
+      "AIG002",
+      "AIG003",
+      "AIG004",
+      "AIG005",
+      "AIG006",
+      "AIG007",
+      "AIG008",
+      "AIG009",
+      "AIG010",
+      "AIG011",
+      "AIG012",
+      "AIG013",
+      "AIG014",
+      "AIG015",
+      "AIG016",
+      "AIG017",
+      "AIG018",
+      "AIG019",
+      "AIG020",
+      "AIG021",
+      "AIG-TP001",
+      "AIG-TP002",
+      "AIG-TP003"
+    ],
+    "live_context_rule_ids_not_run": [
+      "AIG-PB001"
+    ]
+  },
+  "checks": [
+    "actual isolated installed HTTP startup",
+    "packaged HTML and fixed JavaScript served",
+    "actual IAM scan through installed HTTP API",
+    "unrelated Git not used as source provenance"
+  ],
+  "finding_ids": [
+    "AIG003",
+    "AIG004",
+    "AIG005",
+    "AIG013"
+  ]
+}

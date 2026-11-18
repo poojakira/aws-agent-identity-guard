@@ -1,0 +1,504 @@
+{
+  "app_version": "0.3.0",
+  "source_commit": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+  "source_status": "CLEAN",
+  "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+  "static_rule_count": 24,
+  "static_rule_ids": [
+    "AIG001",
+    "AIG002",
+    "AIG003",
+    "AIG004",
+    "AIG005",
+    "AIG006",
+    "AIG007",
+    "AIG008",
+    "AIG009",
+    "AIG010",
+    "AIG011",
+    "AIG012",
+    "AIG013",
+    "AIG014",
+    "AIG015",
+    "AIG016",
+    "AIG017",
+    "AIG018",
+    "AIG019",
+    "AIG020",
+    "AIG021",
+    "AIG-TP001",
+    "AIG-TP002",
+    "AIG-TP003"
+  ],
+  "live_context_rule_ids_not_run": [
+    "AIG-PB001"
+  ],
+  "run_id": "2aa064bd-5894-484e-82d5-0c5dacd10758",
+  "timestamp_utc": "2026-11-18T19:51:01.115549+00:00",
+  "configuration": {
+    "mode": "static-identity-and-optional-trust",
+    "compare": false,
+    "max_document_bytes": 32768,
+    "max_statements": 32,
+    "max_depth": 16
+  },
+  "configuration_sha256": "d81ae5078af75f171f499d8ca83ad41d537f7cfb8dbe4f11c532255b8cea8171",
+  "input_sha256": "632153a0ecd605ba697df15bf6729dda1aebf49da95efe6a164d78de237cba66",
+  "findings": [
+    {
+      "rule_id": "AIG003",
+      "severity": "high",
+      "message": "Statement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope.",
+      "remediation": "Check each listed action's resource-level support. Where supported, use specific ARNs or applicable resource-tag conditions; otherwise review service-specific conditions and required context.",
+      "statement_index": 0,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 1,
+        "endLine": 1,
+        "snippet": "{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "c897581c6513c7c252ca1e78ae0a6a3fecc39214625f1870dca673e6eb9ca37f"
+    },
+    {
+      "rule_id": "AIG004",
+      "severity": "critical",
+      "message": "iam:PassRole without iam:PassedToService condition. An agent with unconstrained PassRole can escalate privileges by passing a high-privilege role to any service it can invoke.",
+      "remediation": "Add a Condition: {StringEquals: {iam:PassedToService: 'bedrock.amazonaws.com'}} (or whichever service runs the agent). Also restrict the Resource to specific role ARNs.",
+      "statement_index": 0,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 1,
+        "endLine": 1,
+        "snippet": "{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "846d0574a01e182468e02e5baa31f97f91bd13fa1de4bf5447615b874fbf372d"
+    },
+    {
+      "rule_id": "AIG005",
+      "severity": "critical",
+      "message": "Agent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path.",
+      "remediation": "Separate agent runtime roles from IAM administration. Agent runtime identities should NEVER have iam:* or policy-modification permissions.",
+      "statement_index": 0,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 1,
+        "endLine": 1,
+        "snippet": "{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "ce8046ca9a7ca42755f04564da288613cee74d387b35404d37def6875c2a308a"
+    },
+    {
+      "rule_id": "AIG013",
+      "severity": "medium",
+      "message": "Statement has Resource: '*' and zero Condition keys. Agent policies should use conditions for tenant isolation (aws:PrincipalTag), request scoping (aws:RequestedRegion), or session binding (aws:TokenIssueTime).",
+      "remediation": "Add at minimum: aws:RequestedRegion to limit geographic blast radius, and aws:PrincipalTag/tenant for multi-tenant isolation.",
+      "statement_index": 0,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 1,
+        "endLine": 1,
+        "snippet": "{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "f6898a91d9028621327fd25a6b75a827f278f6e84d03b344f8b245195d2cbcb6"
+    }
+  ],
+  "sources": [
+    {
+      "name": "identity-policy.json",
+      "sha256": "3ae1af8a5993ad9df4196cebb10315f939b6f2b79dc7cc2a6215db19e1ba5051",
+      "text": "{\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}]}"
+    }
+  ],
+  "statements": [
+    {
+      "id": "identity-policy.json#/Statement/0",
+      "index": 0,
+      "effect": "Allow",
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 1,
+        "endLine": 1,
+        "snippet": "{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}"
+      },
+      "condition": {}
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "identity-policy.json",
+        "kind": "document",
+        "label": "identity-policy.json"
+      },
+      {
+        "id": "identity-policy.json#/Statement/0",
+        "kind": "statement",
+        "label": "Statement 0: Allow",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 1,
+          "endLine": 1,
+          "snippet": "{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}"
+        }
+      },
+      {
+        "id": "identity-policy.json#/Statement/0/Action",
+        "kind": "Action",
+        "label": "\"iam:PassRole\"",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 1,
+          "endLine": 1,
+          "snippet": "{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}"
+        }
+      },
+      {
+        "id": "identity-policy.json#/Statement/0/Resource",
+        "kind": "Resource",
+        "label": "\"*\"",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 1,
+          "endLine": 1,
+          "snippet": "{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "from": "identity-policy.json",
+        "to": "identity-policy.json#/Statement/0",
+        "label": "contains",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 1,
+          "endLine": 1,
+          "snippet": "{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}"
+        }
+      },
+      {
+        "from": "identity-policy.json#/Statement/0",
+        "to": "identity-policy.json#/Statement/0/Action",
+        "label": "Action pattern",
+        "effect": "Allow",
+        "conditions_present": false,
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 1,
+          "endLine": 1,
+          "snippet": "{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}"
+        }
+      },
+      {
+        "from": "identity-policy.json#/Statement/0",
+        "to": "identity-policy.json#/Statement/0/Resource",
+        "label": "Resource pattern",
+        "effect": "Allow",
+        "conditions_present": false,
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 1,
+          "endLine": 1,
+          "snippet": "{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}"
+        }
+      }
+    ],
+    "scope": "Supplied relationships only; no effective grants or reachability inferred"
+  },
+  "sarif": {
+    "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+      {
+        "tool": {
+          "driver": {
+            "name": "aws-agent-identity-guard",
+            "version": "0.3.0",
+            "informationUri": "https://github.com/poojakira/aws-agent-identity-guard",
+            "rules": [
+              {
+                "id": "AIG003",
+                "name": "AIG003",
+                "shortDescription": {
+                  "text": "Statement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "high"
+                }
+              },
+              {
+                "id": "AIG004",
+                "name": "AIG004",
+                "shortDescription": {
+                  "text": "iam:PassRole without iam:PassedToService condition. An agent with unconstrained PassRole can escalate privileges by passing a high-privilege role to any service it can invoke."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "critical"
+                }
+              },
+              {
+                "id": "AIG005",
+                "name": "AIG005",
+                "shortDescription": {
+                  "text": "Agent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "critical"
+                }
+              },
+              {
+                "id": "AIG013",
+                "name": "AIG013",
+                "shortDescription": {
+                  "text": "Statement has Resource: '*' and zero Condition keys. Agent policies should use conditions for tenant isolation (aws:PrincipalTag), request scoping (aws:RequestedRegion), or session binding (aws:TokenIssueTime)."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "medium"
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "ruleId": "AIG003",
+            "ruleIndex": 0,
+            "level": "error",
+            "message": {
+              "text": "Statement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 1,
+                    "endLine": 1
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/0"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "Check each listed action's resource-level support. Where supported, use specific ARNs or applicable resource-tag conditions; otherwise review service-specific conditions and required context.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          },
+          {
+            "ruleId": "AIG004",
+            "ruleIndex": 1,
+            "level": "error",
+            "message": {
+              "text": "iam:PassRole without iam:PassedToService condition. An agent with unconstrained PassRole can escalate privileges by passing a high-privilege role to any service it can invoke."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 1,
+                    "endLine": 1
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/0"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "Add a Condition: {StringEquals: {iam:PassedToService: 'bedrock.amazonaws.com'}} (or whichever service runs the agent). Also restrict the Resource to specific role ARNs.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          },
+          {
+            "ruleId": "AIG005",
+            "ruleIndex": 2,
+            "level": "error",
+            "message": {
+              "text": "Agent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 1,
+                    "endLine": 1
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/0"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "Separate agent runtime roles from IAM administration. Agent runtime identities should NEVER have iam:* or policy-modification permissions.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          },
+          {
+            "ruleId": "AIG013",
+            "ruleIndex": 3,
+            "level": "warning",
+            "message": {
+              "text": "Statement has Resource: '*' and zero Condition keys. Agent policies should use conditions for tenant isolation (aws:PrincipalTag), request scoping (aws:RequestedRegion), or session binding (aws:TokenIssueTime)."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 1,
+                    "endLine": 1
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/0"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "Add at minimum: aws:RequestedRegion to limit geographic blast radius, and aws:PrincipalTag/tenant for multi-tenant isolation.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          }
+        ],
+        "artifacts": [
+          {
+            "location": {
+              "uri": "identity-policy.json",
+              "uriBaseId": "%SRCROOT%"
+            }
+          }
+        ],
+        "properties": {
+          "scope": "STATIC_ONLY_CONTEXT_INCOMPLETE",
+          "inputSha256": "3ae1af8a5993ad9df4196cebb10315f939b6f2b79dc7cc2a6215db19e1ba5051",
+          "run_id": "2aa064bd-5894-484e-82d5-0c5dacd10758",
+          "source_commit": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+          "source_status": "CLEAN",
+          "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+          "timestamp_utc": "2026-11-18T19:51:01.115549+00:00",
+          "configuration_sha256": "d81ae5078af75f171f499d8ca83ad41d537f7cfb8dbe4f11c532255b8cea8171",
+          "input_sha256": "632153a0ecd605ba697df15bf6729dda1aebf49da95efe6a164d78de237cba66",
+          "app_version": "0.3.0"
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "Patterns are review signals, not effective permissions or proven exploitability.",
+    "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+    "SCPs, boundaries, session/resource policies and condition semantics are unknown.",
+    "No AWS call is made. AIG-PB001 requires live role context and is not run here.",
+    "No findings means no configured pattern matched; it does not prove least privilege or safety."
+  ],
+  "effective_permissions": "UNKNOWN",
+  "delta": {
+    "comparison_performed": false,
+    "before_count": null,
+    "after_count": 4,
+    "added": [],
+    "removed": [],
+    "interpretation": "Rule/severity/message/statement-position changes; not measured AWS risk reduction"
+  },
+  "before_input_sha256": [],
+  "human_report": "IAM Permission Engineering Studio \u2014 static review\nRun: 2aa064bd-5894-484e-82d5-0c5dacd10758\nSource: 4411c0792b0279c3bbd60e4af84210b3a551540a (CLEAN)\nEngine version: 0.3.0\nEffective permissions: UNKNOWN\n\nPatterns are review signals, not effective permissions or proven exploitability.\nExplicit Deny and conditions are counter-evidence; their intersections are not evaluated.\nSCPs, boundaries, session/resource policies and condition semantics are unknown.\nNo AWS call is made. AIG-PB001 requires live role context and is not run here.\nNo findings means no configured pattern matched; it does not prove least privilege or safety.\n\nFindings:\nHIGH AIG003 identity-policy.json:1 /Statement/0\nStatement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope.\nRemediation: Check each listed action's resource-level support. Where supported, use specific ARNs or applicable resource-tag conditions; otherwise review service-specific conditions and required context.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}\n\nCRITICAL AIG004 identity-policy.json:1 /Statement/0\niam:PassRole without iam:PassedToService condition. An agent with unconstrained PassRole can escalate privileges by passing a high-privilege role to any service it can invoke.\nRemediation: Add a Condition: {StringEquals: {iam:PassedToService: 'bedrock.amazonaws.com'}} (or whichever service runs the agent). Also restrict the Resource to specific role ARNs.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}\n\nCRITICAL AIG005 identity-policy.json:1 /Statement/0\nAgent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path.\nRemediation: Separate agent runtime roles from IAM administration. Agent runtime identities should NEVER have iam:* or policy-modification permissions.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}\n\nMEDIUM AIG013 identity-policy.json:1 /Statement/0\nStatement has Resource: '*' and zero Condition keys. Agent policies should use conditions for tenant isolation (aws:PrincipalTag), request scoping (aws:RequestedRegion), or session binding (aws:TokenIssueTime).\nRemediation: Add at minimum: aws:RequestedRegion to limit geographic blast radius, and aws:PrincipalTag/tenant for multi-tenant isolation.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\"Effect\":\"Allow\",\"Action\":\"iam:PassRole\",\"Resource\":\"*\"}\n\nDelta: {\"comparison_performed\": false, \"before_count\": null, \"after_count\": 4, \"interpretation\": \"Rule/severity/message/statement-position changes; not measured AWS risk reduction\"}\nConfiguration SHA256: d81ae5078af75f171f499d8ca83ad41d537f7cfb8dbe4f11c532255b8cea8171\nInput SHA256: 632153a0ecd605ba697df15bf6729dda1aebf49da95efe6a164d78de237cba66"
+}

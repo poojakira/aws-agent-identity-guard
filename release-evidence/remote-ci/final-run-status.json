@@ -1,0 +1,127 @@
+{
+  "checked_utc": "2026-11-18T19:57:16.988Z",
+  "source_commit": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+  "required_offline_workflow_definitions": 6,
+  "observed_executions": 13,
+  "all_observed_executions_successful": true,
+  "note": "Sixnormalofflineworkflow_dispatchruns plus sixreviewedbotpull_requestruns and onePRautomationrun. RepeatedexecutionsanddynamicPRautomationarenotnewtesttotals. No AWS/cloudpilot/containerpublishing/releaseworkflowwasstarted.",
+  "runs": [
+    {
+      "id": 44384240003,
+      "name": "Poster Artifact Parity",
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44384240003"
+    },
+    {
+      "id": 44384233770,
+      "name": "Documentation Integrity",
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44384233770"
+    },
+    {
+      "id": 44384226774,
+      "name": "Production Gate",
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44384226774"
+    },
+    {
+      "id": 44384219269,
+      "name": "Security Hygiene",
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44384219269"
+    },
+    {
+      "id": 44384211968,
+      "name": "CI",
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44384211968"
+    },
+    {
+      "id": 44384205592,
+      "name": "Local IAM studio acceptance",
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44384205592"
+    },
+    {
+      "id": 44384115396,
+      "name": "Security Hygiene",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44384115396"
+    },
+    {
+      "id": 44384115213,
+      "name": "Production Gate",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44384115213"
+    },
+    {
+      "id": 44384115603,
+      "name": "CI",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44384115603"
+    },
+    {
+      "id": 44384115233,
+      "name": "Poster Artifact Parity",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44384115233"
+    },
+    {
+      "id": 44384115270,
+      "name": "Local IAM studio acceptance",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44384115270"
+    },
+    {
+      "id": 44384115573,
+      "name": "Documentation Integrity",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44384115573"
+    },
+    {
+      "id": 44383763002,
+      "name": "PR #75",
+      "event": "dynamic",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+      "html_url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44383763002"
+    }
+  ]
+}

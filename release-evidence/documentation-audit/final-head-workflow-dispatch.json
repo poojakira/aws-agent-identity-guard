@@ -1,0 +1,98 @@
+{
+  "utc": "2026-11-18T19:48:51.317670+00:00",
+  "reviewed_source": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+  "purpose": "Explicit finalhead offlineverification afterhostedartifactbotchanges; normalexistingworkflow_dispatch, no approvalsettingchanges",
+  "excluded": "AWSAccessAnalyzerpilot, containerpublishing, release/sign/PyPI workflows NOTstarted",
+  "runs": [
+    {
+      "workflow": "local-studio.yml",
+      "command": [
+        "gh",
+        "workflow",
+        "run",
+        "local-studio.yml",
+        "--repo",
+        "poojakira/aws-agent-identity-guard",
+        "--ref",
+        "codex/local-workbench-20261116"
+      ],
+      "exit_code": 0,
+      "result": ""
+    },
+    {
+      "workflow": "ci.yml",
+      "command": [
+        "gh",
+        "workflow",
+        "run",
+        "ci.yml",
+        "--repo",
+        "poojakira/aws-agent-identity-guard",
+        "--ref",
+        "codex/local-workbench-20261116"
+      ],
+      "exit_code": 0,
+      "result": ""
+    },
+    {
+      "workflow": "security-hygiene.yml",
+      "command": [
+        "gh",
+        "workflow",
+        "run",
+        "security-hygiene.yml",
+        "--repo",
+        "poojakira/aws-agent-identity-guard",
+        "--ref",
+        "codex/local-workbench-20261116"
+      ],
+      "exit_code": 0,
+      "result": ""
+    },
+    {
+      "workflow": "production-gate.yml",
+      "command": [
+        "gh",
+        "workflow",
+        "run",
+        "production-gate.yml",
+        "--repo",
+        "poojakira/aws-agent-identity-guard",
+        "--ref",
+        "codex/local-workbench-20261116"
+      ],
+      "exit_code": 0,
+      "result": ""
+    },
+    {
+      "workflow": "production-policy.yml",
+      "command": [
+        "gh",
+        "workflow",
+        "run",
+        "production-policy.yml",
+        "--repo",
+        "poojakira/aws-agent-identity-guard",
+        "--ref",
+        "codex/local-workbench-20261116"
+      ],
+      "exit_code": 0,
+      "result": ""
+    },
+    {
+      "workflow": "poster-artifact-parity.yml",
+      "command": [
+        "gh",
+        "workflow",
+        "run",
+        "poster-artifact-parity.yml",
+        "--repo",
+        "poojakira/aws-agent-identity-guard",
+        "--ref",
+        "codex/local-workbench-20261116"
+      ],
+      "exit_code": 0,
+      "result": ""
+    }
+  ]
+}

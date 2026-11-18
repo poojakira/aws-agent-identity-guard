@@ -1,0 +1,48 @@
+{
+  "source_commit": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+  "runs": [
+    {
+      "name": "candidate-type-validation",
+      "command": [
+        "/workspace/work/tooling/venv/bin/python",
+        "/workspace/work/validate_inventory.py",
+        "/workspace/work/candidates/aws-agent-identity-guard",
+        "/workspace/work/evidence/aws-agent-identity-guard/docs-reconciliation/candidate-type-validation.json"
+      ],
+      "utc_start": "2026-11-18T19:48:41.401239+00:00",
+      "utc_end": "2026-11-18T19:48:41.586389+00:00",
+      "exit_code": 0,
+      "log": "candidate-type-validation.log"
+    },
+    {
+      "name": "secrets-scan",
+      "command": [
+        "/workspace/work/security-tools/bin/detect-secrets",
+        "scan",
+        "--no-verify",
+        "."
+      ],
+      "utc_start": "2026-11-18T19:48:41.586405+00:00",
+      "utc_end": "2026-11-18T19:48:43.934736+00:00",
+      "exit_code": 0,
+      "log": "secrets-scan.json"
+    },
+    {
+      "name": "bandit",
+      "command": [
+        "/workspace/work/security-tools/bin/bandit",
+        "-r",
+        "src",
+        "-ll",
+        "-f",
+        "json",
+        "-o",
+        "/workspace/work/evidence/aws-agent-identity-guard/docs-reconciliation/bandit.json"
+      ],
+      "utc_start": "2026-11-18T19:48:43.934756+00:00",
+      "utc_end": "2026-11-18T19:48:44.233504+00:00",
+      "exit_code": 0,
+      "log": "bandit.log"
+    }
+  ]
+}

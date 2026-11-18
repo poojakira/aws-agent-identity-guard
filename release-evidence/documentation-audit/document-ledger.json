@@ -1,0 +1,168 @@
+{
+  "reviewed_base": "970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc",
+  "generated_utc": "2026-11-18T19:37:12.997707+00:00",
+  "tracked_text_docs": 32,
+  "documents": [
+    {
+      "path": "CHANGELOG.md",
+      "disposition": "Unreleased documentation changes",
+      "review": "Records presentation and evidence corrections; runtime, rules and gates are unchanged."
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "disposition": "Authorized development; legal preamble preserved",
+      "review": "Actual source/test entry points, rule scope and evidence requirements; no rights change."
+    },
+    {
+      "path": "INCIDENT_RUNBOOK.md",
+      "disposition": "Consolidated response template",
+      "review": "Removed gate bypass, release commands, invented deadlines and incorrect remediation claims."
+    },
+    {
+      "path": "PRODUCTION.md",
+      "disposition": "Current release gates",
+      "review": "PARTIAL status, full candidate checks and deployment/privacy/recovery limits."
+    },
+    {
+      "path": "PRODUCT_VALIDATION.md",
+      "disposition": "Historical context preserved",
+      "review": "Conditional validation ladder; no external pilot or adoption result revalidated."
+    },
+    {
+      "path": "PROVENANCE.md",
+      "disposition": "Historical context preserved",
+      "review": "Maintainer chronology remains distinct from Git; external artifacts not independently retrieved."
+    },
+    {
+      "path": "README.md",
+      "disposition": "Current onboarding and index",
+      "review": "Real local review, 24 static rules plus one live-context ID, prior proof and later-head pending status."
+    },
+    {
+      "path": "RESUME_EVIDENCE.md",
+      "disposition": "Compatibility pointer preserved",
+      "review": "Older submitted metrics remain tied to their cited sources."
+    },
+    {
+      "path": "RUNBOOK.md",
+      "disposition": "Consolidated interface contracts",
+      "review": "Correct static count, exit statuses, exact-role filtering, completeness and remediation behavior."
+    },
+    {
+      "path": "SECURITY.md",
+      "disposition": "Current security/reporting guidance",
+      "review": "No invented SLA or absolute safety claims; credential/report privacy and residual risk."
+    },
+    {
+      "path": "SECURITY_AUDIT.md",
+      "disposition": "Historical report retained",
+      "review": "Dated findings are not a current no-web-surface or independent candidate assessment."
+    },
+    {
+      "path": "SECURITY_AUDIT_2026-09-30.md",
+      "disposition": "Historical report retained",
+      "review": "Old workflow checkpoint remains source-specific; the later studio has a different surface."
+    },
+    {
+      "path": "THREAT_MODEL.md",
+      "disposition": "Current controls and risk mapping",
+      "review": "Studio/CLI/live boundaries, incomplete IAM semantics, artifact privacy and mocked OIDC limitation."
+    },
+    {
+      "path": "VERIFIED_METRICS.md",
+      "disposition": "Source-scoped snapshots reconciled",
+      "review": "970d run 267/3; older 244/3 remains dated; skip reason checked in cited source."
+    },
+    {
+      "path": "docs/EVIDENCE.md",
+      "disposition": "Current evidence/governance reference",
+      "review": "Prior archive/review/CI scope, two deleted branch recovery tags and later-head pending proof."
+    },
+    {
+      "path": "docs/OPERATIONAL_IAM_REMEDIATION_MEASUREMENT.md",
+      "disposition": "Unexecuted authorized method clarified",
+      "review": "Static finding reduction does not establish effective-permission or live-role reduction."
+    },
+    {
+      "path": "docs/PERFORMANCE_BASELINE.md",
+      "disposition": "Threshold versus result clarified",
+      "review": "Existing 500-policy synthetic gate retained; no field performance or SLO claim."
+    },
+    {
+      "path": "docs/RECRUITER_EVIDENCE_AUDIT_2026-10-09.md",
+      "disposition": "Historical inventory/context corrected",
+      "review": "25 product IDs have separate static/live scope; cross-product figures remain dated."
+    },
+    {
+      "path": "docs/STUDIO.md",
+      "disposition": "Actual contract retained and status updated",
+      "review": "Completed implementation review/cleanup is separate from later-head verification."
+    },
+    {
+      "path": "docs/aws-architecture.md",
+      "disposition": "Actual configuration/trust distinction",
+      "review": "Account AssumeRole differs from OIDC; no invented log delivery, backend or cost proof."
+    },
+    {
+      "path": "docs/aws-security-controls.md",
+      "disposition": "Checked-in control mapping",
+      "review": "Source/configuration versus planned deployment; sensitive reports and offline/live distinctions."
+    },
+    {
+      "path": "docs/evidence/RESUME_EVIDENCE.md",
+      "disposition": "Historical submitted record preserved",
+      "review": "230-test application anchor and synthetic performance are not current-head evidence."
+    },
+    {
+      "path": "docs/internal/REPOSITORY_AUDIT.md",
+      "disposition": "Original read-only baseline preserved",
+      "review": "Pre-studio main, dashboard and branch observations remain explicitly historical."
+    },
+    {
+      "path": "docs/internal/RULE_INVENTORY_CORRECTION.md",
+      "disposition": "Reviewed; accurate correction preserved",
+      "review": "24 canonical static IDs plus live AIG-PB001 match code/tests; no AWS call used."
+    },
+    {
+      "path": "docs/license-history/LICENSE-BEFORE-2026-10-13.txt",
+      "disposition": "Read; legal text preserved unchanged",
+      "review": "Historical grants and attribution were not modified."
+    },
+    {
+      "path": "examples/delegated_credentials/README.md",
+      "disposition": "Mock/API limitation corrected",
+      "review": "Local guard/moto does not prove AWS WebIdentity authorization; runtime/tests unchanged."
+    },
+    {
+      "path": "integrations/N8N_WORKFLOW.md",
+      "disposition": "Template behavior/gaps documented",
+      "review": "Exit routing, incomplete scans, duplicate tickets and external sharing require review."
+    },
+    {
+      "path": "poster/01_research_brief.md",
+      "disposition": "Historical source/scope corrected",
+      "review": "718 snapshot, 24 static plus one live-context check and legacy-module skip reason."
+    },
+    {
+      "path": "poster/02_claim_ledger.md",
+      "disposition": "Historical source/scope corrected",
+      "review": "Claims attest to cited source; benchmark remains separate."
+    },
+    {
+      "path": "poster/03_verified_metrics.md",
+      "disposition": "Historical source/scope corrected",
+      "review": "247/244/3 stays dated; corrected skip and product inventory labels."
+    },
+    {
+      "path": "poster/13_reproducibility.md",
+      "disposition": "Historical source/scope corrected",
+      "review": "Pinned 718 checkout; no current-head pass or credential-dependent skip fiction."
+    },
+    {
+      "path": "requirements-studio-test.txt",
+      "disposition": "Read; verification snapshot preserved unchanged",
+      "review": "Tool dependencies are not runtime requirements or wheel-hash locks."
+    }
+  ],
+  "boundary": "Alloriginaltrackedtextdocs read; code/test/config/APIsemantics consulted. This is not allcommands executed, externalhistoricalclaim validation, liveAWSorproductionapproval. RootLICENSE additionallyread andpreserved."
+}
