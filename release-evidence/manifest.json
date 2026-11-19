@@ -1,0 +1,633 @@
+{
+  "repository": "poojakira/aws-agent-identity-guard",
+  "source_commit": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+  "branch": "codex/local-workbench-20261116",
+  "clean_before": true,
+  "clean_after": true,
+  "version": "0.3.0",
+  "generated_utc": "2026-11-19T00:50:25.055324+00:00",
+  "decision": "PARTIAL",
+  "run_id": "selected-branches-abe1c0a1e595",
+  "tests": {
+    "tests": 275,
+    "passed": 272,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 3
+  },
+  "native_subtests": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "separate_python310": {
+    "individual_cases": 23,
+    "passed": 23,
+    "failed": 0,
+    "skipped": 0
+  },
+  "coverage": {
+    "covered_lines": 871,
+    "num_statements": 1129,
+    "percent_covered": 77.14791851195749,
+    "percent_covered_display": "77",
+    "missing_lines": 258,
+    "excluded_lines": 6,
+    "percent_statements_covered": 77.14791851195749,
+    "percent_statements_covered_display": "77"
+  },
+  "unchanged_coverage_gate": null,
+  "runs": [
+    {
+      "name": "dependencies",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "pip",
+        "freeze",
+        "--all"
+      ],
+      "utc_start": "2026-11-19T00:19:15.336756+00:00",
+      "utc_end": "2026-11-19T00:19:16.231370+00:00",
+      "exit_code": 0,
+      "log": "dependencies.log"
+    },
+    {
+      "name": "lint",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "."
+      ],
+      "utc_start": "2026-11-19T00:19:16.231415+00:00",
+      "utc_end": "2026-11-19T00:19:16.264447+00:00",
+      "exit_code": 0,
+      "log": "lint.log"
+    },
+    {
+      "name": "format",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "utc_start": "2026-11-19T00:19:16.264484+00:00",
+      "utc_end": "2026-11-19T00:19:16.295820+00:00",
+      "exit_code": 0,
+      "log": "format.log"
+    },
+    {
+      "name": "regression",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "pytest",
+        "-p",
+        "pytest_cov",
+        "tests/",
+        "-q",
+        "--cov=aws_agent_identity_guard",
+        "--cov-report=json:/workspace/work/evidence/aws-agent-identity-guard/selected-branches/coverage.json",
+        "--cov-report=term-missing",
+        "--junitxml=/workspace/work/evidence/aws-agent-identity-guard/selected-branches/junit.xml"
+      ],
+      "utc_start": "2026-11-19T00:19:16.295856+00:00",
+      "utc_end": "2026-11-19T00:19:38.769550+00:00",
+      "exit_code": 0,
+      "log": "regression.log"
+    },
+    {
+      "name": "typecheck_studio",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "pyright",
+        "--pythonpath",
+        "/workspace/work/envs/iam/bin/python",
+        "src/aws_agent_identity_guard/studio"
+      ],
+      "utc_start": "2026-11-19T00:19:38.769782+00:00",
+      "utc_end": "2026-11-19T00:19:41.961742+00:00",
+      "exit_code": 0,
+      "log": "typecheck_studio.log"
+    },
+    {
+      "name": "bandit",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "bandit",
+        "-r",
+        "src",
+        "-ll",
+        "-f",
+        "json",
+        "-o",
+        "/workspace/work/evidence/aws-agent-identity-guard/selected-branches/bandit.json"
+      ],
+      "utc_start": "2026-11-19T00:19:41.962430+00:00",
+      "utc_end": "2026-11-19T00:19:42.654643+00:00",
+      "exit_code": 0,
+      "log": "bandit.log"
+    },
+    {
+      "name": "browser",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "scripts/studio_e2e.py",
+        "--output",
+        "/workspace/work/evidence/aws-agent-identity-guard/selected-branches/browser",
+        "--schema",
+        "/workspace/work/references/sarif-schema-2.1.0.json",
+        "--chromium",
+        "/usr/bin/chromium"
+      ],
+      "utc_start": "2026-11-19T00:19:42.654860+00:00",
+      "utc_end": "2026-11-19T00:19:54.034461+00:00",
+      "exit_code": 0,
+      "log": "browser.log"
+    },
+    {
+      "name": "build",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "build",
+        "--outdir",
+        "/workspace/work/evidence/aws-agent-identity-guard/selected-branches/artifacts"
+      ],
+      "utc_start": "2026-11-19T00:19:54.034509+00:00",
+      "utc_end": "2026-11-19T00:20:10.758685+00:00",
+      "exit_code": 0,
+      "log": "build.log"
+    },
+    {
+      "name": "dependency_audit",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "-m",
+        "pip_audit",
+        "--skip-editable",
+        "--cache-dir",
+        "/workspace/work/evidence/aws-agent-identity-guard/iam-studio-tool-cache-abe1c0a1e595/pip-audit",
+        "--format",
+        "json",
+        "--output",
+        "/workspace/work/evidence/aws-agent-identity-guard/selected-branches/pip-audit.json"
+      ],
+      "utc_start": "2026-11-19T00:20:10.758712+00:00",
+      "utc_end": "2026-11-19T00:20:20.398218+00:00",
+      "exit_code": 0,
+      "log": "dependency_audit.log"
+    },
+    {
+      "name": "performance_existing_gate",
+      "command": [
+        "/workspace/work/envs/iam/bin/python",
+        "benchmarks/perf_gate.py",
+        "--policies",
+        "500",
+        "--output",
+        "/workspace/work/evidence/aws-agent-identity-guard/selected-branches/performance.json"
+      ],
+      "utc_start": "2026-11-19T00:20:20.431229+00:00",
+      "utc_end": "2026-11-19T00:20:21.062424+00:00",
+      "exit_code": 0,
+      "log": "performance_existing_gate.log"
+    }
+  ],
+  "host_environment": {
+    "os": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "python": "3.12.14",
+    "node": "v24.22.1",
+    "chromium": "Chromium 156.0.8078.79 built on Debian GNU/Linux 13 (trixie)"
+  },
+  "dependency_file_sha256": {
+    "pyproject.toml": "36b6918e93acd85b2b02c3d879848ee4016ccbffff3fa96210555d267a194966",
+    "requirements-studio-test.txt": "ee8573c181805eba70239832647c3300f5dfc435c169317bd0c5706462e00f0e",
+    "demo/requirements-notebook.txt": "ba031523806b75573d50fd519e68af5453ff1f26013b5309b0da42f5c7dfc740"
+  },
+  "scope": "Actual fresh required local runs plus separately scoped notebook/minimal-venv and hosted acceptance proof. Existing main verification dependency caches reused; not a universal clean-build/release/security certification.",
+  "hosted_runs": {
+    "source_commit": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+    "checked_utc": "2026-11-19T00:41:58.241Z",
+    "runs": [
+      {
+        "id": 44428284748,
+        "name": "Local IAM studio acceptance",
+        "path": ".github/workflows/local-studio.yml",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+        "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428284748"
+      },
+      {
+        "id": 44428284685,
+        "name": "Documentation Integrity",
+        "path": ".github/workflows/production-policy.yml",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+        "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428284685"
+      },
+      {
+        "id": 44428284658,
+        "name": "Security Hygiene",
+        "path": ".github/workflows/security-hygiene.yml",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+        "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428284658"
+      },
+      {
+        "id": 44428284308,
+        "name": "Production Gate",
+        "path": ".github/workflows/production-gate.yml",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+        "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428284308"
+      },
+      {
+        "id": 44428284756,
+        "name": "Poster Artifact Parity",
+        "path": ".github/workflows/poster-artifact-parity.yml",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+        "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428284756"
+      },
+      {
+        "id": 44428284537,
+        "name": "CI",
+        "path": ".github/workflows/ci.yml",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+        "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428284537"
+      },
+      {
+        "id": 44428278131,
+        "name": "PR #75",
+        "path": "dynamic/github-code-scanning/codeql",
+        "event": "dynamic",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+        "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428278131"
+      }
+    ]
+  },
+  "notebook": {
+    "repository": "aws-agent-identity-guard",
+    "source_commit": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+    "expected_candidate": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+    "utc_start": "2026-11-19T00:21:59.509991+00:00",
+    "utc_end": "2026-11-19T00:22:03.939508+00:00",
+    "result": "PASS",
+    "error": null,
+    "environment": "Actual committed notebook setup/scenario/comparison cells executed on local LinuxCPython3.12, GitHubpubliccheckout and fresh isolated minimalvenv",
+    "colab_hosted_kernel": "NOT VERIFIED; no Google sign-in or remote hosted execution claimed",
+    "source_notebook_sha256": "e6c00f9d934fdb4d80e8b94d42c55d35935ab3ff974fdd8ea817e99647cc936e",
+    "all_result_checksums_verified": true,
+    "no_external_resources": "No server/tunnel/Drive/GPU/paidAPI/cloudresource/APIkey; only publicGitHub/PyPI downloads",
+    "scenario_summaries": [
+      {
+        "scenario": "broad",
+        "summary": "6 static finding(s); effective permissions UNKNOWN; removed=0"
+      },
+      {
+        "scenario": "scoped",
+        "summary": "1 static finding(s); effective permissions UNKNOWN; removed=0"
+      },
+      {
+        "scenario": "compare",
+        "summary": "1 static finding(s); effective permissions UNKNOWN; removed=6"
+      }
+    ]
+  },
+  "branch_summary": {
+    "remote_count": 2,
+    "retired": 5,
+    "main": "acbba97bc43d77031ee31bda8f2b04ed0030f7c2"
+  },
+  "file_audit": {
+    "tracked": 123,
+    "source": "final-file-audit.json"
+  },
+  "independent_current_source_closure": "NOT VERIFIED",
+  "remaining_gates": [
+    "Static patterns do not establish effective permissions or proven exploitability. Complete Deny/SCP/boundary/session/resource-policy/service-condition intersections and live context are NOT VERIFIED or NOT IMPLEMENTED.",
+    "Current product-container runtime, full transitive clean-build locks and authenticated public hosting are NOT VERIFIED.",
+    "Deployment-specific privacy, operations, recovery and independent current-source adversarial signoff remain NOT VERIFIED."
+  ],
+  "artifacts": {
+    "RELEASE_ASSESSMENT.md": {
+      "bytes": 7387,
+      "sha256": "74b6a9a24e64f6a6d800c38ea58e29bf48f6738a5d9bd68bb70d46f1ed656ddd"
+    },
+    "actionlint.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "architecture/ARCHITECTURE.md": {
+      "bytes": 21995,
+      "sha256": "de4f1e05033092cfd7302b92ea326c0b9c487d4b7b50acaac37f65d40868e59e"
+    },
+    "architecture/BRANCHES.md": {
+      "bytes": 2241,
+      "sha256": "819dfba3d0072a55939a22e16a79de0b48932359e8d5a4e9de86617e67983bb3"
+    },
+    "architecture/TRY_IT.md": {
+      "bytes": 3789,
+      "sha256": "d17a12c18718fcb5a7fe7df4db16c2956ab1099cb3a7fb350ae099b46dc3488c"
+    },
+    "architecture/architecture-handoff.json": {
+      "bytes": 4341,
+      "sha256": "ee3a11838118d32cd4603cbac4ce73b7aaed849ec28f8d1ca4fdd82c83eaba38"
+    },
+    "architecture/diagram-render-verification.json": {
+      "bytes": 1078,
+      "sha256": "18c9ccf1b4811be1b4b3a82c16420eba045f556f13eb6148477ec51e1cb366c0"
+    },
+    "architecture/source-scope.json": {
+      "bytes": 865,
+      "sha256": "eb22a595af7f07cdfe0441e55c089ddc5517f6e5c28c2c0fa9746c6f4bab33e0"
+    },
+    "architecture/viewer-checks.json": {
+      "bytes": 461,
+      "sha256": "d19134f0476a4d859e93550eab34775f614c944fba4b3e9b628507c4c3aea236"
+    },
+    "architecture/viewer-desktop.png": {
+      "bytes": 130714,
+      "sha256": "441d8d62c8a2b14f7b832c687d3aeb4a9f3e5c900cd49330e064293e62797006"
+    },
+    "architecture/viewer-mobile.png": {
+      "bytes": 120919,
+      "sha256": "3c3a42d28b466076ea6789fd6fd1509e630565c043e1eb9b987ce667d39d3583"
+    },
+    "artifacts/aws_agent_identity_guard-0.3.0-py3-none-any.whl": {
+      "bytes": 53013,
+      "sha256": "3427c00904dbeceb7fd17f1c52ec7972de120e7a97a5846140c09431a56e7d8f"
+    },
+    "artifacts/aws_agent_identity_guard-0.3.0.tar.gz": {
+      "bytes": 88714,
+      "sha256": "e7bf5cc6afe879509bd7bbb203260b1c205a9aff17272b7dc66151e4f6dc22b1"
+    },
+    "bandit.json": {
+      "bytes": 3557,
+      "sha256": "2203a8f4184ce44f33cc54905337f573e4085768863fc08ac3a92eaf9a0ca654"
+    },
+    "bandit.log": {
+      "bytes": 273,
+      "sha256": "bc1e5aabef49ed71ffb84e18b83eb5e160420bf632234b1b9f39a47a5e030d34"
+    },
+    "branch-disposition.json": {
+      "bytes": 5652,
+      "sha256": "d383b9ccd7b2c1cbea1de47e4530af639cc98ba1612e70156af87fa88b0e5573"
+    },
+    "browser/browser-result.json": {
+      "bytes": 1458,
+      "sha256": "bb7d599d4aba7e2b566397cc58bd7359104deadc29ff7d9d574cd7e928b51df7"
+    },
+    "browser/changed-review.json": {
+      "bytes": 27186,
+      "sha256": "6e2915497a325cea6b7c2286aa4006f2106dff4f5de7592a70848ce22dd3c5d3"
+    },
+    "browser/desktop.png": {
+      "bytes": 423308,
+      "sha256": "572cedd3fb15e01d0e88e76f0201103621b32c40ea29da4308f8b77b457c24b3"
+    },
+    "browser/first-review.json": {
+      "bytes": 43506,
+      "sha256": "fa01001deba1de33eb5c7aa090b6af8080d7ace872696b855e9a4e5fd88f7707"
+    },
+    "browser/identity-and-trust.sarif": {
+      "bytes": 6564,
+      "sha256": "0fa11803ca9949904a9baf954b72a5f08d9aedd8502cc5dde78902a0c12edb5b"
+    },
+    "browser/mobile.png": {
+      "bytes": 394891,
+      "sha256": "9752555596fc9849269c0d30c5d8b20d951a48a71bd5b23c6861031ea60c258f"
+    },
+    "browser/review.sarif": {
+      "bytes": 3283,
+      "sha256": "c7da0fca2ec9577e47a20718dd753ceb6125ae94e4af5554bd491355b19ff268"
+    },
+    "browser/review.txt": {
+      "bytes": 1692,
+      "sha256": "ff4db47a49b0c71953911f7b2acf2cd80dba0d964e9a2981c843baefa4c7b41d"
+    },
+    "browser.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "build.log": {
+      "bytes": 14307,
+      "sha256": "7b7a3e718b01cc7842d220054afbe0b099a3d9b4cc26de384bf703bf55e76582"
+    },
+    "candidate-type-validation.json": {
+      "bytes": 51729,
+      "sha256": "30d05a8c41c3d23f9809afbca5768bbe8cc17c9d490ffe55a2ce2aff25566ec7"
+    },
+    "cost-and-access-audit.json": {
+      "bytes": 1337,
+      "sha256": "33c5bece5a7017572ec1e21eb9f7fafa02825db45de20dae4dfd977c524bd535"
+    },
+    "coverage-data": {
+      "bytes": 53248,
+      "sha256": "686de5f6916b8ec88f7837dc6fedc019a8779480854ada275d5839e0111cf9bc"
+    },
+    "coverage.json": {
+      "bytes": 51639,
+      "sha256": "5714fc1e5f4d86d476e7266081c3dc4d3e52dcfd7cda9984821a9ae597ada7be"
+    },
+    "current-secret-scan.json": {
+      "bytes": 548,
+      "sha256": "8245a53f42a8fdee23d47e1610419c77676ac6b16fb27574439234eda5901b08"
+    },
+    "demo-bandit.json": {
+      "bytes": 1377,
+      "sha256": "9aaed5e9f3587620a340e9fc3e3ae26ba6f0edb25879fd689e9c3adf5e7de4e9"
+    },
+    "dependencies.log": {
+      "bytes": 1195,
+      "sha256": "bee5c1c57336779557833fb105e34218a2fa07882e562b2f2f1a6b1adebf70fc"
+    },
+    "dependency_audit.log": {
+      "bytes": 31,
+      "sha256": "15950a68a7ed99c59779717acefdceb3f69cfd31bde67d2c954f2a3cea4d7955"
+    },
+    "environment_sbom.log": {
+      "bytes": 295,
+      "sha256": "048ad3c7763fa426656e0b0b871c2b1232840a0720bfdc227c238aa0be0e54dd"
+    },
+    "executed-test-inventory.json": {
+      "bytes": 51133,
+      "sha256": "495ef4d8a1b02dffc9a2880b29e946e77340a99b6814fc81119b664f967e32f5"
+    },
+    "final-audit-0.log": {
+      "bytes": 127,
+      "sha256": "2835978228880d3963ee636c8f96dfddb96f3cfeb420961d500f6b39436d1f5b"
+    },
+    "final-audit-1.log": {
+      "bytes": 437,
+      "sha256": "17abf227df0dc5958f38d3429e398f91b7d9d84f0fc6d1ab6a30604147dbbe47"
+    },
+    "final-audit-2.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "final-audit-3.log": {
+      "bytes": 278,
+      "sha256": "2a75c8476293b1977c48c2948a8b51e945b5654c10e88caf6b0d5f3785a878bb"
+    },
+    "final-doc-links.json": {
+      "bytes": 7726,
+      "sha256": "fbf9ed42a57100f1d57cc1beaffecb386b9dea44366f825a6e4423493c85208f"
+    },
+    "final-file-audit.json": {
+      "bytes": 15520,
+      "sha256": "2e57ad7632b4a19626ad24846ebf2ead65110fd4afe8f2f4ef6f392a2a306401"
+    },
+    "final-file-inventory.json": {
+      "bytes": 51729,
+      "sha256": "30d05a8c41c3d23f9809afbca5768bbe8cc17c9d490ffe55a2ce2aff25566ec7"
+    },
+    "format.log": {
+      "bytes": 27,
+      "sha256": "9071fb8809290955639414bfc7f9a55bb49b60c6fbecf0b84ad6e8cffd072155"
+    },
+    "javascript_syntax.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "junit.xml": {
+      "bytes": 36792,
+      "sha256": "00ca18e740fce2cdb7514b3cab1080e24390442c9ebc3cf6c1f11ebed177292d"
+    },
+    "lint.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "notebook/actual-engine-results.json": {
+      "bytes": 80861,
+      "sha256": "432059cf54e5f70a093a5e10b923c4572d03a28e105313fdb89d77955ac743a9"
+    },
+    "notebook/execution.log": {
+      "bytes": 663,
+      "sha256": "0a57805b3647f5a632a643daddeaf64c991e5d8f04bbf1c8ab5a1c891ccc9d94"
+    },
+    "notebook/minimal-environment.txt": {
+      "bytes": 12,
+      "sha256": "6f2dfd3e7106a07c571ea485df61d85fb1a5dc749c1ad6c93bf84f4f4dd2b52d"
+    },
+    "notebook/verification.json": {
+      "bytes": 1229,
+      "sha256": "0ca03b5a72eef21288951229145049a9b7cf4aa47efebc6500c0d83b9016d0c4"
+    },
+    "pages-configuration.json": {
+      "bytes": 261,
+      "sha256": "0eddc84fac6fce4bf6e07e020a7dea3d82d5c54163e9a3981f3f682222845151"
+    },
+    "performance.json": {
+      "bytes": 534,
+      "sha256": "ba40762623a72a95dca6c0aa39aaed17d1cbee334818e2604b7923b97bbf279d"
+    },
+    "performance_existing_gate.log": {
+      "bytes": 406,
+      "sha256": "684326afc80adfd47ab19ffa751e985d8145000710ee714381933a155836f465"
+    },
+    "pip-audit.json": {
+      "bytes": 3835,
+      "sha256": "12292ddb833a573e09fe680640073d79369133a36a2d53877bd571a8f4a66342"
+    },
+    "primary-run-manifest.json": {
+      "bytes": 9315,
+      "sha256": "4ed199d17a5e660a99203eb9605f87eb3b3589ec87e96be41fa8995f89f3d80f"
+    },
+    "product-matrix.json": {
+      "bytes": 3477,
+      "sha256": "b0c26f7578c8dc25d52ba984942b8f3de05a1e926d9b698ab86a9e4903103a60"
+    },
+    "public-source-verification.json": {
+      "bytes": 3066,
+      "sha256": "fd3984b38ce399cf14678ce27ea9673641df842d9cfd2aa1c01b7c84f034c62c"
+    },
+    "python310-junit.xml": {
+      "bytes": 4279,
+      "sha256": "04eb0816d97501b9bb346d474c6a25c9a75e340d41642fb11e1a14bfedfdf039"
+    },
+    "python310_studio.log": {
+      "bytes": 80,
+      "sha256": "475bcfb56b286d857c4310602373e306e2cb722ad6df6053d0e1aff939c18220"
+    },
+    "regression.log": {
+      "bytes": 2099,
+      "sha256": "eaba9fb0f36e98e899eb3cd0d53fa4ed18baa85928958803770042bc2722d649"
+    },
+    "remote-ci/artifact-verification.json": {
+      "bytes": 1924,
+      "sha256": "96cffa06775f2497b85e820dcb78f678879dd13ea723a146f49e72dc6ddaba59"
+    },
+    "remote-ci/hosted-junit.xml": {
+      "bytes": 36843,
+      "sha256": "b241a4ce0982370b46872c78cdeb058c1d9bb6c97c11da5fcb9cc61efd2672aa"
+    },
+    "remote-ci/hosted-manifest.json": {
+      "bytes": 9152,
+      "sha256": "2cb44d3429a7ba146df9f69f9e1064a97d24ef7fbad828a94fd68965272a42cc"
+    },
+    "remote-ci/status.json": {
+      "bytes": 2731,
+      "sha256": "19cf04585625d50f829388a176a01c443e61f39df7a4e257fb259124853736ac"
+    },
+    "repository_security.log": {
+      "bytes": 38,
+      "sha256": "f71dbebc48b5c072923efef7ced205cd98c6b99d14b8669372d83df3312af9a6"
+    },
+    "secret-history-triage.json": {
+      "bytes": 984,
+      "sha256": "61152a17d62f72728578473fd6eb171ad16e47b97145d80467eeee350a98adf2"
+    },
+    "secret-tool-verification.json": {
+      "bytes": 273,
+      "sha256": "b0510fdb80f61f7eb2204f3172ead51f70c64c74aacd2a8458f30414404c3caa"
+    },
+    "supplemental-runs.json": {
+      "bytes": 3643,
+      "sha256": "8e3ffb82cf37309eff38f1e90a625b5322e15673ed05c8305fd61e821a9f00c1"
+    },
+    "test-environment-sbom.json": {
+      "bytes": 11332,
+      "sha256": "31a573913b2efba325fa400116d42e225d380fb7f90cfd1d83285fbd5626185f"
+    },
+    "tracked_type_validation.log": {
+      "bytes": 127,
+      "sha256": "2835978228880d3963ee636c8f96dfddb96f3cfeb420961d500f6b39436d1f5b"
+    },
+    "typecheck_studio.log": {
+      "bytes": 37,
+      "sha256": "6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332"
+    },
+    "wheel-smoke.json": {
+      "bytes": 1454,
+      "sha256": "d8bfd8dae98f96ffff18568f3232e278c05e3313949221188f15d3c7201474c6"
+    },
+    "wheel_install.log": {
+      "bytes": 1055,
+      "sha256": "a2c62943792e83009596710065de2e5b811655db5f99714e65708947b858c973"
+    }
+  }
+}

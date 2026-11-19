@@ -1,0 +1,1656 @@
+{
+  "source_commit": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+  "count_units": "Individual JUnit testcases; native subtests and separate focused executions excluded",
+  "tests": [
+    {
+      "class": "tests.test_access_analyzer_contract",
+      "name": "test_aws_validate_uses_identity_policy_and_compact_json",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_access_analyzer_contract",
+      "name": "test_compare_policy_keeps_local_and_aws_evidence_separate",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_access_analyzer_contract",
+      "name": "test_aws_validate_handles_non_list_findings_defensively",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_access_analyzer_validation",
+      "name": "test_differential_report_is_bound_to_exact_policy_bytes",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_access_analyzer_validation",
+      "name": "test_differential_adapter_sends_same_policy_semantics",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_cli_output",
+      "name": "test_duplicate_policy_key_is_rejected_before_analysis",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_cli_output",
+      "name": "test_sarif_output_writes_file",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_cli_output",
+      "name": "test_json_output_writes_file",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_cli_output",
+      "name": "test_output_creates_parent_directory",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_cli_output",
+      "name": "test_sarif_output_is_2_1_0_conformant",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_cli_output",
+      "name": "test_sarif_clean_policy_still_conformant",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestConditionHasKey",
+      "name": "test_exact_match",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestConditionHasKey",
+      "name": "test_case_insensitive_match",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestConditionHasKey",
+      "name": "test_mixed_case_key",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestConditionHasKey",
+      "name": "test_no_false_positive_on_longer_key",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestConditionHasKey",
+      "name": "test_empty_condition",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestConditionHasKey",
+      "name": "test_none_condition",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestConditionHasKey",
+      "name": "test_malformed_condition_value",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestConditionHasKey",
+      "name": "test_multiple_operators",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestConditionHasKey",
+      "name": "test_aws_source_arn_found",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestConditionHasKey",
+      "name": "test_aws_source_arn_case_variant",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestConditionHasKey",
+      "name": "test_condition_has_key_any_returns_true_on_first_match",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestConditionHasKey",
+      "name": "test_condition_has_key_any_returns_false_when_none_match",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestAIG004PassRoleConditionParsing",
+      "name": "test_passrole_without_condition_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestAIG004PassRoleConditionParsing",
+      "name": "test_passrole_with_correct_condition_no_finding",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestAIG004PassRoleConditionParsing",
+      "name": "test_passrole_with_lowercase_condition_key_no_finding",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestAIG004PassRoleConditionParsing",
+      "name": "test_passrole_with_passedtoserviceaccount_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestAIG002PartialWildcards",
+      "name": "test_iam_star_role_star_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestAIG002PartialWildcards",
+      "name": "test_s3_get_star_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestAIG002PartialWildcards",
+      "name": "test_bedrock_star_agent_star_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestAIG002PartialWildcards",
+      "name": "test_ec2_describe_star_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestAIG002PartialWildcards",
+      "name": "test_explicit_star_still_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestAIG002PartialWildcards",
+      "name": "test_service_star_still_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestTrustPolicyConditionParsing",
+      "name": "test_tp002_fires_without_external_id",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestTrustPolicyConditionParsing",
+      "name": "test_tp002_no_finding_with_external_id",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestTrustPolicyConditionParsing",
+      "name": "test_tp002_no_finding_with_lowercase_externalid_key",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestTrustPolicyConditionParsing",
+      "name": "test_tp003_no_finding_with_source_arn",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_condition_structural.TestTrustPolicyConditionParsing",
+      "name": "test_tp003_no_finding_with_lowercase_source_arn",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestEmptyStatement",
+      "name": "test_empty_statement_list",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestEmptyStatement",
+      "name": "test_missing_statement_key",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestEmptyStatement",
+      "name": "test_statement_is_none",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestEmptyStatement",
+      "name": "test_statement_single_object",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestDenyOnlyPolicies",
+      "name": "test_single_deny_statement",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestDenyOnlyPolicies",
+      "name": "test_multiple_deny_statements",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestDenyOnlyPolicies",
+      "name": "test_deny_with_condition",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestNotAction",
+      "name": "test_not_action_with_allow",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestNotAction",
+      "name": "test_not_action_with_deny",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestNotAction",
+      "name": "test_not_action_list",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestNotAction",
+      "name": "test_not_action_empty_list",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestNotResource",
+      "name": "test_not_resource_with_allow",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestNotResource",
+      "name": "test_not_resource_with_deny",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestNotResource",
+      "name": "test_not_resource_wildcard_action",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestNotResource",
+      "name": "test_not_resource_list",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestLargePolicy",
+      "name": "test_100_statements",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestLargePolicy",
+      "name": "test_100_statements_with_wildcards",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestLargePolicy",
+      "name": "test_100_statements_mixed_features",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestUnicodeHandling",
+      "name": "test_unicode_action_name",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestUnicodeHandling",
+      "name": "test_unicode_resource_arn",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestUnicodeHandling",
+      "name": "test_emoji_in_sid",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestUnicodeHandling",
+      "name": "test_chinese_characters",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestRemediateOutput",
+      "name": "test_remediate_basic_finding",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestRemediateOutput",
+      "name": "test_remediate_empty_findings",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestRemediateOutput",
+      "name": "test_remediate_multiple_findings",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestPublicBreachPatterns",
+      "name": "test_capital_one_2019_pattern",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestPublicBreachPatterns",
+      "name": "test_uber_2016_pattern",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestPublicBreachPatterns",
+      "name": "test_privilege_escalation_via_iam_passrole",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestPublicBreachPatterns",
+      "name": "test_privilege_escalation_via_iam_create_policy",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestPublicBreachPatterns",
+      "name": "test_s3_public_access_pattern",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestPublicBreachPatterns",
+      "name": "test_cloudtrail_disable_pattern",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestPublicBreachPatterns",
+      "name": "test_ssrf_metadata_exfil_role",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestScannerEdgeCases",
+      "name": "test_policy_as_json_string",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestScannerEdgeCases",
+      "name": "test_action_as_single_string",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestScannerEdgeCases",
+      "name": "test_resource_as_single_string",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestScannerEdgeCases",
+      "name": "test_multiple_conditions",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestScannerEdgeCases",
+      "name": "test_version_2008",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestScannerEdgeCases",
+      "name": "test_no_version_field",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestScannerEdgeCases",
+      "name": "test_sid_field_present",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestScannerEdgeCases",
+      "name": "test_principal_field",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestScannerEdgeCases",
+      "name": "test_wildcard_principal",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_coverage_boost.TestRulesModule",
+      "name": "test_get_rules_returns_list",
+      "status": "SKIPPED",
+      "skip_reason": "rules module not importable"
+    },
+    {
+      "class": "tests.test_coverage_boost.TestRulesModule",
+      "name": "test_each_rule_has_required_fields",
+      "status": "SKIPPED",
+      "skip_reason": "rules module not importable"
+    },
+    {
+      "class": "tests.test_coverage_boost.TestRulesModule",
+      "name": "test_evaluate_rule_with_safe_policy",
+      "status": "SKIPPED",
+      "skip_reason": "rules module not importable"
+    },
+    {
+      "class": "tests.test_enforce_mode.TestEnforceMode",
+      "name": "test_enforce_flag_exists",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_enforce_mode.TestEnforceMode",
+      "name": "test_enforce_mode_fails_on_incomplete_scan",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_enforce_mode.TestEnforceMode",
+      "name": "test_static_mode_clean_policy_passes_even_with_enforce",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_enforce_mode.TestIncompleteScanDetection",
+      "name": "test_scan_report_has_completeness_fields",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_enforce_mode.TestIncompleteScanDetection",
+      "name": "test_incomplete_scan_marks_scan_complete_false",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_enforce_mode.TestNoHTTPProxy",
+      "name": "test_no_http_proxy_in_repo",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_enforce_mode.TestNoHTTPProxy",
+      "name": "test_no_runtime_auth_engine",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_enforce_mode.TestTransportSecurity",
+      "name": "test_no_network_listeners",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestInvalidJsonInput",
+      "name": "test_truncated_json",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestInvalidJsonInput",
+      "name": "test_completely_invalid_json",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestInvalidJsonInput",
+      "name": "test_json_array_not_object",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestInvalidJsonInput",
+      "name": "test_json_scalar",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestInvalidJsonInput",
+      "name": "test_empty_file",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestMissingFile",
+      "name": "test_nonexistent_file",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestMissingFile",
+      "name": "test_directory_instead_of_file",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestEmptyPolicyDocument",
+      "name": "test_empty_object",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestEmptyPolicyDocument",
+      "name": "test_empty_statement_list",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestEmptyPolicyDocument",
+      "name": "test_empty_object_via_cli",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestEmptyPolicyDocument",
+      "name": "test_empty_statement_via_cli",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestMalformedPolicy",
+      "name": "test_missing_statement_field",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestMalformedPolicy",
+      "name": "test_statement_is_string_not_list",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestMalformedPolicy",
+      "name": "test_statement_entry_is_string",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestMalformedPolicy",
+      "name": "test_statement_missing_effect",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestMalformedPolicy",
+      "name": "test_statement_missing_action_and_notaction",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestMalformedPolicy",
+      "name": "test_statement_missing_resource",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestMalformedPolicy",
+      "name": "test_action_is_integer",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestMalformedPolicy",
+      "name": "test_null_values_in_statement",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestLargePolicyDocument",
+      "name": "test_many_statements",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestLargePolicyDocument",
+      "name": "test_many_actions_per_statement",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestLargePolicyDocument",
+      "name": "test_large_policy_via_cli",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestNonUtf8Content",
+      "name": "test_latin1_encoded_file",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestNonUtf8Content",
+      "name": "test_null_bytes_in_file",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_failure_modes.TestNonUtf8Content",
+      "name": "test_binary_file",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_iam_parser_fuzz",
+      "name": "test_scan_policy_never_crashes",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_iam_parser_fuzz",
+      "name": "test_scan_trust_never_crashes",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_iam_parser_fuzz",
+      "name": "test_as_list_always_returns_list",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_iam_parser_fuzz",
+      "name": "test_condition_has_key_case_insensitive",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_iam_parser_fuzz",
+      "name": "test_statements_with_unicode_keys",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_iam_parser_fuzz",
+      "name": "test_wildcard_action_string_not_list",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_iam_parser_fuzz",
+      "name": "test_nested_notaction_fires_aig001",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_iam_parser_fuzz",
+      "name": "test_deny_statement_not_scanned",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_killchain.TestKillChainCombinations",
+      "name": "test_service_wildcard_does_not_grant_other_services",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_killchain.TestKillChainCombinations",
+      "name": "test_notaction_complement_is_not_treated_as_excluded_action",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_killchain.TestKillChainCombinations",
+      "name": "test_notaction_star_grants_no_combo_actions",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_killchain.TestKillChainCombinations",
+      "name": "test_harvest_plus_lateral_is_aig019_critical",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_killchain.TestKillChainCombinations",
+      "name": "test_harvest_plus_metadata_is_aig020",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_killchain.TestKillChainCombinations",
+      "name": "test_full_chain_is_aig021",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_killchain.TestKillChainCombinations",
+      "name": "test_harvest_only_does_not_trigger_combination",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_killchain.TestKillChainCombinations",
+      "name": "test_lateral_only_does_not_trigger_combination",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_killchain.TestKillChainCombinations",
+      "name": "test_wildcard_triggers_all_chains",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_live_scanner",
+      "name": "test_live_scan_wildcard_action_is_critical",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_live_scanner",
+      "name": "test_live_scan_wildcard_principal_is_critical",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_live_scanner",
+      "name": "test_live_scan_cross_account_missing_external_id",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_live_scanner",
+      "name": "test_live_scan_passrole_without_condition",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_live_scanner",
+      "name": "test_live_scan_clean_role_no_high_critical",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_live_scanner",
+      "name": "test_scan_role_by_name_returns_only_target_role",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_live_scanner",
+      "name": "test_scan_role_by_name_raises_on_missing",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_live_scanner",
+      "name": "test_report_has_required_fields",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_live_scanner",
+      "name": "test_aig_pb001_fires_for_highrisk_role_without_boundary",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_live_scanner",
+      "name": "test_aig_pb001_does_not_fire_when_boundary_present",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_live_scanner",
+      "name": "test_live_scan_marks_report_incomplete_on_aws_collection_error",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_measure_iam_remediation",
+      "name": "test_verified_reduction",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_measure_iam_remediation",
+      "name": "test_missing_authorization_blocks_credit",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_measure_iam_remediation",
+      "name": "test_incomplete_scan_rejected",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_measure_iam_remediation",
+      "name": "test_changed_inventory_rejected",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_notebook_demo",
+      "name": "test_canonical_guided_fixture[broad]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_notebook_demo",
+      "name": "test_canonical_guided_fixture[scoped]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_notebook_demo",
+      "name": "test_canonical_guided_fixture[compare]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_notebook_demo",
+      "name": "test_unknown_fixture_rejected",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_notebook_demo",
+      "name": "test_isolated_runner_uses_own_source",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestBedrockAgentDefaultOverprivileged",
+      "name": "test_catches_wildcard_resource_on_invoke_model",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestBedrockAgentDefaultOverprivileged",
+      "name": "test_catches_unconstrained_pass_role",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestBedrockAgentDefaultOverprivileged",
+      "name": "test_catches_bedrock_control_plane_actions",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestBedrockAgentDefaultOverprivileged",
+      "name": "test_catches_lambda_invoke_without_function_scope",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestBedrockAgentDefaultOverprivileged",
+      "name": "test_catches_excessive_action_breadth",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestBedrockAgentDefaultOverprivileged",
+      "name": "test_properly_scoped_policy_passes",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestBedrockAgentDefaultOverprivileged",
+      "name": "test_example_file_matches_inline_policy",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestSageMakerFullAccessPolicy",
+      "name": "test_catches_sagemaker_wildcard_action",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestSageMakerFullAccessPolicy",
+      "name": "test_catches_sagemaker_control_plane",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestSageMakerFullAccessPolicy",
+      "name": "test_catches_network_egress_ec2",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestSageMakerFullAccessPolicy",
+      "name": "test_catches_sensitive_data_access",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestSageMakerFullAccessPolicy",
+      "name": "test_catches_s3_write_without_prefix",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestSageMakerFullAccessPolicy",
+      "name": "test_catches_no_conditions_on_broad_statements",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestSageMakerFullAccessPolicy",
+      "name": "test_passrole_with_condition_not_flagged_by_aig004",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestSageMakerFullAccessPolicy",
+      "name": "test_example_file_matches_inline_policy",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestLambdaOverPermissiveRole",
+      "name": "test_catches_network_egress",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestLambdaOverPermissiveRole",
+      "name": "test_catches_dynamodb_full_table_scan",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestLambdaOverPermissiveRole",
+      "name": "test_catches_s3_write_without_prefix_scoping",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestLambdaOverPermissiveRole",
+      "name": "test_catches_sensitive_data_without_abac",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestLambdaOverPermissiveRole",
+      "name": "test_catches_lambda_invoke_all_functions",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestLambdaOverPermissiveRole",
+      "name": "test_catches_no_conditions_broad_statements",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestLambdaOverPermissiveRole",
+      "name": "test_total_finding_count_shows_severity",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestLambdaOverPermissiveRole",
+      "name": "test_example_file_matches_inline_policy",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestECSTaskRoleBedrockAgent",
+      "name": "test_catches_passrole_without_passed_to_service",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestECSTaskRoleBedrockAgent",
+      "name": "test_catches_passrole_as_privilege_escalation",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestECSTaskRoleBedrockAgent",
+      "name": "test_catches_bedrock_invoke_without_model_scope",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestECSTaskRoleBedrockAgent",
+      "name": "test_catches_tool_execution_unscoped",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestECSTaskRoleBedrockAgent",
+      "name": "test_catches_secrets_without_abac",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestECSTaskRoleBedrockAgent",
+      "name": "test_catches_dynamodb_unscoped_scan",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestECSTaskRoleBedrockAgent",
+      "name": "test_catches_s3_write_broad",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestECSTaskRoleBedrockAgent",
+      "name": "test_properly_constrained_ecs_role_passes",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestCrossAccountTrustPolicyConfusedDeputy",
+      "name": "test_catches_missing_external_id",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestCrossAccountTrustPolicyConfusedDeputy",
+      "name": "test_catches_service_principal_missing_source_scope",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestCrossAccountTrustPolicyConfusedDeputy",
+      "name": "test_catches_wildcard_principal",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestCrossAccountTrustPolicyConfusedDeputy",
+      "name": "test_catches_partial_conditions_still_vulnerable",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestCrossAccountTrustPolicyConfusedDeputy",
+      "name": "test_properly_secured_trust_policy",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_real_world_policies.TestCrossAccountTrustPolicyConfusedDeputy",
+      "name": "test_service_principal_trust_not_flagged",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG001NotActionNotResource",
+      "name": "test_not_action_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG001NotActionNotResource",
+      "name": "test_not_resource_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG001NotActionNotResource",
+      "name": "test_normal_action_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG001NotActionNotResource",
+      "name": "test_not_action_allow_is_critical",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG001NotActionNotResource",
+      "name": "test_not_action_complement_fires_per_action_critical_rules",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG001NotActionNotResource",
+      "name": "test_not_action_does_not_flag_excluded_actions",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG002WildcardActions",
+      "name": "test_star_action_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG002WildcardActions",
+      "name": "test_service_wildcard_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG002WildcardActions",
+      "name": "test_specific_action_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG003WildcardResources",
+      "name": "test_star_resource_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG003WildcardResources",
+      "name": "test_scoped_resource_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG004PassRoleConstraint",
+      "name": "test_unconstrained_passrole_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG004PassRoleConstraint",
+      "name": "test_constrained_passrole_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG005PrivilegeEscalation",
+      "name": "test_iam_star_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG005PrivilegeEscalation",
+      "name": "test_attach_role_policy_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG005PrivilegeEscalation",
+      "name": "test_additional_priv_esc_vectors_fire[iam:CreateAccessKey]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG005PrivilegeEscalation",
+      "name": "test_additional_priv_esc_vectors_fire[iam:CreateLoginProfile]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG005PrivilegeEscalation",
+      "name": "test_additional_priv_esc_vectors_fire[iam:UpdateLoginProfile]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG005PrivilegeEscalation",
+      "name": "test_additional_priv_esc_vectors_fire[iam:PutGroupPolicy]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG005PrivilegeEscalation",
+      "name": "test_additional_priv_esc_vectors_fire[iam:AttachGroupPolicy]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG005PrivilegeEscalation",
+      "name": "test_read_only_iam_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG006ToolExecutionScope",
+      "name": "test_lambda_invoke_star_resource_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG006ToolExecutionScope",
+      "name": "test_scoped_lambda_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG007SensitiveDataAccess",
+      "name": "test_secrets_without_tags_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG007SensitiveDataAccess",
+      "name": "test_secrets_with_principal_tag_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG008BedrockControlPlane",
+      "name": "test_create_agent_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG008BedrockControlPlane",
+      "name": "test_delete_guardrail_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG008BedrockControlPlane",
+      "name": "test_invoke_model_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG009SageMakerControlPlane",
+      "name": "test_create_endpoint_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG009SageMakerControlPlane",
+      "name": "test_create_notebook_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG009SageMakerControlPlane",
+      "name": "test_invoke_endpoint_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG010NetworkEgress",
+      "name": "test_create_network_interface_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG010NetworkEgress",
+      "name": "test_authorize_egress_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG011AntiForensics",
+      "name": "test_stop_logging_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG011AntiForensics",
+      "name": "test_delete_detector_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG011AntiForensics",
+      "name": "test_read_only_trail_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG012ExcessiveActionBreadth",
+      "name": "test_many_actions_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG012ExcessiveActionBreadth",
+      "name": "test_few_actions_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG013NoConditionKeys",
+      "name": "test_no_conditions_with_star_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG013NoConditionKeys",
+      "name": "test_with_condition_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG013NoConditionKeys",
+      "name": "test_scoped_resource_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG014S3WriteWithoutPrefix",
+      "name": "test_put_object_star_resource_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG014S3WriteWithoutPrefix",
+      "name": "test_put_object_bucket_wildcard_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG014S3WriteWithoutPrefix",
+      "name": "test_put_object_with_prefix_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG015BedrockModelScoping",
+      "name": "test_invoke_model_star_resource_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG015BedrockModelScoping",
+      "name": "test_invoke_model_specific_model_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG016LambdaFunctionScope",
+      "name": "test_invoke_star_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG016LambdaFunctionScope",
+      "name": "test_invoke_specific_function_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG017AssumeRoleSessionTags",
+      "name": "test_assume_role_no_tags_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG017AssumeRoleSessionTags",
+      "name": "test_assume_role_with_request_tags_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG018DatabaseFullAccess",
+      "name": "test_dynamodb_scan_star_fires",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestAIG018DatabaseFullAccess",
+      "name": "test_dynamodb_with_leading_keys_does_not_fire",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestTrustPolicyRules",
+      "name": "test_wildcard_principal_is_critical",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestTrustPolicyRules",
+      "name": "test_cross_account_missing_external_id",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestTrustPolicyRules",
+      "name": "test_aws_principal_does_not_trigger_service_source_scope_rule",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestTrustPolicyRules",
+      "name": "test_well_formed_cross_account_passes",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestTrustPolicyRules",
+      "name": "test_service_principal_missing_source_scope_is_advisory",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestTrustPolicyRules",
+      "name": "test_malformed_input_raises_type_error",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestRealisticAgentPolicies",
+      "name": "test_well_scoped_bedrock_agent_passes",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestRealisticAgentPolicies",
+      "name": "test_overprivileged_agent_has_many_findings",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestRealisticAgentPolicies",
+      "name": "test_deny_statements_are_ignored",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestRealisticAgentPolicies",
+      "name": "test_empty_policy_passes",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_scanner.TestRealisticAgentPolicies",
+      "name": "test_type_error_on_non_dict",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_actual_engine_is_source_of_identity_and_trust_findings",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_metadata_listing_findings_do_not_invent_cross_service_or_content_access",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_structural_source_location_is_not_confused_by_strings_or_single_statement",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_policy_level_findings_do_not_invent_a_specific_statement_location",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_edit_and_rerun_produces_actual_pattern_delta_and_complete_configuration",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_deny_and_conditions_remain_visible_counter_evidence_not_false_effective_proof",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_graph_only_contains_supported_supplied_context_and_marks_complements",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_malformed_and_unsupported_inputs_fail_closed[[]]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_malformed_and_unsupported_inputs_fail_closed[{}]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_malformed_and_unsupported_inputs_fail_closed[{\"Statement\":[1]}]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_malformed_and_unsupported_inputs_fail_closed[{\"Statement\":[]}]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_malformed_and_unsupported_inputs_fail_closed[{\"Statement\":{\"Effect\":\"Allow\",\"Action\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"*\"}}]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_malformed_and_unsupported_inputs_fail_closed[{\"Statement\":{\"Effect\":\"Allow\",\"Action\":5,\"Resource\":\"*\"}}]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_malformed_and_unsupported_inputs_fail_closed[{\"Statement\":{\"Action\":\"*\",\"Resource\":\"*\"}}]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_malformed_and_unsupported_inputs_fail_closed[{\"Statement\":{\"Effect\":\"Allow\",\"Action\":\"*\",\"Resource\":\"*\",\"Condition\":[]}}]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_malformed_and_unsupported_inputs_fail_closed[{\"Statement\":{\"Effect\":\"Allow\",\"Action\":\"*\",\"Resource\":\"*\",\"Unknown\":true}}]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_malformed_and_unsupported_inputs_fail_closed[{\"Statement\":{\"Effect\":\"Allow\",\"Action\":\"*\",\"Resource\":\"*\",\"Condition\":{\"Bool\":{\"x\":NaN}}}}]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_malformed_and_unsupported_inputs_fail_closed[{\"Statement\":{\"Effect\":\"Allow\",\"Action\":\"*\",\"Resource\":\"*\",\"Condition\":{\"Bool\":{\"x\":1e999}}}}]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_malformed_and_unsupported_inputs_fail_closed[{\"Version\":[],\"Statement\":{}}]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_malformed_and_unsupported_inputs_fail_closed[[[[[[[[[[[[[[[[[[[[[0]]]]]]]]]]]]]]]]]]]]]",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_byte_statement_string_and_configuration_bounds",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_sarif_export_matches_official_schema_and_statement_line_evidence",
+      "status": "PASSED",
+      "skip_reason": null
+    },
+    {
+      "class": "tests.test_studio",
+      "name": "test_http_boundaries_actual_engine_error_recovery_and_rate",
+      "status": "PASSED",
+      "skip_reason": null
+    }
+  ]
+}

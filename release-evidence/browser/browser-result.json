@@ -1,0 +1,56 @@
+{
+  "result": "passed",
+  "health": {
+    "status": "ok",
+    "app_version": "0.3.0",
+    "source_commit": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+    "source_status": "CLEAN",
+    "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+    "static_rule_count": 24,
+    "static_rule_ids": [
+      "AIG001",
+      "AIG002",
+      "AIG003",
+      "AIG004",
+      "AIG005",
+      "AIG006",
+      "AIG007",
+      "AIG008",
+      "AIG009",
+      "AIG010",
+      "AIG011",
+      "AIG012",
+      "AIG013",
+      "AIG014",
+      "AIG015",
+      "AIG016",
+      "AIG017",
+      "AIG018",
+      "AIG019",
+      "AIG020",
+      "AIG021",
+      "AIG-TP001",
+      "AIG-TP002",
+      "AIG-TP003"
+    ],
+    "live_context_rule_ids_not_run": [
+      "AIG-PB001"
+    ]
+  },
+  "schema_sha256": "c3b4bb2d6093897483348925aaa73af03b3e3f4bd4ca38cef26dcb4212a2682e",
+  "checks": [
+    "real sample engine scan",
+    "source statement navigation",
+    "custom file upload",
+    "actual edit/rerun delta and before evidence",
+    "official SARIF schema for identity/trust exports",
+    "human review export",
+    "safe HTML-shaped principal rendering",
+    "mobile bounds",
+    "malformed input removes stale output",
+    "delayed real response is discarded after input changes",
+    "delayed identity/trust file completion invalidates real scan exports",
+    "later edits supersede obsolete asynchronous file reads",
+    "no browser errors"
+  ]
+}

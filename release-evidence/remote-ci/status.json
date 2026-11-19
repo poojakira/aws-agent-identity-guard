@@ -1,0 +1,76 @@
+{
+  "source_commit": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+  "checked_utc": "2026-11-19T00:41:58.241Z",
+  "runs": [
+    {
+      "id": 44428284748,
+      "name": "Local IAM studio acceptance",
+      "path": ".github/workflows/local-studio.yml",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428284748"
+    },
+    {
+      "id": 44428284685,
+      "name": "Documentation Integrity",
+      "path": ".github/workflows/production-policy.yml",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428284685"
+    },
+    {
+      "id": 44428284658,
+      "name": "Security Hygiene",
+      "path": ".github/workflows/security-hygiene.yml",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428284658"
+    },
+    {
+      "id": 44428284308,
+      "name": "Production Gate",
+      "path": ".github/workflows/production-gate.yml",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428284308"
+    },
+    {
+      "id": 44428284756,
+      "name": "Poster Artifact Parity",
+      "path": ".github/workflows/poster-artifact-parity.yml",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428284756"
+    },
+    {
+      "id": 44428284537,
+      "name": "CI",
+      "path": ".github/workflows/ci.yml",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428284537"
+    },
+    {
+      "id": 44428278131,
+      "name": "PR #75",
+      "path": "dynamic/github-code-scanning/codeql",
+      "event": "dynamic",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/44428278131"
+    }
+  ]
+}

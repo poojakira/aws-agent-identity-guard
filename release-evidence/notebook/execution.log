@@ -1,0 +1,10 @@
+Resolved source: abe1c0a1e5953b18eae762a5c41f400ff677adb2
+Guided dependencies installed. Full-app and hosted-runtime verification are separate.
+6 static finding(s); effective permissions UNKNOWN; removed=0
+Run source: {'commit': 'abe1c0a1e5953b18eae762a5c41f400ff677adb2', 'state': 'CLEAN'}
+Evidence SHA-256: 4894cf4ebd92d139beff8ce9a7748ad633f5490202b397108c36a5df60a1cd0c
+<IPython.core.display.JSON object>
+broad → 6 static finding(s); effective permissions UNKNOWN; removed=0
+scoped → 1 static finding(s); effective permissions UNKNOWN; removed=0
+compare → 1 static finding(s); effective permissions UNKNOWN; removed=6
+<IPython.core.display.JSON object>

@@ -1,0 +1,29 @@
+{
+  "utc": "2026-11-18T23:59:29.827433+00:00",
+  "renderer": "mermaid11.12.2;headlessChromium;strictsecurity;pureSVGtext",
+  "mermaid_js_sha256": "d0830a6c05546e9edb8fe20a8f545f3e0dc7c4c3134d584bad9c13a99d7a71e0",
+  "diagrams": [
+    {
+      "diagram": 1,
+      "path": "docs/architecture/components.svg",
+      "svg_sha256": "396979d7508fc6747b05f7e711b687f54ef64078e649b884e7cc260ec706a4e5",
+      "bytes": 42384,
+      "parsed_and_rendered": true
+    },
+    {
+      "diagram": 2,
+      "path": "docs/architecture/sequence.svg",
+      "svg_sha256": "43a633f8a2c4bead8236ce88d30802584d640057c4aa592d23f9e2358c28cc23",
+      "bytes": 39678,
+      "parsed_and_rendered": true
+    },
+    {
+      "diagram": 3,
+      "path": "docs/architecture/guided-notebook.svg",
+      "svg_sha256": "e5cc1a715ad9723860887b5db7d5865f3747124811820e45bc2465b682ec23f6",
+      "bytes": 18774,
+      "parsed_and_rendered": true
+    }
+  ],
+  "standalone_svg": "Root width/height set to actual viewBox pixels for readable full-size opening; README uses separate22pxoverview; HTMLvieweraddszoom/pan"
+}

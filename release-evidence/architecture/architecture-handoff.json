@@ -1,0 +1,121 @@
+{
+  "utc": "2026-11-18T21:24:23.806525+00:00",
+  "base_head_observed": "4411c0792b0279c3bbd60e4af84210b3a551540a",
+  "source_review": "Static code/symbol/limit/API-path cross-check only; no server launch, runtime test, deployment or Colab execution",
+  "source_content_sha256": {
+    "src/aws_agent_identity_guard/studio/__main__.py": "b20d2e7a3824fe07fcaead277e1eb5d2c4c18f04cb8022f79e5bb648bb783154",
+    "src/aws_agent_identity_guard/studio/analysis.py": "e7832aeb8db554c5642ae239027ef753f342c197aa345e3914419bc8dfbddfb6",
+    "src/aws_agent_identity_guard/studio/studio.js": "a9b5e32486face33db451ae94a74f3ddbca33868a8f2dd6da4924de11c7f8393",
+    "src/aws_agent_identity_guard/scanner.py": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+    "src/aws_agent_identity_guard/cli.py": "4694f3fdbc33489eac921db6b0a6a4f876fc74b04ce7b70cb91d9c5624dc27d2",
+    "demo/adapter.py": "1a4ce29010b8e94fb5c044bdd9366e329ea5daab09f9f118ea201ca1bb542b7f"
+  },
+  "checks": [
+    {
+      "check": "documented symbols exist",
+      "source": "src/aws_agent_identity_guard/studio/__main__.py",
+      "symbols": [
+        "StudioServer",
+        "Handler",
+        "create_server",
+        "main",
+        "boundary",
+        "setup",
+        "respond",
+        "do_GET",
+        "do_POST",
+        "unique_pairs"
+      ],
+      "result": "PASS"
+    },
+    {
+      "check": "documented symbols exist",
+      "source": "src/aws_agent_identity_guard/studio/analysis.py",
+      "symbols": [
+        "InputError",
+        "Document",
+        "parse",
+        "validate",
+        "strings",
+        "location",
+        "rule_inventory",
+        "analyze_documents",
+        "review_change",
+        "provenance",
+        "checksum"
+      ],
+      "result": "PASS"
+    },
+    {
+      "check": "documented symbols exist",
+      "source": "src/aws_agent_identity_guard/scanner.py",
+      "symbols": [
+        "Finding",
+        "scan_policy_document",
+        "scan_trust_policy"
+      ],
+      "result": "PASS"
+    },
+    {
+      "check": "documented symbols exist",
+      "source": "src/aws_agent_identity_guard/cli.py",
+      "symbols": [
+        "_build_sarif"
+      ],
+      "result": "PASS"
+    },
+    {
+      "check": "documented symbols exist",
+      "source": "demo/adapter.py",
+      "symbols": [
+        "run"
+      ],
+      "result": "PASS"
+    },
+    {
+      "check": "three closed component/sequence/inline-guided Mermaid fences",
+      "result": "PASS",
+      "scope": "Structural source check only; no visual Mermaid render"
+    },
+    {
+      "check": "new architecture relative links resolve",
+      "count": 20,
+      "result": "PASS"
+    },
+    {
+      "check": "discarded HTTP-preview claims absent; no HTTP demo source retained",
+      "result": "PASS"
+    },
+    {
+      "check": "UI async, comparison and browser-download markers match source read",
+      "result": "PASS"
+    },
+    {
+      "check": "canonical literal static inventory",
+      "count": 24,
+      "result": "PASS"
+    }
+  ],
+  "agent_edited": [
+    "docs/ARCHITECTURE.md",
+    "docs/STUDIO.md"
+  ],
+  "STUDIO_corrections": [
+    "source spans are characters/text line ranges rather than UTF8 byte offsets",
+    "SARIF schema validation is verification gate not runtime remote schema service",
+    "health declares IDs/hash; actual literal inventory validation occurs on review"
+  ],
+  "README_runtime_tests_workflows_dependencies_untouched_by_agent": true,
+  "commit_push_launch": false,
+  "guided_surface": "demo.adapter fixed synthetic presets in same Python process; forthcoming notebook; no HTTP server/public full hosting created",
+  "notebook_present_at_handoff": false,
+  "colab_execution": "NOT VERIFIED",
+  "mermaid_rendering": "NOT EXECUTED; fenced graph/sequence structures checked",
+  "parent_worktree_changes": "Parent owns demo/notebook/README edits; review recorded source hashes again if they change",
+  "remaining": [
+    "Parent creates/validates notebook and exact try link; no execution/anonymous compute guarantee is implied",
+    "Parent freezes/executes actual final candidate checks before publication",
+    "Notebook/runtime/provider authentication and compute availability are external concerns",
+    "Parent should update adapter leftover public/server wording and strict scenario handling after discarded HTTP prototype"
+  ]
+}

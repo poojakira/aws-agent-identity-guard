@@ -1,0 +1,791 @@
+{
+  "app_version": "0.3.0",
+  "source_commit": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+  "source_status": "CLEAN",
+  "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+  "static_rule_count": 24,
+  "static_rule_ids": [
+    "AIG001",
+    "AIG002",
+    "AIG003",
+    "AIG004",
+    "AIG005",
+    "AIG006",
+    "AIG007",
+    "AIG008",
+    "AIG009",
+    "AIG010",
+    "AIG011",
+    "AIG012",
+    "AIG013",
+    "AIG014",
+    "AIG015",
+    "AIG016",
+    "AIG017",
+    "AIG018",
+    "AIG019",
+    "AIG020",
+    "AIG021",
+    "AIG-TP001",
+    "AIG-TP002",
+    "AIG-TP003"
+  ],
+  "live_context_rule_ids_not_run": [
+    "AIG-PB001"
+  ],
+  "run_id": "9c60580d-a246-4f81-b446-f7e78adc3e3b",
+  "timestamp_utc": "2026-11-19T00:19:47.362384+00:00",
+  "configuration": {
+    "mode": "static-identity-and-optional-trust",
+    "compare": false,
+    "max_document_bytes": 32768,
+    "max_statements": 32,
+    "max_depth": 16
+  },
+  "configuration_sha256": "d81ae5078af75f171f499d8ca83ad41d537f7cfb8dbe4f11c532255b8cea8171",
+  "input_sha256": "b858d281b5a84169b02243c5816543588ab74d8db37b21fa0520b5c2bd9b2bbf",
+  "findings": [
+    {
+      "rule_id": "AIG003",
+      "severity": "high",
+      "message": "Statement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope.",
+      "remediation": "Check each listed action's resource-level support. Where supported, use specific ARNs or applicable resource-tag conditions; otherwise review service-specific conditions and required context.",
+      "statement_index": 0,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 4,
+        "endLine": 13,
+        "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "c897581c6513c7c252ca1e78ae0a6a3fecc39214625f1870dca673e6eb9ca37f"
+    },
+    {
+      "rule_id": "AIG004",
+      "severity": "critical",
+      "message": "iam:PassRole without iam:PassedToService condition. An agent with unconstrained PassRole can escalate privileges by passing a high-privilege role to any service it can invoke.",
+      "remediation": "Add a Condition: {StringEquals: {iam:PassedToService: 'bedrock.amazonaws.com'}} (or whichever service runs the agent). Also restrict the Resource to specific role ARNs.",
+      "statement_index": 0,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 4,
+        "endLine": 13,
+        "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "846d0574a01e182468e02e5baa31f97f91bd13fa1de4bf5447615b874fbf372d"
+    },
+    {
+      "rule_id": "AIG005",
+      "severity": "critical",
+      "message": "Agent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path.",
+      "remediation": "Separate agent runtime roles from IAM administration. Agent runtime identities should NEVER have iam:* or policy-modification permissions.",
+      "statement_index": 0,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 4,
+        "endLine": 13,
+        "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "ce8046ca9a7ca42755f04564da288613cee74d387b35404d37def6875c2a308a"
+    },
+    {
+      "rule_id": "AIG006",
+      "severity": "high",
+      "message": "Tool execution action 'lambda:InvokeFunction' targets Resource: '*'. The agent can invoke ANY function, endpoint, or task in the account - not just its intended tools.",
+      "remediation": "Restrict to specific ARNs: the Lambda functions, ECS tasks, or Bedrock agents this tool is allowed to call. Use resource tags for dynamic scoping.",
+      "statement_index": 0,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 4,
+        "endLine": 13,
+        "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "e91b2f67d417650b600553813518dbedbc5bd32c5d42c1da3073949c4513706c"
+    },
+    {
+      "rule_id": "AIG007",
+      "severity": "medium",
+      "message": "Sensitive-data or metadata action 'secretsmanager:GetSecretValue' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents.",
+      "remediation": "Add principal tags (aws:PrincipalTag/tenant, aws:PrincipalTag/agent-id) or resource tags to ensure the agent only accesses data belonging to its tenant.",
+      "statement_index": 0,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 4,
+        "endLine": 13,
+        "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "e7f37c65abd6c5f2efcd9274b02024533ac33236b7d86ac521486ba124c4bb52"
+    },
+    {
+      "rule_id": "AIG013",
+      "severity": "medium",
+      "message": "Statement has Resource: '*' and zero Condition keys. Agent policies should use conditions for tenant isolation (aws:PrincipalTag), request scoping (aws:RequestedRegion), or session binding (aws:TokenIssueTime).",
+      "remediation": "Add at minimum: aws:RequestedRegion to limit geographic blast radius, and aws:PrincipalTag/tenant for multi-tenant isolation.",
+      "statement_index": 0,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 4,
+        "endLine": 13,
+        "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "f6898a91d9028621327fd25a6b75a827f278f6e84d03b344f8b245195d2cbcb6"
+    },
+    {
+      "rule_id": "AIG016",
+      "severity": "high",
+      "message": "Lambda invoke without function-name resource scoping. The agent can invoke ANY Lambda in the account - including admin utilities, data pipelines, or credential-rotation functions.",
+      "remediation": "Scope to the specific tool functions: arn:aws:lambda:REGION:ACCOUNT:function:agent-tool-* using a naming convention and wildcard suffix.",
+      "statement_index": 0,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 4,
+        "endLine": 13,
+        "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "972fb5d3e488e7edf17d965d68745d855307cf3e0276ed6fed708a3942df442d"
+    },
+    {
+      "rule_id": "AIG019",
+      "severity": "critical",
+      "message": "Allow statements may combine credential-access (secretsmanager:GetSecretValue) AND lateral-movement (iam:PassRole) actions. Check effective permissions, conditions, boundaries, and resource scopes before concluding the same principal can use both capabilities.",
+      "remediation": "Split credential-read and role-assumption into separate roles that cannot be held by the same session. If an agent must do both, gate the assume-role behind a distinct short-lived role with aws:RequestTag session binding and CloudTrail alerting.",
+      "statement_index": null,
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "",
+        "startLine": 1,
+        "endLine": 15,
+        "snippet": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }\n  ]\n}"
+      },
+      "scope": "static pattern; effective permission UNKNOWN",
+      "counter_evidence": {
+        "deny_statement_indices": [],
+        "conditions_present": false
+      },
+      "assumptions": [
+        "Patterns are review signals, not effective permissions or proven exploitability.",
+        "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+        "SCPs, boundaries, session/resource policies and condition semantics are unknown."
+      ],
+      "fingerprint": "93ba79455e1764b57413cb106e4ca6a83bedf863d6e353a76006ba3aaec954eb"
+    }
+  ],
+  "sources": [
+    {
+      "name": "identity-policy.json",
+      "sha256": "64a18f9ebaa000c14baf5e5b5cd3509e156db2921c64505aa0ca47f0e5ed5a23",
+      "text": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }\n  ]\n}"
+    }
+  ],
+  "statements": [
+    {
+      "id": "identity-policy.json#/Statement/0",
+      "index": 0,
+      "effect": "Allow",
+      "location": {
+        "source": "identity-policy.json",
+        "json_pointer": "/Statement/0",
+        "startLine": 4,
+        "endLine": 13,
+        "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+      },
+      "condition": {}
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "identity-policy.json",
+        "kind": "document",
+        "label": "identity-policy.json"
+      },
+      {
+        "id": "identity-policy.json#/Statement/0",
+        "kind": "statement",
+        "label": "Statement 0: Allow",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 13,
+          "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+        }
+      },
+      {
+        "id": "identity-policy.json#/Statement/0/Action",
+        "kind": "Action",
+        "label": "[\"iam:PassRole\", \"lambda:InvokeFunction\", \"secretsmanager:GetSecretValue\"]",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 13,
+          "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+        }
+      },
+      {
+        "id": "identity-policy.json#/Statement/0/Resource",
+        "kind": "Resource",
+        "label": "\"*\"",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 13,
+          "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "from": "identity-policy.json",
+        "to": "identity-policy.json#/Statement/0",
+        "label": "contains",
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 13,
+          "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+        }
+      },
+      {
+        "from": "identity-policy.json#/Statement/0",
+        "to": "identity-policy.json#/Statement/0/Action",
+        "label": "Action pattern",
+        "effect": "Allow",
+        "conditions_present": false,
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 13,
+          "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+        }
+      },
+      {
+        "from": "identity-policy.json#/Statement/0",
+        "to": "identity-policy.json#/Statement/0/Resource",
+        "label": "Resource pattern",
+        "effect": "Allow",
+        "conditions_present": false,
+        "location": {
+          "source": "identity-policy.json",
+          "json_pointer": "/Statement/0",
+          "startLine": 4,
+          "endLine": 13,
+          "snippet": "{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }"
+        }
+      }
+    ],
+    "scope": "Supplied relationships only; no effective grants or reachability inferred"
+  },
+  "sarif": {
+    "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+      {
+        "tool": {
+          "driver": {
+            "name": "aws-agent-identity-guard",
+            "version": "0.3.0",
+            "informationUri": "https://github.com/poojakira/aws-agent-identity-guard",
+            "rules": [
+              {
+                "id": "AIG003",
+                "name": "AIG003",
+                "shortDescription": {
+                  "text": "Statement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "high"
+                }
+              },
+              {
+                "id": "AIG004",
+                "name": "AIG004",
+                "shortDescription": {
+                  "text": "iam:PassRole without iam:PassedToService condition. An agent with unconstrained PassRole can escalate privileges by passing a high-privilege role to any service it can invoke."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "critical"
+                }
+              },
+              {
+                "id": "AIG005",
+                "name": "AIG005",
+                "shortDescription": {
+                  "text": "Agent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "critical"
+                }
+              },
+              {
+                "id": "AIG006",
+                "name": "AIG006",
+                "shortDescription": {
+                  "text": "Tool execution action 'lambda:InvokeFunction' targets Resource: '*'. The agent can invoke ANY function, endpoint, or task in the account - not just its intended tools."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "high"
+                }
+              },
+              {
+                "id": "AIG007",
+                "name": "AIG007",
+                "shortDescription": {
+                  "text": "Sensitive-data or metadata action 'secretsmanager:GetSecretValue' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "medium"
+                }
+              },
+              {
+                "id": "AIG013",
+                "name": "AIG013",
+                "shortDescription": {
+                  "text": "Statement has Resource: '*' and zero Condition keys. Agent policies should use conditions for tenant isolation (aws:PrincipalTag), request scoping (aws:RequestedRegion), or session binding (aws:TokenIssueTime)."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "medium"
+                }
+              },
+              {
+                "id": "AIG016",
+                "name": "AIG016",
+                "shortDescription": {
+                  "text": "Lambda invoke without function-name resource scoping. The agent can invoke ANY Lambda in the account - including admin utilities, data pipelines, or credential-rotation functions."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "high"
+                }
+              },
+              {
+                "id": "AIG019",
+                "name": "AIG019",
+                "shortDescription": {
+                  "text": "Allow statements may combine credential-access (secretsmanager:GetSecretValue) AND lateral-movement (iam:PassRole) actions. Check effective permissions, conditions, boundaries, and resource scopes before concluding the same principal can use both capabilities."
+                },
+                "helpUri": "https://github.com/poojakira/aws-agent-identity-guard",
+                "properties": {
+                  "severity": "critical"
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "ruleId": "AIG003",
+            "ruleIndex": 0,
+            "level": "error",
+            "message": {
+              "text": "Statement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 4,
+                    "endLine": 13
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/0"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "Check each listed action's resource-level support. Where supported, use specific ARNs or applicable resource-tag conditions; otherwise review service-specific conditions and required context.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          },
+          {
+            "ruleId": "AIG004",
+            "ruleIndex": 1,
+            "level": "error",
+            "message": {
+              "text": "iam:PassRole without iam:PassedToService condition. An agent with unconstrained PassRole can escalate privileges by passing a high-privilege role to any service it can invoke."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 4,
+                    "endLine": 13
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/0"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "Add a Condition: {StringEquals: {iam:PassedToService: 'bedrock.amazonaws.com'}} (or whichever service runs the agent). Also restrict the Resource to specific role ARNs.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          },
+          {
+            "ruleId": "AIG005",
+            "ruleIndex": 2,
+            "level": "error",
+            "message": {
+              "text": "Agent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 4,
+                    "endLine": 13
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/0"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "Separate agent runtime roles from IAM administration. Agent runtime identities should NEVER have iam:* or policy-modification permissions.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          },
+          {
+            "ruleId": "AIG006",
+            "ruleIndex": 3,
+            "level": "error",
+            "message": {
+              "text": "Tool execution action 'lambda:InvokeFunction' targets Resource: '*'. The agent can invoke ANY function, endpoint, or task in the account - not just its intended tools."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 4,
+                    "endLine": 13
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/0"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "Restrict to specific ARNs: the Lambda functions, ECS tasks, or Bedrock agents this tool is allowed to call. Use resource tags for dynamic scoping.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          },
+          {
+            "ruleId": "AIG007",
+            "ruleIndex": 4,
+            "level": "warning",
+            "message": {
+              "text": "Sensitive-data or metadata action 'secretsmanager:GetSecretValue' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 4,
+                    "endLine": 13
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/0"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "Add principal tags (aws:PrincipalTag/tenant, aws:PrincipalTag/agent-id) or resource tags to ensure the agent only accesses data belonging to its tenant.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          },
+          {
+            "ruleId": "AIG013",
+            "ruleIndex": 5,
+            "level": "warning",
+            "message": {
+              "text": "Statement has Resource: '*' and zero Condition keys. Agent policies should use conditions for tenant isolation (aws:PrincipalTag), request scoping (aws:RequestedRegion), or session binding (aws:TokenIssueTime)."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 4,
+                    "endLine": 13
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/0"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "Add at minimum: aws:RequestedRegion to limit geographic blast radius, and aws:PrincipalTag/tenant for multi-tenant isolation.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          },
+          {
+            "ruleId": "AIG016",
+            "ruleIndex": 6,
+            "level": "error",
+            "message": {
+              "text": "Lambda invoke without function-name resource scoping. The agent can invoke ANY Lambda in the account - including admin utilities, data pipelines, or credential-rotation functions."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 4,
+                    "endLine": 13
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/Statement/0"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "statementIndex": 0,
+              "remediation": "Scope to the specific tool functions: arn:aws:lambda:REGION:ACCOUNT:function:agent-tool-* using a naming convention and wildcard suffix.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          },
+          {
+            "ruleId": "AIG019",
+            "ruleIndex": 7,
+            "level": "error",
+            "message": {
+              "text": "Allow statements may combine credential-access (secretsmanager:GetSecretValue) AND lateral-movement (iam:PassRole) actions. Check effective permissions, conditions, boundaries, and resource scopes before concluding the same principal can use both capabilities."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "identity-policy.json",
+                    "uriBaseId": "%SRCROOT%"
+                  },
+                  "region": {
+                    "startLine": 1,
+                    "endLine": 15
+                  }
+                },
+                "logicalLocations": [
+                  {
+                    "fullyQualifiedName": "/"
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "remediation": "Split credential-read and role-assumption into separate roles that cannot be held by the same session. If an agent must do both, gate the assume-role behind a distinct short-lived role with aws:RequestTag session binding and CloudTrail alerting.",
+              "scope": "static pattern; effective permission UNKNOWN",
+              "counterEvidence": {
+                "deny_statement_indices": [],
+                "conditions_present": false
+              }
+            }
+          }
+        ],
+        "artifacts": [
+          {
+            "location": {
+              "uri": "identity-policy.json",
+              "uriBaseId": "%SRCROOT%"
+            }
+          }
+        ],
+        "properties": {
+          "scope": "STATIC_ONLY_CONTEXT_INCOMPLETE",
+          "inputSha256": "64a18f9ebaa000c14baf5e5b5cd3509e156db2921c64505aa0ca47f0e5ed5a23",
+          "run_id": "9c60580d-a246-4f81-b446-f7e78adc3e3b",
+          "source_commit": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+          "source_status": "CLEAN",
+          "rule_set_sha256": "125f5aaabb4aedb330bf89df45b33940a0a0ed9a52394cb9406080906ed766a7",
+          "timestamp_utc": "2026-11-19T00:19:47.362384+00:00",
+          "configuration_sha256": "d81ae5078af75f171f499d8ca83ad41d537f7cfb8dbe4f11c532255b8cea8171",
+          "input_sha256": "b858d281b5a84169b02243c5816543588ab74d8db37b21fa0520b5c2bd9b2bbf",
+          "app_version": "0.3.0"
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "Patterns are review signals, not effective permissions or proven exploitability.",
+    "Explicit Deny and conditions are counter-evidence; their intersections are not evaluated.",
+    "SCPs, boundaries, session/resource policies and condition semantics are unknown.",
+    "No AWS call is made. AIG-PB001 requires live role context and is not run here.",
+    "No findings means no configured pattern matched; it does not prove least privilege or safety."
+  ],
+  "effective_permissions": "UNKNOWN",
+  "delta": {
+    "comparison_performed": false,
+    "before_count": null,
+    "after_count": 8,
+    "added": [],
+    "removed": [],
+    "interpretation": "Rule/severity/message/statement-position changes; not measured AWS risk reduction"
+  },
+  "before_input_sha256": [],
+  "human_report": "IAM Permission Engineering Studio — static review\nRun: 9c60580d-a246-4f81-b446-f7e78adc3e3b\nSource: abe1c0a1e5953b18eae762a5c41f400ff677adb2 (CLEAN)\nEngine version: 0.3.0\nEffective permissions: UNKNOWN\n\nPatterns are review signals, not effective permissions or proven exploitability.\nExplicit Deny and conditions are counter-evidence; their intersections are not evaluated.\nSCPs, boundaries, session/resource policies and condition semantics are unknown.\nNo AWS call is made. AIG-PB001 requires live role context and is not run here.\nNo findings means no configured pattern matched; it does not prove least privilege or safety.\n\nFindings:\nHIGH AIG003 identity-policy.json:4 /Statement/0\nStatement uses Resource:*. Its resource scope is broad for the listed actions; it does not grant unlisted actions or establish effective access. Some actions require this scope.\nRemediation: Check each listed action's resource-level support. Where supported, use specific ARNs or applicable resource-tag conditions; otherwise review service-specific conditions and required context.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }\n\nCRITICAL AIG004 identity-policy.json:4 /Statement/0\niam:PassRole without iam:PassedToService condition. An agent with unconstrained PassRole can escalate privileges by passing a high-privilege role to any service it can invoke.\nRemediation: Add a Condition: {StringEquals: {iam:PassedToService: 'bedrock.amazonaws.com'}} (or whichever service runs the agent). Also restrict the Resource to specific role ARNs.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }\n\nCRITICAL AIG005 identity-policy.json:4 /Statement/0\nAgent has privilege-management action 'iam:PassRole'. This lets the agent modify IAM policies, create roles, or assume other identities - classic escalation path.\nRemediation: Separate agent runtime roles from IAM administration. Agent runtime identities should NEVER have iam:* or policy-modification permissions.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }\n\nHIGH AIG006 identity-policy.json:4 /Statement/0\nTool execution action 'lambda:InvokeFunction' targets Resource: '*'. The agent can invoke ANY function, endpoint, or task in the account - not just its intended tools.\nRemediation: Restrict to specific ARNs: the Lambda functions, ECS tasks, or Bedrock agents this tool is allowed to call. Use resource tags for dynamic scoping.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }\n\nMEDIUM AIG007 identity-policy.json:4 /Statement/0\nSensitive-data or metadata action 'secretsmanager:GetSecretValue' has no principal-tag or resource-tag condition. Capabilities remain limited to the listed actions and supplied context; listing does not itself authorize reading secret values or object contents.\nRemediation: Add principal tags (aws:PrincipalTag/tenant, aws:PrincipalTag/agent-id) or resource tags to ensure the agent only accesses data belonging to its tenant.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }\n\nMEDIUM AIG013 identity-policy.json:4 /Statement/0\nStatement has Resource: '*' and zero Condition keys. Agent policies should use conditions for tenant isolation (aws:PrincipalTag), request scoping (aws:RequestedRegion), or session binding (aws:TokenIssueTime).\nRemediation: Add at minimum: aws:RequestedRegion to limit geographic blast radius, and aws:PrincipalTag/tenant for multi-tenant isolation.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }\n\nHIGH AIG016 identity-policy.json:4 /Statement/0\nLambda invoke without function-name resource scoping. The agent can invoke ANY Lambda in the account - including admin utilities, data pipelines, or credential-rotation functions.\nRemediation: Scope to the specific tool functions: arn:aws:lambda:REGION:ACCOUNT:function:agent-tool-* using a naming convention and wildcard suffix.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }\n\nCRITICAL AIG019 identity-policy.json:1 \nAllow statements may combine credential-access (secretsmanager:GetSecretValue) AND lateral-movement (iam:PassRole) actions. Check effective permissions, conditions, boundaries, and resource scopes before concluding the same principal can use both capabilities.\nRemediation: Split credential-read and role-assumption into separate roles that cannot be held by the same session. If an agent must do both, gate the assume-role behind a distinct short-lived role with aws:RequestTag session binding and CloudTrail alerting.\nCounter-evidence: {\"deny_statement_indices\": [], \"conditions_present\": false}\nEvidence:\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"SyntheticBroadAgent\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"iam:PassRole\",\n        \"lambda:InvokeFunction\",\n        \"secretsmanager:GetSecretValue\"\n      ],\n      \"Resource\": \"*\"\n    }\n  ]\n}\n\nDelta: {\"comparison_performed\": false, \"before_count\": null, \"after_count\": 8, \"interpretation\": \"Rule/severity/message/statement-position changes; not measured AWS risk reduction\"}\nConfiguration SHA256: d81ae5078af75f171f499d8ca83ad41d537f7cfb8dbe4f11c532255b8cea8171\nInput SHA256: b858d281b5a84169b02243c5816543588ab74d8db37b21fa0520b5c2bd9b2bbf"
+}

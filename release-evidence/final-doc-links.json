@@ -1,0 +1,162 @@
+{
+  "repository": "/workspace/work/candidates/aws-agent-identity-guard",
+  "source_commit": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+  "source_status": "",
+  "utc": "2026-11-19T00:38:48.351145+00:00",
+  "documents_parsed": 34,
+  "local_targets_checked": 113,
+  "errors": [],
+  "external_targets_not_verified": [
+    {
+      "document": "CHANGELOG.md",
+      "url": "https://keepachangelog.com/en/1.1.0/",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "PROVENANCE.md",
+      "url": "https://github.com/poojakira",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "PROVENANCE.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/commit/b4799d64eeefba1dfbced8cf8d303a6e07f18dbe",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "README.md",
+      "url": "https://colab.research.google.com/github/poojakira/aws-agent-identity-guard/blob/codex/local-workbench-20261116/notebooks/try_product.ipynb",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "README.md",
+      "url": "https://raw.githubusercontent.com/poojakira/aws-agent-identity-guard/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/browser/desktop.png",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "README.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/selected-branches-20261118/release-evidence/RELEASE_ASSESSMENT.md",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "README.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/selected-branches-20261118/release-evidence/manifest.json",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "README.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/docs-reconciliation-20261118/release-evidence",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "README.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/pull/75",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "README.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/selected-branches-20261118/release-evidence/branch-cleanup.json",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "SECURITY.md",
+      "url": "https://github.com/poojakira",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "VERIFIED_METRICS.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/blob/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/RELEASE_ASSESSMENT.md",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "VERIFIED_METRICS.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38497940763",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "VERIFIED_METRICS.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38462296804",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "VERIFIED_METRICS.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38009457205",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "VERIFIED_METRICS.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/36781556871",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "docs/BRANCHES.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/selected-branches-20261118/release-evidence/branch-cleanup.json",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "docs/EVIDENCE.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/selected-branches-20261118/release-evidence",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "docs/EVIDENCE.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/blob/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/RELEASE_ASSESSMENT.md",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "docs/EVIDENCE.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/blob/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/manifest.json",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "docs/EVIDENCE.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/pull/75",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "docs/RECRUITER_EVIDENCE_AUDIT_2026-10-09.md",
+      "url": "https://github.com/poojakira/mcp-agent-security-gateway/actions/runs/38462601803",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "docs/RECRUITER_EVIDENCE_AUDIT_2026-10-09.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38462296804",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "docs/RECRUITER_EVIDENCE_AUDIT_2026-10-09.md",
+      "url": "https://github.com/poojakira/hf-model-provenance-scanner/actions/runs/38462464074",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "docs/TRY_IT.md",
+      "url": "https://colab.research.google.com/github/poojakira/aws-agent-identity-guard/blob/codex/local-workbench-20261116/notebooks/try_product.ipynb",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "docs/TRY_IT.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/selected-branches-20261118/release-evidence/RELEASE_ASSESSMENT.md",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "docs/TRY_IT.md",
+      "url": "https://research.google.com/colaboratory/faq.html",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "poster/03_verified_metrics.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/37170669504",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "poster/13_reproducibility.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38497940763",
+      "reason": "External target not validated by local-file/anchor check"
+    },
+    {
+      "document": "poster/13_reproducibility.md",
+      "url": "https://github.com/poojakira/aws-agent-identity-guard/actions/runs/37170669504",
+      "reason": "External target not validated by local-file/anchor check"
+    }
+  ],
+  "scope": "CommonMark links/images and block HTML href/src, local existence and Markdown heading/HTML ids. No claim of external URL/image semantics or perfect GitHub/MDX/RST parser equivalence."
+}

@@ -1,0 +1,28 @@
+{
+  "repository": "aws-agent-identity-guard",
+  "source_commit": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+  "expected_candidate": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+  "utc_start": "2026-11-19T00:21:59.509991+00:00",
+  "utc_end": "2026-11-19T00:22:03.939508+00:00",
+  "result": "PASS",
+  "error": null,
+  "environment": "Actual committed notebook setup/scenario/comparison cells executed on local LinuxCPython3.12, GitHubpubliccheckout and fresh isolated minimalvenv",
+  "colab_hosted_kernel": "NOT VERIFIED; no Google sign-in or remote hosted execution claimed",
+  "source_notebook_sha256": "e6c00f9d934fdb4d80e8b94d42c55d35935ab3ff974fdd8ea817e99647cc936e",
+  "all_result_checksums_verified": true,
+  "no_external_resources": "No server/tunnel/Drive/GPU/paidAPI/cloudresource/APIkey; only publicGitHub/PyPI downloads",
+  "scenario_summaries": [
+    {
+      "scenario": "broad",
+      "summary": "6 static finding(s); effective permissions UNKNOWN; removed=0"
+    },
+    {
+      "scenario": "scoped",
+      "summary": "1 static finding(s); effective permissions UNKNOWN; removed=0"
+    },
+    {
+      "scenario": "compare",
+      "summary": "1 static finding(s); effective permissions UNKNOWN; removed=6"
+    }
+  ]
+}

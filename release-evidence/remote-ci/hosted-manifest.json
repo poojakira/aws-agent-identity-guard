@@ -1,0 +1,252 @@
+{
+  "repository": "poojakira/aws-agent-identity-guard",
+  "source_commit": "abe1c0a1e5953b18eae762a5c41f400ff677adb2",
+  "branch": "",
+  "clean_before": true,
+  "utc_start": "2026-11-19T00:27:13.261624+00:00",
+  "python": "3.12.16",
+  "platform": "Linux-7.0.0-1016-aws-x86_64-with-glibc2.43",
+  "run_id": "44428284748",
+  "version": "0.3.0",
+  "static_rule_count": 24,
+  "additional_live_context_rule_count": 1,
+  "test_environment_pins_sha256": "ee8573c181805eba70239832647c3300f5dfc435c169317bd0c5706462e00f0e",
+  "official_schema_sha256": "c3b4bb2d6093897483348925aaa73af03b3e3f4bd4ca38cef26dcb4212a2682e",
+  "decision": "PARTIAL",
+  "runs": [
+    {
+      "name": "dependencies",
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+        "-m",
+        "pip",
+        "freeze",
+        "--all"
+      ],
+      "utc_start": "2026-11-19T00:27:13.264107+00:00",
+      "utc_end": "2026-11-19T00:27:13.443603+00:00",
+      "exit_code": 0,
+      "log": "dependencies.log"
+    },
+    {
+      "name": "lint",
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "."
+      ],
+      "utc_start": "2026-11-19T00:27:13.443632+00:00",
+      "utc_end": "2026-11-19T00:27:13.476169+00:00",
+      "exit_code": 0,
+      "log": "lint.log"
+    },
+    {
+      "name": "format",
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "utc_start": "2026-11-19T00:27:13.476189+00:00",
+      "utc_end": "2026-11-19T00:27:13.503667+00:00",
+      "exit_code": 0,
+      "log": "format.log"
+    },
+    {
+      "name": "regression",
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+        "-m",
+        "pytest",
+        "-p",
+        "pytest_cov",
+        "tests/",
+        "-q",
+        "--cov=aws_agent_identity_guard",
+        "--cov-report=json:/tmp/iam-studio-44428284748-1/coverage.json",
+        "--cov-report=term-missing",
+        "--junitxml=/tmp/iam-studio-44428284748-1/junit.xml"
+      ],
+      "utc_start": "2026-11-19T00:27:13.503687+00:00",
+      "utc_end": "2026-11-19T00:27:27.570323+00:00",
+      "exit_code": 0,
+      "log": "regression.log"
+    },
+    {
+      "name": "typecheck_studio",
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+        "-m",
+        "pyright",
+        "--pythonpath",
+        "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+        "src/aws_agent_identity_guard/studio"
+      ],
+      "utc_start": "2026-11-19T00:27:27.570356+00:00",
+      "utc_end": "2026-11-19T00:27:33.377225+00:00",
+      "exit_code": 0,
+      "log": "typecheck_studio.log"
+    },
+    {
+      "name": "bandit",
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+        "-m",
+        "bandit",
+        "-r",
+        "src",
+        "-ll",
+        "-f",
+        "json",
+        "-o",
+        "/tmp/iam-studio-44428284748-1/bandit.json"
+      ],
+      "utc_start": "2026-11-19T00:27:33.377253+00:00",
+      "utc_end": "2026-11-19T00:27:33.629971+00:00",
+      "exit_code": 0,
+      "log": "bandit.log"
+    },
+    {
+      "name": "browser",
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+        "scripts/studio_e2e.py",
+        "--output",
+        "/tmp/iam-studio-44428284748-1/browser",
+        "--schema",
+        "/tmp/iam-sarif-44428284748.json",
+        "--chromium",
+        "/home/runner/.cache/ms-playwright/chromium-1255/chrome-linux64/chrome"
+      ],
+      "utc_start": "2026-11-19T00:27:33.629995+00:00",
+      "utc_end": "2026-11-19T00:27:39.402701+00:00",
+      "exit_code": 0,
+      "log": "browser.log"
+    },
+    {
+      "name": "build",
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+        "-m",
+        "build",
+        "--outdir",
+        "/tmp/iam-studio-44428284748-1/artifacts"
+      ],
+      "utc_start": "2026-11-19T00:27:39.402721+00:00",
+      "utc_end": "2026-11-19T00:27:43.807398+00:00",
+      "exit_code": 0,
+      "log": "build.log"
+    },
+    {
+      "name": "dependency_audit",
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+        "-m",
+        "pip_audit",
+        "--skip-editable",
+        "--cache-dir",
+        "/tmp/iam-studio-tool-cache-abe1c0a1e595/pip-audit",
+        "--format",
+        "json",
+        "--output",
+        "/tmp/iam-studio-44428284748-1/pip-audit.json"
+      ],
+      "utc_start": "2026-11-19T00:27:43.807419+00:00",
+      "utc_end": "2026-11-19T00:27:45.439464+00:00",
+      "exit_code": 0,
+      "log": "dependency_audit.log"
+    },
+    {
+      "name": "performance_existing_gate",
+      "command": [
+        "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+        "benchmarks/perf_gate.py",
+        "--policies",
+        "500",
+        "--output",
+        "/tmp/iam-studio-44428284748-1/performance.json"
+      ],
+      "utc_start": "2026-11-19T00:27:45.439489+00:00",
+      "utc_end": "2026-11-19T00:27:45.745101+00:00",
+      "exit_code": 0,
+      "log": "performance_existing_gate.log"
+    }
+  ],
+  "limitations": [
+    "Static patterns do not establish effective IAM permissions or exploitability",
+    "No live AWS validation; actual skip names and reasons are recorded separately",
+    "No public or multi-user deployment approval",
+    "Full historical document and branch reconciliation remains incomplete",
+    "Installed wheels cannot attest to source Git metadata and report UNKNOWN"
+  ],
+  "tests": {
+    "tests": 275,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 3,
+    "passed": 272
+  },
+  "skipped_tests": [
+    {
+      "name": "test_get_rules_returns_list",
+      "class": "tests.test_coverage_boost.TestRulesModule",
+      "reason": "rules module not importable"
+    },
+    {
+      "name": "test_each_rule_has_required_fields",
+      "class": "tests.test_coverage_boost.TestRulesModule",
+      "reason": "rules module not importable"
+    },
+    {
+      "name": "test_evaluate_rule_with_safe_policy",
+      "class": "tests.test_coverage_boost.TestRulesModule",
+      "reason": "rules module not importable"
+    }
+  ],
+  "coverage": {
+    "covered_lines": 871,
+    "num_statements": 1129,
+    "percent_covered": 77.14791851195749,
+    "percent_covered_display": "77",
+    "missing_lines": 258,
+    "excluded_lines": 6,
+    "percent_statements_covered": 77.14791851195749,
+    "percent_statements_covered_display": "77"
+  },
+  "clean_after": true,
+  "utc_end": "2026-11-19T00:27:45.748728+00:00",
+  "checks_passed": true,
+  "artifacts": {
+    "pip-audit.json": "12292ddb833a573e09fe680640073d79369133a36a2d53877bd571a8f4a66342",
+    "performance.json": "ef9457e12d3ab09ea5a6f8a9174084c41018805d6b631ad4387a3d5ee35914d5",
+    "format.log": "9071fb8809290955639414bfc7f9a55bb49b60c6fbecf0b84ad6e8cffd072155",
+    "typecheck_studio.log": "6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332",
+    "dependency_audit.log": "15950a68a7ed99c59779717acefdceb3f69cfd31bde67d2c954f2a3cea4d7955",
+    "build.log": "1256111d8c75a1ed215d6caffb5490453d309491b3cb7bd38e41076b698bfa63",
+    "coverage.json": "b9db90daf492361fa1160f2c1928992691d56d3401febe25599a0bdc0422c084",
+    "bandit.log": "4ecf1947eb498a21dc6160723569f6d2c5923dbd02cd75b6e10ef584b9ede3d4",
+    "regression.log": "54ce0527316725e3e1eb893c9fde23b69643b5ec15aa7880b547a7b5ecf12415",
+    "coverage-data": "ad9cb28e6c2145eb16bd1b817a6230a08fd5e632e9ac3cfceced47b28b81f916",
+    "bandit.json": "a03cf90531efbaec1963df7bb913c5d0f888bf3228d4fec0a1e05281992c57b6",
+    "browser.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "lint.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "junit.xml": "b241a4ce0982370b46872c78cdeb058c1d9bb6c97c11da5fcb9cc61efd2672aa",
+    "performance_existing_gate.log": "4126ea407da6967ca494b2eeb8f0a171848c35da0150f476a6e54167cda1c6bf",
+    "dependencies.log": "bee5c1c57336779557833fb105e34218a2fa07882e562b2f2f1a6b1adebf70fc",
+    "browser/changed-review.json": "6d71e1f555818c7e510efb523a55f1faf901e7a7ac74397d687432bc84033725",
+    "browser/review.txt": "c9e4b0cdc677078e686cf3cefe32567f9a856bbe6db344a029e0ada8bce9c603",
+    "browser/review.sarif": "3429c0a7268e5d217a6ef6bbf6f25cdedd8803714e135eec56422fc20578991c",
+    "browser/desktop.png": "577d562a0b38d771905bda0eff0231307cfec32251ee6fefa090a78a3e6dd084",
+    "browser/mobile.png": "e734f417f7174cb059e0fec758f6e70111468710dc03007c46f19570d6abc222",
+    "browser/identity-and-trust.sarif": "eda2515faee7c5084c93ecff7f4cd9bea12e9c12cb67d89e739b5d693c95be47",
+    "browser/first-review.json": "5ed21dd76472890a5362fa5c55ded2c99976dcc15eece84008344a36e2c6040a",
+    "browser/browser-result.json": "bb7d599d4aba7e2b566397cc58bd7359104deadc29ff7d9d574cd7e928b51df7",
+    "artifacts/aws_agent_identity_guard-0.3.0-py3-none-any.whl": "1a8e2d525ea570700cd8e7e954ea926ce7b00d2056582fdef0deb545b6a26613",
+    "artifacts/aws_agent_identity_guard-0.3.0.tar.gz": "d28b849e5064f7785c951884f1bd79d965b32b6d6dfd50a51852109d45f28c67"
+  }
+}

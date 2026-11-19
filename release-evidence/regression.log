@@ -1,0 +1,21 @@
+........................................................................ [ 26%]
+.......sss.............................................................. [ 52%]
+........................................................................ [ 78%]
+...........................................................              [100%]
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.14-final-0 _______________
+
+Name                                                         Stmts   Miss  Cover   Missing
+------------------------------------------------------------------------------------------
+src/aws_agent_identity_guard/__init__.py                         3      0   100%
+src/aws_agent_identity_guard/access_analyzer_validation.py      15      0   100%
+src/aws_agent_identity_guard/cli.py                            152     68    55%   145-157, 234-303, 307, 331-344, 350
+src/aws_agent_identity_guard/live_scanner.py                   255     82    68%   55-56, 168-171, 177-188, 213-220, 227-240, 246-299, 318-320, 350-352, 379-399, 506-515
+src/aws_agent_identity_guard/remediate.py                       83     46    45%   229, 233-260, 264-291, 295-324, 328-360, 364-420, 428-457, 462
+src/aws_agent_identity_guard/scanner.py                        260      9    97%   187-188, 327, 349, 749-750, 1034, 1049-1050
+src/aws_agent_identity_guard/studio/__init__.py                  0      0   100%
+src/aws_agent_identity_guard/studio/__main__.py                112     24    79%   38, 78-90, 96-97, 100, 113, 121, 130-131, 143-153, 157
+src/aws_agent_identity_guard/studio/analysis.py                249     29    88%   49, 57, 61-62, 85, 97-98, 100, 107, 109, 136, 144, 152, 166, 180, 186, 208, 211, 214, 218, 228, 233-236, 240, 246, 249, 256
+------------------------------------------------------------------------------------------
+TOTAL                                                         1129    258    77%
+Coverage JSON written to file /workspace/work/evidence/aws-agent-identity-guard/selected-branches/coverage.json
