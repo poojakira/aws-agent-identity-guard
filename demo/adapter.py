@@ -19,7 +19,7 @@ SPEC = {
         "exploitability or deployment safety.",
         "No AWS call, account inventory, SCP/boundary/session/resource-policy "
         "intersection or live authorization.",
-        "Comparison is a rule-fingerprint delta, not measured AWS risk " "reduction.",
+        "Comparison is a rule-fingerprint delta, not measured AWS risk reduction.",
     ],
     "repository": "https://github.com/poojakira/aws-agent-identity-guard/tree/codex/local-workbench-20261116",
 }

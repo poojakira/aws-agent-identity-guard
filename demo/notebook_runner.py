@@ -72,7 +72,7 @@ def main():
                 "report": report,
                 "report_sha256": hashlib.sha256(data).hexdigest(),
                 "checksum_encoding": (
-                    "UTF-8 JSON; sorted keys; compact separators; " "ensure_ascii=true; no NaN"
+                    "UTF-8 JSON; sorted keys; compact separators; ensure_ascii=true; no NaN"
                 ),
             },
             allow_nan=False,
