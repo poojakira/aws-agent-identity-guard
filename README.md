@@ -4,6 +4,20 @@ IAM Permission Engineering Studio helps cloud developers and security reviewers 
 
 **Release decision: PARTIAL.** The local browser workflow functions within its supported structural/static scope. Effective permissions, proven exploitability, authenticated multi-user hosting and deployment-specific approval remain unverified or unimplemented. Findings are review signals, not authorization decisions.
 
+## Try the real engine in your browser
+
+[**Open the free Colab notebook**](https://colab.research.google.com/github/poojakira/aws-agent-identity-guard/blob/codex/local-workbench-20261116/notebooks/try_product.ipynb) · [Inspect the notebook source](notebooks/try_product.ipynb) · [Detailed architecture diagrams](docs/ARCHITECTURE.md)
+
+Sign in with a Google account, select the **free CPU runtime**, and run the setup and scenario cells. Change the scenario and run again to inspect freshly computed evidence and hashes. This is an inline, guided synthetic-data demonstration of the actual repository engine, **not a publicly hosted copy of the full web application**. No API key, paid plan, GPU, Drive mount, tunnel or cloud-resource creation is used by the notebook. Free Colab availability/limits are outside this repository's control.
+
+The setup resolves the reviewed branch to one exact SHA, checks it out and installs only minimal demo dependencies in a separate temporary environment. It starts no web server. [Testing access and limitations](docs/TRY_IT.md) distinguishes locally executed notebook checks from Colab-hosted runtime verification. Use the full local UI below for its broader supported input and workflow.
+
+## Architecture
+
+![Detailed components, trust boundaries and actual engine path](docs/architecture/components.svg)
+
+See the [detailed architecture and execution sequences](docs/ARCHITECTURE.md) for exact code symbols, controls, limits, errors, cleanup, evidence and the separate guided notebook scope.
+
 ## Start locally
 
 Prerequisites: Python 3.10 or newer, pip and a browser. The static engine/studio has no third-party runtime dependency, AWS credential requirement or paid-service requirement. Initial installation may download packaging tools.
@@ -40,16 +54,11 @@ Deny statements and conditions are visible context; the scanner does not evaluat
 
 Each studio document is limited to 32,768 UTF-8 bytes, depth 16 and 32 statements; action/resource/principal lists have at most 64 values. The backend retains no policy database. Inputs exist in browser/backend memory; explicit exports persist on the operator's disk. The trusted host/operator remain part of the boundary.
 
-## Verification and evidence
+## Current verification and source
 
-The prior published implementation-source run at **`970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc`** recorded **267 passed, 3 skipped, 77.14791851195749% statement coverage**. The three skips are absent legacy `TestRulesModule` API tests, not live-AWS checks. Focused independent review passed 38 observations and 23 Python 3.10 tests at that source. Seven associated hosted workflows passed; the actual-head studio run and identical-tree legacy merge checks are distinguished in the report. These results do not attest to later documentation commits.
+Read the [generated assessment and exact commands](https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/selected-branches-20261118/release-evidence/RELEASE_ASSESSMENT.md) and [source manifest](https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/selected-branches-20261118/release-evidence/manifest.json). The manifest records the checked-out SHA, clean state, actual regression/browser outcomes, skips, dependency scope and artifact hashes. Compare its `source_commit` with the checkout you are using. A passing earlier commit does not attest to a later commit.
 
-- [Published assessment and exact-source proof](https://github.com/poojakira/aws-agent-identity-guard/blob/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/RELEASE_ASSESSMENT.md)
-- [Published manifest and artifact hashes](https://github.com/poojakira/aws-agent-identity-guard/blob/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/manifest.json)
-- [Current procedure, branch disposition and later-head evidence status](docs/EVIDENCE.md)
-- [Review proposal: PR #75](https://github.com/poojakira/aws-agent-identity-guard/pull/75)
-
-A later head requires its own generated verification manifest. The planned non-release archive is `evidence/docs-reconciliation-20261118`; the name alone proves neither publication nor a passing run.
+The previous published documentation candidate was `4411c0792b0279c3bbd60e4af84210b3a551540a`; its [immutable evidence](https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/docs-reconciliation-20261118/release-evidence) remains historical. The newer architecture/notebook changes require their own generated evidence. [PR #75](https://github.com/poojakira/aws-agent-identity-guard/pull/75) records the current source, publication and remaining blockers. **Release remains PARTIAL.**
 
 ## Develop and verify
 
@@ -77,3 +86,9 @@ The verifier needs a clean checkout and an existing Chromium at the chosen path.
 | Contribution terms and documentation audit | [Contributing](CONTRIBUTING.md), [audit ledger](docs/DOCUMENTATION_AUDIT.md) |
 
 Historical records retain their original sources/dates; documentary review does not establish field accuracy, live account coverage or operational approval. Main remains unchanged; active/unique branches are preserved. See the exact completed cleanup and recovery references in the evidence guide.
+
+## Selected branches and recovery
+
+Only `main` and `codex/local-workbench-20261116` remain as remote branches. This cleanup retired 5 additional branches after preserving their exact tips in `archive/selected-20261118/*` annotated recovery tags and a verified private Git bundle. Unmerged/dependency changes were **not merged or certified** by retiring their branches. Existing release/deployment source references are preserved separately. Main was not rewritten or merged.
+
+See [branch policy and restore procedure](docs/BRANCHES.md) and the generated [branch-cleanup evidence](https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/selected-branches-20261118/release-evidence/branch-cleanup.json). Bots or collaborators may create later branches; the published report records the actual verification time rather than promising permanent branch counts.

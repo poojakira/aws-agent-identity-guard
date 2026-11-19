@@ -14,4 +14,4 @@ Production users must choose their own response targets, trusted identity, reten
 
 ## Branch/release state
 
-Main remains the integration branch. Preserve active PRs and unique work; archive verified recovery references before removing proven merged/unused branches. Two merged poster branches were deleted after content/reference/recovery checks; see [branch disposition](docs/EVIDENCE.md#branch-disposition). Earlier forensic tables retain their original date. No main history rewrite, automatic package/container publication, cloud resource or production release follows from this documentation change. Roll back in a separate reviewed checkout and re-run checks; code rollback does not undo AWS actions or rotate credentials.
+The owner-selected remote branch set is `main` and `codex/local-workbench-20261116`. Additional dependency and unique-work branches were retired only after exact-tip annotated recovery tags and verified private backups; unreviewed changes were not merged. See [selected branches and recovery](docs/BRANCHES.md). Earlier branch counts/dispositions remain historical. Security automation and protected-main checks remain enabled.

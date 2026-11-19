@@ -6,9 +6,11 @@ The user is a cloud developer or security reviewer examining an IAM change witho
 
 The product has 24 static rules (AIG001–AIG021, AIG-TP001–003). The additional product-wide rule AIG-PB001 lives in the live scanner and checks boundary presence using role context; it is not run here. Presence does not prove boundary effectiveness. No AWS client, account credentials, paid API or external service is used in this local application.
 
-Acceptance: a user can paste or upload a supported policy, see actual findings at exact statement lines, inspect conditions and supplied Deny statements, edit and rescan, navigate added/removed finding evidence, inspect a graph derived from supplied statements, and download standards-validated SARIF 2.1.0 and a text review. A successful HTTP request is not a claim about effective permissions. Engine failure produces an explicit error and removes stale output.
+Acceptance: a user can paste or upload a supported policy, see actual findings at exact statement lines, inspect conditions and supplied Deny statements, edit and rescan, navigate added/removed finding evidence, inspect a graph derived from supplied statements, and download SARIF 2.1.0 and a text review. Official-schema validation is a release verification check, not an AWS authorization check or a schema-service call on every export. A successful HTTP request is not a claim about effective permissions. Engine failure produces an explicit error and removes stale output.
 
 ## Architecture and ADR
+
+See [the detailed architecture](ARCHITECTURE.md) for component/trust boundaries, the actual comparison/export sequence and code-symbol mapping.
 
 ```mermaid
 flowchart LR
@@ -21,7 +23,7 @@ flowchart LR
     Export --> Browser
 ```
 
-Entry points are `studio.__main__.create_server`, `studio.analysis.Document`, and `studio.analysis.review_change`. `scan_policy_document` and `scan_trust_policy` remain the engine of record. `_build_sarif` supplies the canonical SARIF structure; the adapter adds verified source regions and run metadata. A parser records structural spans, so text containing the word Statement does not confuse evidence locations. Policy-level combination findings link to the whole document rather than inventing a contributing line. Source text and location come from the exact supplied bytes.
+Entry points are `studio.__main__.create_server`, `studio.analysis.Document`, and `studio.analysis.review_change`. `scan_policy_document` and `scan_trust_policy` remain the engine of record. `_build_sarif` supplies the canonical SARIF structure; the adapter adds verified source regions and run metadata. A parser records structural spans, so text containing the word Statement does not confuse evidence locations. Policy-level combination findings link to the whole document rather than inventing a contributing line. Source snippets and one-based line ranges come from exact supplied text; parser spans are character offsets, not advertised UTF-8 byte-column offsets.
 
 ADR: a serial stdlib HTTP server keeps the static product free of runtime dependencies. One request runs at a time; bounded input limits engine work and memory. There is no job queue or background worker. The browser retains the previous successful input only in memory and submits it explicitly for comparison. No input or result is persisted by the backend. No shared infrastructure or other security product is required.
 
@@ -37,7 +39,7 @@ The graph contains only supplied documents, statements, action/resource/principa
 
 The app accepts bounded UTF-8 IAM identity JSON and optional role trust JSON. This is supported structural validation, **not a complete AWS policy-language validator**. JSON duplicates, non-finite numbers, depth above 16, documents above 32768 bytes, more than 32 statements, non-object statements, missing/invalid Effect, incompatible Action/NotAction or Resource/NotResource fields, unknown statement fields and malformed condition objects fail closed. Each action/resource/principal list is limited to 64 non-empty strings; individual strings to 4096 characters. Trust input supports Action and Principal with the implicit role resource; unsupported NotAction/NotPrincipal/resource-policy structures are rejected explicitly.
 
-`GET /` serves the browser. `GET /health` reports software version 0.3.0, actual rule inventory/hash and source provenance. Only a tracked editable package at its exact Git top-level reports a Git SHA with CLEAN/DIRTY status. Installed distributions report UNKNOWN, including when installed under another repository.
+`GET /` serves the browser. `GET /health` reports software version 0.3.0, declared static rule IDs, canonical scanner-file hash and source provenance. A review separately checks the literal rule inventory against the advertised IDs before analysis. Only a tracked editable package at its exact Git top-level reports a Git SHA with CLEAN/DIRTY status. Installed distributions report UNKNOWN, including when installed under another repository.
 
 `POST /api/review` requires exactly `Content-Type: application/json`, one declared Content-Length, no Transfer-Encoding, and a body of 1–196608 bytes. Fields are JSON strings: required `policy`, optional `trust`, `before_policy`, `before_trust`. Comparison requires a before identity policy. Unknown fields are rejected. No filename, filesystem path, executable, account, credential, URL or remote target is accepted.
 
