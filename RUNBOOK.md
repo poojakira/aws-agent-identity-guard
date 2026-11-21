@@ -1,615 +1,79 @@
-# Runbook — AWS Agent Identity Guard v0.3.0
+# Operations runbook
 
-**Last updated:** 2026-08-08  
-**Audience:** SREs, DevSecOps, Cloud Security Engineers  
-**Severity:** This tool gates deployments. If it's broken, insecure agent roles may reach production.
+## Choose the correct interface
 
----
+| Interface | Entry point | Input and boundary |
+|---|---|---|
+| Local studio | `python -m aws_agent_identity_guard.studio` / `iam-studio` | Bounded identity/trust JSON; real browser/static evidence, no AWS |
+| Static CLI | `aws-agent-identity-guard POLICY.json` | One local identity-policy object per invocation; no AWS |
+| Python trust API | `scan_trust_policy` | Supplied trust document; no effective-permission evaluation |
+| Optional live collector | `aws-agent-identity-guard --live-scan` | Operator-authorized IAM/STS reads using Boto3 credentials |
 
-## Table of Contents
+Use [README setup](README.md#start-locally) for the studio. It binds only to loopback, has no multi-user login/database, and stops with Ctrl+C. `GET /health` reports liveness, rule inventory and source provenance; health is not a security or effective-permission verdict. A wheel reports source UNKNOWN outside the exact tracked source root. An occupied port can be changed with `--port`; the bind address cannot.
 
-1. [Prerequisites](#1-prerequisites)
-2. [Installation](#2-installation)
-3. [Configuration](#3-configuration)
-4. [Usage — Static Scan](#4-usage--static-scan)
-5. [Usage — Live AWS Scan](#5-usage--live-aws-scan)
-6. [Usage — Remediation](#6-usage--remediation)
-7. [Interpreting Results](#7-interpreting-results)
-8. [Exit Codes](#8-exit-codes)
-9. [CI/CD Integration](#9-cicd-integration)
-10. [Troubleshooting](#10-troubleshooting)
-11. [Alerting & Escalation](#11-alerting--escalation)
-12. [Maintenance](#12-maintenance)
+## Static CLI
 
----
+Use this reviewed source checkout/virtual environment. A PyPI name/version is not proof that a registry distribution matches this candidate; verify distribution provenance separately. After source installation:
 
-## 1. Prerequisites
-
-| Requirement | Version | Notes |
-|-------------|---------|-------|
-| Python | 3.10+ | Verify with `python --version` or `py --version` (Windows) |
-| pip | Latest | Comes with Python. Upgrade: `python -m pip install --upgrade pip` |
-| boto3 | ≥1.34.0 | **Only required for live AWS scanning.** Not needed for static analysis. |
-| AWS Credentials | N/A | Only for live scanning. Static mode analyzes JSON files locally. |
-
-### Verify Prerequisites
-
-**Windows (PowerShell):**
-```powershell
-py --version
-# Expected: Python 3.10.x or higher
-
-py -m pip --version
-# Expected: pip 24.x from ...
-```
-
-**Linux / macOS (bash):**
-```bash
-python3 --version
-# Expected: Python 3.10.x or higher
-
-python3 -m pip --version
-# Expected: pip 24.x from ...
-```
-
----
-
-## 2. Installation
-
-### Option A: Install from PyPI (Recommended for CI and production use)
-
-**Windows (PowerShell):**
-```powershell
-# Static analysis only (zero dependencies)
-py -m pip install aws-agent-identity-guard
-
-# With live AWS scanning support
-py -m pip install "aws-agent-identity-guard[live]"
-
-# Verify installation
+```sh
 aws-agent-identity-guard --version
-# Expected: aws-agent-identity-guard 0.3.0
+aws-agent-identity-guard --help
+aws-agent-identity-guard examples/agent_policy_wildcard.json --format json
+aws-agent-identity-guard examples/agent_policy_wildcard.json --format sarif --output /tmp/iam-results.sarif
 ```
 
-**Linux / macOS (bash):**
-```bash
-# Static analysis only (zero dependencies)
-pip install aws-agent-identity-guard
+The intentionally broad synthetic fixture normally returns a finding exit status. Inspect outputs, not only shell success. `--output` writes machine-readable JSON/SARIF; do not combine `--remediate` with machine-readable stdout because appended template text is not JSON. Static CLI JSON has a top-level `findings` array. Findings contain rule ID, lowercase severity, message, remediation and optional statement index; text mode prints a block per finding with no severity-count summary. A no-finding text response is a scanner result, not permission to deploy. The static CLI does not accept a trust-policy flag; use the studio or `scan_trust_policy` for trust input.
 
-# With live AWS scanning support
-pip install "aws-agent-identity-guard[live]"
+### Exit status
 
-# Verify installation
-aws-agent-identity-guard --version
-# Expected: aws-agent-identity-guard 0.3.0
+| Status | Actual meaning | Operator interpretation |
+|---|---|---|
+| 0 | No high/critical findings; medium findings may remain | No configured blocking pattern matched; safety/effective permissions unknown |
+| 1 | High/critical findings; live `--enforce` also fails on incomplete/error reports | Preserve/review output; retain the configured CI gate |
+| 2 | Unusable input/configuration/runtime failure, including unavailable live prerequisites | No successful clean scan established |
+
+CLI reads a local object as UTF-8 JSON and rejects duplicate keys. It does not apply every studio structural/size bound. Do not assume an arbitrary CLI JSON object was fully validated as AWS policy language. Analyze one file at a time; if writing a batch wrapper, aggregate every exit status and distinguish findings from tool errors. Do not mask nonzero statuses or make incomplete scans appear clean.
+
+## Optional live collection
+
+**Not executed by this documentation pass.** It requires an explicitly authorized target account and `.[live]`/Boto3, and may consume AWS API/service quotas. Prefer an existing short-lived workload identity or read-only profile through the standard provider chain. Never put credentials in source, shell examples, screenshots or outputs. The studio needs none of these prerequisites.
+
+```sh
+aws-agent-identity-guard --live-scan --enforce --format json --output /tmp/iam-account-scan.json
+aws-agent-identity-guard --live-scan --enforce --role-name exact-role-name --region us-east-1 --format json --output /tmp/iam-role-scan.json
 ```
 
-### Option B: Install from Source (for development or unreleased fixes)
+`--role-name` selects one exact role name, not a wildcard and not a cross-account traversal. Account access comes from the configured SDK identity, not from this flag. Region defaults to the session region or us-east-1; IAM itself is global. The collector enumerates roles, users and collected policy documents, invokes canonical static rules, and adds AIG-PB001 for flagged roles without a boundary. It does not calculate all effective permissions, evaluate group inheritance/intersections, or infer authorization from boundary attachment.
 
-**Windows (PowerShell):**
-```powershell
-git clone https://github.com/poojakira/aws-agent-identity-guard.git
-cd aws-agent-identity-guard
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-py -m pip install --upgrade pip
-py -m pip install -e .
+Required reads follow the actual collector: STS `GetCallerIdentity`; IAM `ListRoles`, `GetRole`, `ListUsers`, `ListRolePolicies`, `GetRolePolicy`, `ListAttachedRolePolicies`, `GetPolicy`, `GetPolicyVersion`, `ListUserPolicies`, `GetUserPolicy`, `ListAttachedUserPolicies`, and `ListUserTags`. Review scope/conditions for your environment rather than copying an account-wide wildcard policy blindly. [Terraform/trust guidance](docs/aws-architecture.md) distinguishes account-principal AssumeRole from OIDC web identity. No CloudWatch log delivery or CloudTrail lookup is implemented by the ordinary collector despite older source commentary.
 
-# With live scanning
-py -m pip install -e ".[live]"
+JSON reports include `scan_complete`, `errors`, `roles_discovered`, `completeness_reason`, counts, findings and collected role context. A role cap of 500 can truncate a scan; it is a constructor option rather than a documented CLI flag. API errors can also make collection incomplete. Without `--enforce`, a partial report with no high/critical findings may exit 0. Use the flag and inspect all completeness fields for CI. Absence of findings in a partial scan is not absence of risk. Do not infer completeness from the number of roles alone.
 
-# With dev tools (pytest, ruff, pyright, moto)
-py -m pip install -e ".[dev]"
+## Remediation output
 
-# Verify
-aws-agent-identity-guard --version
-# Expected: aws-agent-identity-guard 0.3.0
+```sh
+aws-agent-identity-guard examples/agent_policy_wildcard.json --remediate
 ```
 
-**Linux / macOS (bash):**
-```bash
-git clone https://github.com/poojakira/aws-agent-identity-guard.git
-cd aws-agent-identity-guard
-python3 -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-pip install -e .
+Static `--remediate` invokes rule-keyed templates in `remediate.py` for supported findings. The CLI prints explanations and Terraform HCL; template objects may also contain CloudFormation/fixed-policy representations, but the CLI does not print every representation. Template selection is rule-based, but generated content can include a generation timestamp, so repeated outputs need not be byte-identical. It does not apply infrastructure or prove the suggestions correct for your resources. Placeholders, account/region/service/resource names, workload requirements and policy intersections require independent review and testing. Treat the help phrase “ready-to-apply” as a description of emitted template syntax, not deployment approval. Live mode returns before the static remediation branch; `--live-scan --remediate` does not perform live auto-remediation.
 
-# With live scanning
-pip install -e ".[live]"
+## Data, CI and recovery
 
-# With dev tools (pytest, ruff, pyright, moto)
-pip install -e ".[dev]"
+Studio input/comparisons stay in memory; downloads remain on the operator's disk. CLI/live reports can reveal ARNs, account/role names, policies and error details. Protect their storage and access; they are not automatically anonymized. There is no persistent studio backup to restore. For retained CLI/live reports use your own reviewed retention/encryption/backup policy.
 
-# Verify
-aws-agent-identity-guard --version
-# Expected: aws-agent-identity-guard 0.3.0
-```
+Use [the repository verification workflow](docs/EVIDENCE.md), pin reviewed source/artifact and Actions revisions in your own CI, and retain nonzero finding/error statuses. Generic JSON is not automatically a GitLab security-report schema; use it as a normal artifact or supply a separately validated adapter. SARIF schema validity does not prove security conclusions. No Slack/Jira/email should receive policy context without explicit authorization and redaction. The [n8n template](integrations/N8N_WORKFLOW.md) needs error/completeness and downstream-side-effect review before activation.
 
-> **Note:** If PowerShell blocks venv activation, run `Set-ExecutionPolicy -Scope Process Bypass` first.
+For failure: preserve the exact source/version, non-secret input/configuration hashes, actual stderr/outcome, and a synthetic reproduction. Use [SECURITY.md](SECURITY.md) for private vulnerability reports. Do not bypass gates, broadly suppress findings or mutate AWS just to obtain a green check. Roll back in a separate reviewed checkout/virtual environment after preserving local changes; re-run its checks. Code rollback does not undo AWS changes or revoke credentials. [Incident guidance](INCIDENT_RUNBOOK.md) is a template, not a staffed SLA.
 
----
+## Troubleshooting
 
-## 3. Configuration
-
-### Static Mode (Default)
-
-No configuration required. The tool reads a JSON policy file and applies 25 rules locally. Zero network calls.
-
-### Live Mode — Environment Variables
-
-Set these before running `--live-scan`:
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `AWS_PROFILE` | Recommended for local use | Named profile from the standard AWS credential chain |
-| `AWS_DEFAULT_REGION` | Yes | Region to scan (for example, `us-east-1`) |
-| Temporary role/session credentials | Recommended in managed environments | Obtain through AWS SSO, STS, workload identity, EC2/ECS role, or another supported credential provider |
-
-Do not paste long-lived access keys or secret keys into this repository, Markdown, shell history, screenshots, or committed `.env` files. The live scanner uses boto3 and therefore follows the standard AWS credential-provider chain.
-
-**Windows (PowerShell):**
-```powershell
-$env:AWS_PROFILE = "your-read-only-security-profile"
-$env:AWS_DEFAULT_REGION = "us-east-1"
-aws sts get-caller-identity
-```
-
-**Linux / macOS (bash):**
-```bash
-export AWS_PROFILE="your-read-only-security-profile"
-export AWS_DEFAULT_REGION="us-east-1"
-aws sts get-caller-identity
-```
-
-For CI or workloads running in AWS, prefer short-lived role credentials/workload identity rather than static access keys.
-
-### Required IAM Permissions for Live Scan
-
-The scanning identity needs read-only IAM access:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Effect": "Allow",
-    "Action": [
-      "iam:ListRoles",
-      "iam:ListUsers",
-      "iam:ListRolePolicies",
-      "iam:ListAttachedRolePolicies",
-      "iam:GetRolePolicy",
-      "iam:GetPolicy",
-      "iam:GetPolicyVersion",
-      "iam:GetRole",
-      "iam:ListUserPolicies",
-      "iam:ListAttachedUserPolicies",
-      "iam:GetUserPolicy"
-    ],
-    "Resource": "*"
-  }]
-}
-```
-
----
-
-## 4. Usage — Static Scan
-
-### Basic scan (human-readable text output)
-
-```bash
-aws-agent-identity-guard policy.json
-```
-
-**Expected output:**
-```
-CRITICAL AIG002 statement=0: Agent policy grants wildcard service or full-account actions. An autonomous agent with '*' can do anything including deleting the account's entire infrastructure.
-  remediation: Scope actions to the exact APIs the agent tool calls. Use service-level wildcards only in dev environments with a permission boundary as a safety net.
-HIGH AIG003 statement=0: Agent policy grants access to all resources in the account. Combined with tool-execution actions, this means the agent can invoke any Lambda, read any secret, or run tasks anywhere.
-  remediation: Bind permissions to specific ARNs or use resource tags and conditions (aws:ResourceTag) to limit blast radius.
-```
-
-> The text format is `SEVERITY RULE_ID statement=N: <message>` followed by an
-> indented `remediation:` line, one block per finding. Policy-wide kill-chain
-> rules (AIG019–AIG021) omit the `statement=N` suffix. There is no summary
-> count line in text mode — severity counts are derivable from the findings,
-> and the process exit code (0/1/2) is the machine-readable signal for CI.
-> A clean policy prints `PASS: no high-risk agent IAM findings`.
-
-### JSON output (for programmatic consumption)
-
-```bash
-aws-agent-identity-guard policy.json --format json
-```
-
-**Expected output:**
-```json
-{
-  "findings": [
-    {
-      "rule_id": "AIG002",
-      "severity": "critical",
-      "message": "Agent policy grants wildcard service or full-account actions...",
-      "remediation": "Scope actions to the exact APIs the agent tool calls...",
-      "statement_index": 0
-    }
-  ]
-}
-```
-
-> The JSON output is a single object with a top-level `findings` array. Each
-> finding carries `rule_id`, `severity` (lowercase: `critical`/`high`/`medium`),
-> `message`, `remediation`, and `statement_index` (may be `null` for
-> policy-wide/kill-chain rules). Severity counts are shown in the human-readable
-> `text` output, not embedded in the JSON.
-
-### SARIF output (for GitHub Advanced Security / Code Scanning)
-
-```bash
-aws-agent-identity-guard policy.json --format sarif > results.sarif
-```
-
-Upload `results.sarif` to GitHub Code Scanning or any SARIF-compatible viewer.
-
-### Scan multiple files
-
-The CLI analyzes one policy document per invocation. To scan several files,
-loop over them in your shell (each run has its own exit code):
-
-```bash
-# bash
-for f in deploy/*.json; do
-  echo "== $f =="
-  aws-agent-identity-guard "$f" --format json || exit_code=$?
-done
-```
-
-```powershell
-# PowerShell
-Get-ChildItem deploy\*.json | ForEach-Object {
-  Write-Host "== $($_.Name) =="
-  aws-agent-identity-guard $_.FullName --format json
-}
-```
-
----
-
-## 5. Usage — Live AWS Scan
-
-### Scan all IAM roles in the configured account/region
-
-```bash
-aws-agent-identity-guard --live-scan --format json
-```
-
-**Expected output:**
-```json
-{
-  "account_id": "123456789012",
-  "region": "us-east-1",
-  "roles_scanned": 47,
-  "findings": [...],
-  "summary": {"critical": 3, "high": 12, "medium": 5, "total": 20}
-}
-```
-
-### Scan a single role
-
-```bash
-aws-agent-identity-guard --live-scan --role-name my-bedrock-agent-role --format text
-```
-
-### Write output to file
-
-```bash
-aws-agent-identity-guard --live-scan --format sarif --output scan-results.sarif
-```
-
----
-
-## 6. Usage — Remediation
-
-Generate remediation suggestions for findings:
-
-```bash
-aws-agent-identity-guard policy.json --remediate
-```
-
-The findings are printed first (same text format as a normal scan), followed
-by a generated remediation section. Remediations are produced from
-deterministic templates keyed on rule ID (currently AIG004, AIG006/AIG016,
-and dangerous-action findings) — not every rule has an auto-generated fix.
-
-**Expected output (abridged):**
-```
-CRITICAL AIG004 statement=0: iam:PassRole without iam:PassedToService condition. ...
-  remediation: Add a Condition: {StringEquals: {iam:PassedToService: 'bedrock.amazonaws.com'}} ...
-...
-
----------------------------------------------------------------------
-GENERATED REMEDIATIONS (deterministic IaC templates)
----------------------------------------------------------------------
-
---- Fix for AIG004 ---
-Explanation: Scoped iam:PassRole to only pass roles to bedrock.amazonaws.com. ...
-
-Terraform HCL:
-resource "aws_iam_role_policy" "agent_wildcard_passrole_scoped" {
-  name = "passrole-scoped-to-service"
-  role = aws_iam_role.agent_wildcard.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Sid    = "PassRoleToSpecificService"
-      Effect = "Allow"
-      Action = "iam:PassRole"
-      Resource = "arn:aws:iam::*:role/agent_wildcard-execution"
-      Condition = { StringEquals = { "iam:PassedToService" = "bedrock.amazonaws.com" } }
-    }]
-  })
-}
-```
-
----
-
-## 7. Interpreting Results
-
-### Severity Levels
-
-| Severity | Meaning | Action Required |
-|----------|---------|-----------------|
-| **CRITICAL** | Privilege escalation, wildcard admin, confused deputy — active exploit path | **Block deployment immediately.** Fix before merge. If the role is already live, treat it as urgent per your own process. |
-| **HIGH** | Over-permissive scope, unscoped tool execution, cross-account risk | **Block deployment.** Fix in current sprint. Notify security team. |
-| **MEDIUM** | Missing defense-in-depth controls, missing conditions | **Warning.** Fix within 2 sprints. Track in backlog. |
-
-### When to Block Deployments
-
-- **Always block** on CRITICAL or HIGH findings (exit code 1)
-- **Warn but allow** on MEDIUM-only findings (exit code 0)
-- **Investigate** exit code 2 (tool error — do NOT assume clean)
-
-### Rule Categories
-
-| Rule Range | Category | What It Checks |
-|------------|----------|---------------|
-| AIG001–AIG021 | Identity Policy | Permission scope, wildcards, escalation paths, blast radius |
-| AIG-TP001–AIG-TP003 | Trust Policy | Who can assume the role (principals, conditions) |
-| AIG-PB001 | Permission Boundary | Whether high-risk roles have boundaries applied |
-
----
-
-## 8. Exit Codes
-
-| Code | Meaning | CI Action |
-|------|---------|-----------|
-| `0` | No HIGH or CRITICAL findings | Deploy is safe to proceed |
-| `1` | At least one HIGH or CRITICAL finding | **Block the deploy** |
-| `2` | Runtime error (bad input, missing creds, parse failure) | **Investigate before deploying** |
-
----
-
-## 9. CI/CD Integration
-
-### GitHub Actions
-
-```yaml
-name: IAM Policy Lint
-
-on:
-  pull_request:
-    paths:
-      - 'deploy/**'
-      - 'infra/**'
-      - '*.json'
-
-jobs:
-  iam-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install aws-agent-identity-guard
-        run: pip install aws-agent-identity-guard
-
-      - name: Scan IAM policies
-        run: |
-          aws-agent-identity-guard deploy/agent-role-policy.json --format sarif > results.sarif
-          aws-agent-identity-guard deploy/agent-role-policy.json --format text
-
-      - name: Upload SARIF to GitHub Security
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: results.sarif
-          category: iam-agent-lint
-```
-
-### GitLab CI
-
-```yaml
-iam-policy-lint:
-  stage: security
-  image: python:3.12-slim
-  before_script:
-    - pip install aws-agent-identity-guard
-  script:
-    - aws-agent-identity-guard deploy/agent-role-policy.json --format json > gl-iam-report.json
-    - aws-agent-identity-guard deploy/agent-role-policy.json --format text
-  artifacts:
-    reports:
-      security: gl-iam-report.json
-    paths:
-      - gl-iam-report.json
-    when: always
-  rules:
-    - changes:
-        - deploy/**
-        - infra/**
-```
-
-### Jenkins Pipeline
-
-```groovy
-pipeline {
-    agent { docker { image 'python:3.12-slim' } }
-
-    stages {
-        stage('Install') {
-            steps {
-                sh 'pip install aws-agent-identity-guard'
-            }
-        }
-        stage('Scan IAM Policies') {
-            steps {
-                sh '''
-                    aws-agent-identity-guard deploy/agent-role-policy.json --format json > iam-findings.json
-                    aws-agent-identity-guard deploy/agent-role-policy.json --format text
-                '''
-            }
-        }
-    }
-
-    post {
-        always {
-            archiveArtifacts artifacts: 'iam-findings.json', allowEmptyArchive: true
-        }
-        failure {
-            slackSend channel: '#security-alerts',
-                      message: "⚠️ IAM policy lint FAILED on ${env.JOB_NAME} #${env.BUILD_NUMBER}"
-        }
-    }
-}
-```
-
----
-
-## 10. Troubleshooting
-
-| Problem | Cause | Fix |
-|---------|-------|-----|
-| `ModuleNotFoundError: No module named 'boto3'` | Live scanning requires boto3 | `pip install "aws-agent-identity-guard[live]"` |
-| `NoCredentialsError` during `--live-scan` | No AWS credentials available in the standard provider chain | Configure AWS SSO/profile for local use, or attach an appropriate short-lived workload/instance role |
-| `AccessDenied` on live scan | Scanning identity lacks IAM read permissions | Attach the read-only IAM policy from Section 3 above |
-| Exit code `2` with no output | JSON parse error or file not found | Check stderr: `aws-agent-identity-guard policy.json 2>&1` — look for file path or JSON syntax errors |
-| `command not found: aws-agent-identity-guard` | Not in PATH | Verify install: `pip show aws-agent-identity-guard`. Use `python -m aws_agent_identity_guard` as fallback. |
-| Wrong Python version | Running with Python < 3.10 | Use `py -3.12` (Windows) or `python3.12` (Linux) explicitly |
-| `UnicodeDecodeError` reading policy file | File has non-UTF-8 encoding | Re-save the file as UTF-8. On Windows: `Get-Content policy.json | Set-Content -Encoding UTF8 policy-fixed.json` |
-| SARIF file is empty | Redirect captured stderr too | Use `aws-agent-identity-guard policy.json --format sarif > results.sarif 2>errors.log` |
-| Findings count differs from last run | Rules updated between versions | Pin version in CI: `pip install aws-agent-identity-guard==0.3.0` |
-
----
-
-## 11. Alerting & Escalation
-
-> This section is **reference guidance you adapt to your own organization**, not
-> a description of an operated service. This tool is a static/live IAM linter;
-> it ships **no on-call rotation, no SLA/SLO, no PagerDuty/OpsGenie hookup, and
-> no operated alerting**. The response times, roles, and channels below are
-> suggestions — replace them with whatever your team actually runs.
-
-### When CRITICAL Findings Are Detected
-
-**Suggested immediate actions:**
-
-1. **Block the deployment.** Exit code 1 should already prevent merge/deploy in CI.
-2. **Identify the policy owner.** Check git blame on the policy file.
-3. **Notify your security team** (adapt the channel) with:
-   - Repository and PR link
-   - Rule IDs triggered (e.g., AIG002, AIG004)
-   - Affected IAM role name
-4. **If the role is already live:**
-   - Apply a permission boundary to contain blast radius
-   - Open an incident per your own process
-   - Rotate any credentials that may have been exposed via the overprivileged role
-
-**Suggested escalation matrix (illustrative — no committed SLA):**
-
-| Scenario | Escalate To | Suggested target |
-|----------|-------------|------------------|
-| CRITICAL in PR (not deployed) | Policy author + security reviewer | Fix before merge |
-| CRITICAL in a live role | Whoever owns the account | Remediate promptly |
-| AIG004 (PassRole without condition) | Security owner | Treat as potential privilege escalation |
-| AIG-TP001 (wildcard principal) | Security owner + cloud architect | High urgency — anyone can assume this role |
-
-### Recommended Alert Channels (if you wire them up yourself)
-
-- **Slack/Teams:** Post JSON output to a channel of your choosing
-- **PagerDuty/OpsGenie:** You may trigger on exit code 1 in your own pipelines
-- **SIEM:** Forward SARIF findings to your SIEM for correlation
-
----
-
-## 12. Maintenance
-
-### Updating to Latest Version
-
-```bash
-# Check current version
-aws-agent-identity-guard --version
-
-# Update from PyPI
-pip install --upgrade aws-agent-identity-guard
-
-# Verify
-aws-agent-identity-guard --version
-```
-
-### Pinning Versions in CI
-
-Always pin to avoid unexpected rule changes breaking builds:
-
-```bash
-pip install aws-agent-identity-guard==0.3.0
-```
-
-Update pinned version after testing new rules in a non-blocking mode first.
-
-### Adding Custom Rules
-
-The tool currently ships with 25 built-in rules. Custom rule extensions are not yet supported — file an issue at https://github.com/poojakira/aws-agent-identity-guard/issues if you need custom rules.
-
-### Checking for New Releases
-
-```bash
-pip index versions aws-agent-identity-guard
-```
-
-Or watch the GitHub repository for releases:
-https://github.com/poojakira/aws-agent-identity-guard/releases
-
-### Running Tests After Update
-
-```bash
-# Clone and run the test suite to validate
-pytest tests/test_scanner.py -v
-pytest tests/test_live_scanner.py -v   # Uses moto, no real AWS calls
-```
-
----
-
-## Quick Reference Card
-
-```bash
-# Static scan (text output)
-aws-agent-identity-guard policy.json
-
-# Static scan (JSON for CI)
-aws-agent-identity-guard policy.json --format json
-
-# Static scan (SARIF for GitHub)
-aws-agent-identity-guard policy.json --format sarif > results.sarif
-
-# Live scan (all roles in account)
-aws-agent-identity-guard --live-scan --format json
-
-# Live scan (single role)
-aws-agent-identity-guard --live-scan --role-name my-agent-role --format text
-
-# Remediation suggestions
-aws-agent-identity-guard policy.json --remediate
-```
+| Observation | Check and recovery |
+|---|---|
+| Studio connection refused | Check owned terminal, printed port, Python version and virtual environment |
+| Studio 403 | Use exact `127.0.0.1` origin/port; alternate Host/proxying is refused |
+| Studio 400/413/415 | Correct supported JSON, bounded size and request framing; no successful review is established |
+| Studio 429 | Wait for the serial server's local rate budget to refill |
+| Export disabled after editing/upload | Review the current snapshot again; old output is intentionally invalidated |
+| Command absent | Activate the environment or use `python -m aws_agent_identity_guard.cli`; inspect `--help` |
+| Live missing Boto3/credentials/access | Keep result incomplete/error; install/configure approved live prerequisites only if that separate operation is authorized |
+| Findings differ across versions | Compare exact rules/configuration/input and pin the reviewed version; never equate count reduction with verified permission reduction |

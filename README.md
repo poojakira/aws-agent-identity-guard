@@ -1,361 +1,94 @@
-> **READ THIS LICENSE BEFORE USING THIS REPOSITORY.** Owner-controlled new releases are subject to the [proprietary All Rights Reserved LICENSE](LICENSE): copying, modification, and redistribution require written authorization except where law or GitHub's Terms allow. Previously granted MIT rights remain valid for versions covered by that license; see the [historical license](docs/license-history/LICENSE-BEFORE-2026-10-13.txt). Third-party rights remain unaffected.
-
 # AWS Agent Identity Guard
 
-> Static analysis for AWS IAM policies used by AI agents and tool executors — flag over-privileged, escalation-prone, and audit-tampering grants before deployment.
+IAM Permission Engineering Studio helps cloud developers and security reviewers inspect a proposed IAM change without AWS access. Paste or upload an identity policy and optional role trust policy, invoke the real static scanners, inspect exact statement evidence, then edit and compare findings.
 
-[![CI](https://github.com/poojakira/aws-agent-identity-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/poojakira/aws-agent-identity-guard/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-244%20passing-brightgreen)](VERIFIED_METRICS.md)
-[![Rules](https://img.shields.io/badge/rules-25-blue)](VERIFIED_METRICS.md)
-[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
+**Release decision: PARTIAL.** The local browser workflow functions within its supported structural/static scope. Effective permissions, proven exploitability, authenticated multi-user hosting and deployment-specific approval remain unverified or unimplemented. Findings are review signals, not authorization decisions.
 
-Maintainer: Pooja Kiran ([@poojakira](https://github.com/poojakira)).
+## Try the real engine in your browser
 
-Portfolio: [Pooja Kiran Security Engineering Portfolio](https://poojakira.github.io/Pooja_Kiran_Portfolio_Website/).
+[**Open the free Colab notebook**](https://colab.research.google.com/github/poojakira/aws-agent-identity-guard/blob/codex/local-workbench-20261116/notebooks/try_product.ipynb) · [Inspect the notebook source](notebooks/try_product.ipynb) · [Detailed architecture diagrams](docs/ARCHITECTURE.md)
 
-## Overview
+Sign in with a Google account, select the **free CPU runtime**, and run the setup and scenario cells. Change the scenario and run again to inspect freshly computed evidence and hashes. This is an inline, guided synthetic-data demonstration of the actual repository engine, **not a publicly hosted copy of the full web application**. No API key, paid plan, GPU, Drive mount, tunnel or cloud-resource creation is used by the notebook. Free Colab availability/limits are outside this repository's control.
 
-`aws-agent-identity-guard` reads IAM policy JSON (identity, trust, and permission-boundary) and produces reviewable findings for the agent-specific risk patterns that turn overbroad cloud permissions into real actions — invoking Lambda, assuming roles, changing Bedrock/SageMaker control-plane resources, reading secrets, or disabling audit trails. It is a static linter: no AWS calls in default mode, zero runtime dependencies for local-file scanning, and an optional live account scan when installed with `boto3`.
-
-## Latest inspected hosted CI (2026-10-13)
-
-[CI run 38462296804](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38462296804), commit `4098ff55`: **247 collected, 244 passed, 3 skipped** on Python 3.12; 3.10/3.11/3.12, lint, security audit and synthetic performance gate succeeded. This static analysis does not establish live AWS effective permissions or production latency.
-
-## Historical verified snapshot (September 2026)
-
-The earlier 243/240/3 CI evidence is a dated snapshot, **not the latest `main` test total**. The original poster keeps its separate evidence anchor. See [VERIFIED_METRICS.md](VERIFIED_METRICS.md).
-
-| Metric | Historical verified result |
-|---|---:|
-| Tests | 243 collected — 240 passed, 3 skipped (live-scan, need AWS creds) |
-| Deterministic rules | 25 (AIG001–AIG021, AIG-TP001–003, AIG-PB001) |
-| Output formats | text, JSON, SARIF 2.1.0 |
-| Ruff / format | clean |
-
-## Security Problem
-
-AI agents and tool executors run under IAM roles. An over-permissive role lets an autonomous agent escalate privilege (`iam:PassRole` without conditions, policy-modification actions), widen blast radius (`Resource: "*"`), pivot across accounts (weak trust policies), or disable its own audit trail (`cloudtrail:StopLogging`). These risks are reviewable in the policy document *before* deployment — which is where this tool operates.
-
-## Threat Model & Scope
-
-**In scope:** static analysis of a single IAM policy document per invocation (identity/trust/permission-boundary), emitted as text/JSON/SARIF for pre-deploy review and CI gating.
-
-**Out of scope / not claimed:** It does not call AWS in default mode, does not compute effective permissions, does not resolve ARNs or prove a role exists, and does not enforce at runtime. It complements — does not replace — IAM Access Analyzer, Prowler, Parliament, CloudTrail, and Security Hub. There is no fail-open/fail-closed runtime behavior because it is not a runtime gatekeeper. Condition-key checks verify presence, not logical sufficiency.
+The setup resolves the reviewed branch to one exact SHA, checks it out and installs only minimal demo dependencies in a separate temporary environment. It starts no web server. [Testing access and limitations](docs/TRY_IT.md) distinguishes locally executed notebook checks from Colab-hosted runtime verification. Use the full local UI below for its broader supported input and workflow.
 
 ## Architecture
 
-```text
-IAM policy JSON  --->  argparse / json.loads (allow_pickle=False, dup-key reject)
-      |
-      v
-scanner.py: scan_policy_document / scan_trust_policy   (25 deterministic rules)
-      |
-      v
-Output: text / JSON / SARIF 2.1.0  --->  stdout or file
-      |
-      v
-Exit code 0 (clean) / 1 (high|critical finding) / 2 (input/CLI error)   --->  CI gate
+[![Readable architecture overview](docs/architecture/overview.svg)](docs/architecture/overview.svg)
 
-[--live-scan]  AWS IAM read-only APIs (boto3) ---> same rule engine
+Open the [full-size overview](docs/architecture/overview.svg) or [zoomable HTML viewer](docs/index.html). See the [detailed architecture and execution sequences](docs/ARCHITECTURE.md) for exact code symbols, controls, limits, errors, cleanup, evidence and the separate guided notebook scope.
+
+## Start locally
+
+Prerequisites: Python 3.10 or newer, pip and a browser. The static engine/studio has no third-party runtime dependency, AWS credential requirement or paid-service requirement. Initial installation may download packaging tools.
+
+```sh
+python -m venv .venv
+. .venv/bin/activate
+python -m pip install -e .
+python -m aws_agent_identity_guard.studio
 ```
 
-## Core Capabilities
+On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1`. Open **http://127.0.0.1:8762**. To avoid an occupied port, use `python -m aws_agent_identity_guard.studio --port 8765` and open the printed address. The service binds only to IPv4 loopback and accepts its exact origin. Stop with Ctrl+C; do not expose it through a tunnel or reverse proxy.
 
-- 25 deterministic rules: wildcard grants, `iam:PassRole`, `sts:AssumeRole`, privilege escalation, blast radius, trust-policy risks (wildcard principal, missing `ExternalId`/`SourceArn`), and missing permission boundaries
-- Text, JSON, and SARIF 2.1.0 output; GitHub Code Scanning compatible
-- CI merge-gate exit codes (0 / 1 / 2)
-- Optional `--live-scan` mode (read-only IAM APIs) with a `max_roles` safety cap
-- Deterministic remediation templates for a subset of rules
+## Complete a real policy review
 
+1. Select **Load synthetic example**, or paste/upload a permitted identity policy. Keep credentials and secrets out of inputs.
+2. Optionally expand **Optional role trust policy** and supply trust JSON. Select **Review IAM change**.
+3. Select a finding to inspect its exact statement, source lines, rationale, remediation and supplied counter-context. The graph displays supplied statements and patterns only.
+4. Edit the policy and review again. Added/removed pattern findings link to After/Before evidence; the delta is not measured risk reduction.
+5. Export **SARIF 2.1.0**, a text review or evidence JSON. Exports contain supplied policy context, so review them before sharing. Clearing the previous review or closing the tab removes the in-memory comparison reference.
 
-No AWS credentials required. No cloud calls. Just feed it your policy JSON.
+![Actual studio showing source-linked policy findings](https://raw.githubusercontent.com/poojakira/aws-agent-identity-guard/9d829ee9a65df098ba91fe4672d88bfd63788999/release-evidence/browser/desktop.png)
 
-## Install
+This screenshot belongs to tested implementation source `970d1e1e3d5e65e91bd45fe16bb59725eec7b1dc`; its immutable evidence archive is not a software release.
 
-```bash
-pip install aws-agent-identity-guard
+## Supported scope and uncertainty
+
+- **24 static rules:** AIG001–AIG021 and AIG-TP001–003. A separate live-context AIG-PB001 checks missing boundary presence on flagged roles; it does not run from supplied policy alone. The product-wide inventory is 25 IDs, not 25 static rules.
+- Canonical identity/trust scanners, bounded structural parsing, exact source spans, input/configuration/rule hashes and CLEAN/DIRTY/UNKNOWN provenance.
+- Upload/editor review, explicit errors, supplied-only graph, before/after comparison, safely rendered findings and schema-checked SARIF/text/JSON exports.
+- Separate CLI, optional read-only AWS collection, rule-based remediation templates and validation adapters retain their own prerequisites. The studio does not invoke AWS.
+
+Deny statements and conditions are visible context; the scanner does not evaluate their intersections with Allow, SCPs, boundaries, sessions, resource policies or service-specific applicability. Effective permissions remain **UNKNOWN**. Some canonical messages describe potential capabilities broadly; validate the actual listed actions and all applicable context before concluding a grant or exploit. No finding does not prove least privilege or safety. Boundary presence does not prove effectiveness.
+
+Each studio document is limited to 32,768 UTF-8 bytes, depth 16 and 32 statements; action/resource/principal lists have at most 64 values. The backend retains no policy database. Inputs exist in browser/backend memory; explicit exports persist on the operator's disk. The trusted host/operator remain part of the boundary.
+
+## Verification and release scope
+
+**LOCAL ONLY, historical snapshot.** The archived suite at `abe1c0a1e5953b18eae762a5c41f400ff677adb2` recorded 272 passed, 0 failed, 3 skipped, 77.15% statement coverage. The archive was generated on November 19, 2026 UTC and lists the exact commands, tooling, test window, skips and artifact hashes. Use its source SHA when citing the results. [Manifest](https://raw.githubusercontent.com/poojakira/aws-agent-identity-guard/a396433a4070a0ddc68aa83f9b1093e87fc3224f/release-evidence/manifest.json) · [Assessment](https://github.com/poojakira/aws-agent-identity-guard/blob/a396433a4070a0ddc68aa83f9b1093e87fc3224f/release-evidence/RELEASE_ASSESSMENT.md)
+
+The studio evaluates supplied JSON and context offline. Complete AWS authorization depends on policy intersections and request context, including organization policies, session policies, resource policies and permission boundaries. [Draft review](https://github.com/poojakira/aws-agent-identity-guard/pull/75)
+
+## Develop and verify
+
+The direct/transitive verification snapshot targets Linux x86_64/Python 3.12; wheel hashes are not locked. Runtime supports Python 3.10+. Fetch the official schema only for verification, not normal operation:
+
+```sh
+python -m pip install -r requirements-studio-test.txt
+python -m pip install -e .
+curl -fLS https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json -o /tmp/iam-sarif-schema.json
+echo 'c3b4bb2d6093897483348925aaa73af03b3e3f4bd4ca38cef26dcb4212a2682e  /tmp/iam-sarif-schema.json' | sha256sum -c -
+python scripts/studio_verify.py --output /tmp/iam-studio-evidence --schema /tmp/iam-sarif-schema.json --chromium /usr/bin/chromium
 ```
 
-## Usage
+The verifier needs a clean checkout and an existing Chromium at the chosen path. It runs complete regression, lint/format/type/security, actual browser/export/schema checks, build, dependency audit and the existing synthetic performance gate, then records actual commands, UTC times, outcomes and hashes outside the checkout. Existing gates remain unchanged. For focused development use `SARIF_SCHEMA_PATH=/tmp/iam-sarif-schema.json python -m pytest tests/test_studio.py`; without the schema prerequisite that schema check is skipped explicitly.
 
-```bash
-aws-agent-identity-guard deploy/agent-role-policy.json
-```
+## Documentation index
 
-### Output
+| Task | Guide |
+|---|---|
+| Browser product, architecture, API, user/developer workflow and limits | [Studio](docs/STUDIO.md) |
+| CLI, optional live collection, remediation, failures and rollback | [Runbook](RUNBOOK.md) |
+| Threat boundaries and vulnerability reporting | [Threat model](THREAT_MODEL.md), [security](SECURITY.md) |
+| Evidence, historical metrics, branch/release state | [Evidence](docs/EVIDENCE.md), [source-scoped metrics](VERIFIED_METRICS.md), [release gates](PRODUCTION.md) |
+| Optional AWS trust/configuration and n8n template | [AWS architecture](docs/aws-architecture.md), [controls](docs/aws-security-controls.md), [n8n](integrations/N8N_WORKFLOW.md) |
+| Contribution terms and documentation audit | [Contributing](CONTRIBUTING.md), [audit ledger](docs/DOCUMENTATION_AUDIT.md) |
 
-```
-CRITICAL AIG002 statement=0: Wildcard service prefix 'bedrock:*' grants full Bedrock control
-  remediation: Replace bedrock:* with specific actions: bedrock:InvokeModel, bedrock:InvokeModelWithResponseStream
-CRITICAL AIG004 statement=0: iam:PassRole without iam:PassedToService condition
-  remediation: Add Condition: {"StringEquals": {"iam:PassedToService": "bedrock.amazonaws.com"}}
-CRITICAL AIG005 statement=0: Policy grants privilege-management action: iam:AttachRolePolicy
-  remediation: Remove iam:AttachRolePolicy — agents must not modify their own permissions
-CRITICAL AIG011 statement=0: Policy grants audit-tampering action: cloudtrail:StopLogging
-  remediation: Remove cloudtrail:StopLogging — no agent should disable its audit trail
-HIGH AIG003 statement=0: Resource '*' with 12 actions creates unbounded blast radius
-  remediation: Scope Resource to specific ARNs for each action
-HIGH AIG006 statement=0: lambda:InvokeFunction without function-name scoping
-  remediation: Restrict Resource to arn:aws:lambda:REGION:ACCOUNT:function:FUNCTION_NAME
-HIGH AIG009 statement=0: SageMaker control-plane action sagemaker:CreateEndpoint in agent role
-  remediation: Remove sagemaker:CreateEndpoint or scope to specific endpoint configs
-HIGH AIG010 statement=0: Network egress modification action ec2:CreateNetworkInterface
-  remediation: Remove ec2:CreateNetworkInterface — agents should not modify network paths
-HIGH AIG014 statement=0: s3:* includes write/delete without key-prefix scoping
-  remediation: Scope to specific bucket and prefix: arn:aws:s3:::bucket/prefix/*
-```
+Historical records retain their original sources/dates; documentary review does not establish field accuracy, live account coverage or operational approval. Main remains unchanged; active/unique branches are preserved. See the exact completed cleanup and recovery references in the evidence guide.
 
-Exit code `1` means at least one high or critical finding was detected. Whether that blocks deployment is controlled by your CI policy.
+## Selected branches and recovery
 
-### Output Formats
+Only `main` and `codex/local-workbench-20261116` remain as remote branches. This cleanup retired 5 additional branches after preserving their exact tips in `archive/selected-20261118/*` annotated recovery tags and a verified private Git bundle. Unmerged/dependency changes were **not merged or certified** by retiring their branches. Existing release/deployment source references are preserved separately. Main was not rewritten or merged.
 
-```bash
-# Human-readable (default)
-aws-agent-identity-guard policy.json
-
-# JSON for programmatic consumption
-aws-agent-identity-guard policy.json --format json
-
-# SARIF for GitHub Advanced Security
-aws-agent-identity-guard policy.json --format sarif --output results.sarif
-```
-
-## CI Integration
-
-```yaml
-- run: pip install aws-agent-identity-guard
-- run: aws-agent-identity-guard deploy/agent-role-policy.json --format sarif --output results.sarif
-- uses: github/codeql-action/upload-sarif@v3
-  with:
-    sarif_file: results.sarif
-```
-
-Findings can appear inline on pull requests through GitHub Code Scanning. Critical or high findings return exit code `1`, so a workflow can use the result as a merge gate.
-
-Full workflow example:
-
-```yaml
-name: Agent IAM Lint
-on: [pull_request]
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: pip install aws-agent-identity-guard
-      - run: aws-agent-identity-guard deploy/agent-role-policy.json --format sarif --output results.sarif
-      - uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: results.sarif
-```
-
-## What It Catches: 25 rules
-
-24 rules run in static file-scan mode; AIG-PB001 additionally runs in `--live-scan` mode (it needs role metadata from the AWS API). All 25 rule IDs are emitted by the code and covered by tests.
-
-| Rule | Severity | Pattern |
-|------|----------|---------|
-| AIG001 | HIGH / CRITICAL | NotAction/NotResource in agent policies (escalates to CRITICAL for `NotAction`+`Allow`, a wildcard-equivalent grant) |
-| AIG002 | CRITICAL | Wildcard service prefix (`bedrock:*`, `s3:*`), including the `NotAction`+`Allow` complement |
-| AIG003 | HIGH | `Resource: "*"` - unbounded blast radius |
-| AIG004 | CRITICAL | `iam:PassRole` without `iam:PassedToService` condition (also evaluated on the `NotAction`+`Allow` complement) |
-| AIG005 | CRITICAL | Privilege-management / escalation actions (iam:*, policy modification, `CreateAccessKey`, `Create`/`UpdateLoginProfile`, `Put`/`AttachGroupPolicy`) |
-| AIG006 | HIGH | Tool execution (Lambda, SSM, ECS, Bedrock) without resource scoping |
-| AIG007 | MEDIUM | Sensitive data access without ABAC tags |
-| AIG008 | CRITICAL | Bedrock control-plane, agent can modify itself |
-| AIG009 | HIGH | SageMaker control-plane in a runtime role |
-| AIG010 | HIGH | Network egress modification (ENI, security groups) |
-| AIG011 | CRITICAL | Audit trail tampering (CloudTrail, GuardDuty, Config) |
-| AIG012 | MEDIUM | Excessive action breadth (>15 actions per statement) |
-| AIG013 | MEDIUM | `Resource: "*"` with zero Condition keys |
-| AIG014 | HIGH | S3 write/delete without key-prefix scoping |
-| AIG015 | MEDIUM | Bedrock InvokeModel without model-ID scoping |
-| AIG016 | HIGH | Lambda invoke without function-name scoping |
-| AIG017 | HIGH | `sts:AssumeRole` without session tag requirements |
-| AIG018 | HIGH | Database full-table access without row-level conditions |
-| AIG019 | CRITICAL | Credential-access and identity-pivot actions in Allow statements; effective permissions require review |
-| AIG020 | HIGH | Credential-access and instance-identity discovery actions; does not prove IMDS reachability |
-| AIG021 | CRITICAL | All three action categories appear; does not prove an executable chain |
-| AIG-TP001 | CRITICAL / HIGH | Wildcard principal (`*`); severity is lower when a Condition block exists because static analysis cannot prove its sufficiency |
-| AIG-TP002 | MEDIUM | AWS-principal trust without `sts:ExternalId`; advisory for third-party/shared-service delegation, not a universal cross-account requirement |
-| AIG-TP003 | MEDIUM | AWS service-principal trust without `aws:SourceArn` / `aws:SourceAccount` / `aws:SourceOrg*` scoping where supported |
-| AIG-PB001 | MEDIUM | Role with critical findings but no permission boundary (emitted only in `--live-scan` mode, where role metadata is available) |
-
-## Live Account Scanning
-
-Scan roles in a running AWS account (requires `boto3`):
-
-```bash
-pip install 'aws-agent-identity-guard[live]'
-
-# Scan all roles
-aws-agent-identity-guard --live-scan --format json
-
-# Scan a specific agent role
-aws-agent-identity-guard --live-scan --role-name my-bedrock-agent-role
-
-# SARIF output
-aws-agent-identity-guard --live-scan --format sarif --output scan.sarif
-```
-
-## Relationship to Other IAM Tools
-
-Use this alongside mature AWS security tools. It is intentionally narrower than account-wide posture products and focuses on pre-deploy policy review for agent roles.
-
-| | aws-agent-identity-guard | Parliament | Prowler | IAM Access Analyzer |
-|---|---|---|---|---|
-| Main role | Agent-role static linter | General IAM linting | Account posture assessment | AWS policy analysis service |
-| Default data path | Local policy JSON | Local policy JSON | AWS account/API scan | AWS service APIs |
-| Agent-specific rules | Implemented in this repo | Out of scope for this audit | Out of scope for this audit | Out of scope for this audit |
-| SARIF output | Implemented in this repo | Tool/version dependent | Workflow dependent | Export/integration dependent |
-| Account-wide cloud context | No | No | Yes | Yes |
-
-## Exit Codes
-
-| Code | Meaning |
-|------|---------|
-| 0 | No critical or high findings found by these rules |
-| 1 | Critical or high findings found |
-| 2 | Invalid input or CLI error |
-
-## Local Test Note
-
-Some developer workstations load unrelated pytest plugins globally. To run this project's tests in an isolated way:
-
-```bash
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests -q
-```
-
-## Known Limitations
-
-- **Static analysis only.** This tool reads IAM policy JSON and produces findings. It does not intercept API calls, enforce runtime deny decisions, or act as a policy enforcement point. There is no "fail-closed" behavior because it is not a runtime system.
-- **No semantic understanding of Condition keys.** The scanner checks for the *presence* of specific Condition keys (e.g., `iam:PassedToService`, `aws:SourceArn`) but does not evaluate whether the condition values are logically sufficient to mitigate a risk.
-- **Single-policy scope.** Each invocation analyzes one policy document in isolation. Cross-policy interactions (e.g., a permissive identity policy constrained by an SCP or permission boundary) are not considered.
-- **Trust-policy context is incomplete in static mode.** The scanner cannot infer whether an AWS principal is same-account, organization-owned, or a third party. `AIG-TP002` is therefore an advisory. `AIG-TP003` is limited to AWS service principals and only recommends source-scoping keys where that service supports them.
-- **Action pattern matching is prefix-based.** Wildcard detection uses prefix/fnmatch logic. Unusual action name formats or future AWS service namespaces may not be covered until rules are updated.
-- **No AWS API calls in default mode.** The tool cannot resolve resource ARNs, check whether a role actually exists, or determine effective permissions. Use IAM Access Analyzer or CloudTrail for runtime validation.
-- **Trust policy analysis requires explicit invocation.** `scan_trust_policy()` must be called separately; it is not triggered by passing a standard identity policy to `scan_policy_document()`.
-- **Large policies may produce many findings.** A policy with 200+ actions in a single statement will trigger multiple overlapping rules. Findings are not deduplicated across rules by design — each rule surfaces a distinct risk vector.
-
-## Failure Semantics
-
-This tool is a static linter. It reads a file, analyzes it, and exits. There is no persistent process, no daemon, no network listener, and no fail-open/fail-closed runtime behavior.
-
-| Exit Code | Meaning | When It Happens |
-|-----------|---------|-----------------|
-| **0** | Clean scan | No critical or high-severity findings were detected. The policy may still have medium/low findings. |
-| **1** | Findings detected | At least one critical or high-severity finding exists. In `--enforce` mode with `--live-scan`, also returned when the scan was incomplete or encountered errors. |
-| **2** | Input/CLI error | The input file does not exist, is not valid JSON, is not a JSON object, cannot be decoded as UTF-8, or the CLI was invoked with invalid arguments. The tool prints a diagnostic message to stderr/stdout and exits immediately. |
-
-**Design rationale:** Exit code 2 signals "the tool could not do its job" — the input was unusable. Exit code 1 signals "the tool did its job and found problems." CI pipelines should treat exit 2 as an infrastructure failure (fix the input), and exit 1 as a policy gate (fix the policy or accept the risk).
-
-**No fail-closed behavior:** Because this is not a runtime gatekeeper, there is no concept of "fail closed." If the tool cannot parse the input, it exits 2 and produces no findings — it does not block or allow anything. Whether a CI pipeline treats exit 2 as a blocking failure is a pipeline-configuration decision, not a tool decision.
-
-## Verification
-
-| Field | Value |
-|-------|-------|
-| Environment | GitHub Actions `ubuntu-latest`; Python 3.11 evidence job (matrix also covers 3.10 and 3.12) |
-| Historical main CI | 2026-09-23, 231 passed and 3 skipped |
-| Previously cited main CI (historical) | 243 collected: 240 passed, 3 skipped; anchored to earlier HEAD `e77583a`, not current main |
-| Test command | `python -m pytest tests/ -q` |
-| Latest hosted test result | 247 collected: 244 passed, 3 skipped on [CI 38462296804](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38462296804) (October 13, 2026); details and benchmark limits in `VERIFIED_METRICS.md` |
-| Rule coverage | All 25 emitted rule IDs (AIG001–AIG021, AIG-TP001–TP003, AIG-PB001) are referenced by positive/negative tests; parser edge cases fuzzed in `tests/test_iam_parser_fuzz.py` (Hypothesis), failure modes in `tests/test_failure_modes.py` |
-| SARIF | Output validated against SARIF 2.1.0 MUST-level invariants in `tests/test_cli_output.py` |
-| Lint/format | `ruff==0.8.4 check src tests` and `ruff format --check src tests` clean |
-
-To re-verify after changes:
-
-```bash
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests/ -q
-```
-
-
-## Additional Documentation
-
-- [INCIDENT_RUNBOOK.md](INCIDENT_RUNBOOK.md) - incident response for false positives and escalation patterns
-- [docs/PERFORMANCE_BASELINE.md](docs/PERFORMANCE_BASELINE.md) - scan performance baselines and regression gates
-- [benchmarks/perf_gate.py](benchmarks/perf_gate.py) - CI performance gate (p95 < 10ms, >1000 policies/sec)
-
-## Companion demo: delegated short-lived credentials (mocked)
-
-An additive, illustrative demo lives under [`examples/delegated_credentials/`](examples/delegated_credentials/README.md). It shows an agent exchanging an OIDC/workload-identity token for **short-lived, scoped credentials** via STS `AssumeRoleWithWebIdentity`, with `ExternalId`-based confused-deputy prevention.
-
-This demo is **mocked with [moto](https://github.com/getmoto/moto) (`@mock_aws`) — it does not call live AWS.** It is illustrative only and does not change the fact that the core tool is a static IAM linter. Verified: 6 tests passed with moto 5.2.3 / boto3 1.43.103. See [`examples/delegated_credentials/README.md`](examples/delegated_credentials/README.md) for details.
-
-<!-- security-systems-poster -->
-## Research Poster
-
-**Security Systems / 02 — Static Security Analysis of AWS IAM Policies for AI Workload Identities**
-
-[![Research poster](poster/poster.png)](poster/poster_36x48.pdf)
-
-> Technical research poster (36 x 48 in). Click the image for the print-resolution **[PDF](poster/poster_36x48.pdf)**.
-> Poster measurements are dated snapshots at their printed commits. Use the repository evidence files for newer results; do not read the poster as a verification of the latest `main`.
-> Every metric on it is evidence-backed; historical/projected numbers are labeled and separated from current results.
-<!-- security-systems-poster -->
-
-## License
-
-Proprietary / All Rights Reserved. See [LICENSE](LICENSE); previously published MIT-licensed versions retain their applicable grants.
-
-<!-- repo-verification:start -->
-## Verification update — 2026-09-30
-
-- **Scope:** Account-wide `poojakira` repository pass covering source/configuration, CI/release workflows, security-hygiene gates, dependency/SAST controls, and documentation consistency.
-- **Remediation:** Pinned release/container actions to immutable revisions and re-ran the repository gates.
-- **Verification state:** CI, Production Gate, Security Hygiene, Documentation Integrity, and Container Release completed successfully after the hardening commits.
-- **Security note:** IAM findings remain static-analysis evidence; no claim is made that analyzed policies were deployed to a live AWS account.
-- **Evidence boundary:** This update records repository and GitHub Actions evidence observed during the pass. It is not a claim of independent penetration testing, production deployment, or zero residual risk.
-<!-- repo-verification:end -->
-
-## Verification checkpoint — 2026-09-30
-
-- **Snapshot commit:** `43da7475d0b44877f387994743af2fa20590905b`
-- **Status:** VERIFIED GREEN
-- **Evidence:** Container Release, Documentation Integrity, repository checks, Production Gate, and CI completed successfully on the snapshot revision.
-- This note records only the observed workflow state for this dated snapshot.
-
-
-## Secret handling
-
-Keep runtime credentials outside Git. If this repository provides an `.env.example` or `.env.sample`, copy it to a local `.env` or `.env.local` and fill in values locally; the real environment file must remain untracked.
-
-Do not commit AWS access keys or session credentials, API tokens, service-account JSON, private keys, package-manager credentials, Terraform state, or secret-bearing `tfvars`. CI/deployment credentials belong in GitHub Actions secrets or the deployment provider's secret manager. AWS account IDs are identifiers; AWS access-key IDs, secret access keys, and session tokens are credentials.
-
-If a real credential is ever exposed, revoke or rotate it at the provider first, then remove it from the working tree and reachable Git history. The Security Hygiene workflow checks the current tree and reachable history for common credential formats without printing matched secret values.
-
-<!-- security-local-config:start -->
-## Secrets and local configuration
-
-- Never commit real API keys, access tokens, passwords, cloud credentials, private keys, or a populated `.env` file.
-- Local `.env` and `.env.*` files are ignored by Git. Only safe templates such as `.env.example` or `.env.sample` may be committed, and they must contain placeholder or empty values only.
-- If an integration needs credentials, create your own local `.env` file (or use your shell/secret manager) and supply **your own** API key. In GitHub Actions, use repository/environment secrets rather than hard-coding values in workflow YAML.
-- Do not copy or reuse any credential that appears in repository history, examples, tests, screenshots, logs, or documentation. Test strings are not intended to be usable credentials.
-- If a real credential is ever committed, **revoke or rotate it at the credential provider first**, then remove it from the current tree and reachable Git history. Deleting a key from GitHub does not revoke it.
-<!-- security-local-config:end -->
-
-## Product validation
-
-This repository separates **implementation evidence**, **public/external interoperability checks**, and **real deployment or customer evidence**. See [PRODUCT_VALIDATION.md](PRODUCT_VALIDATION.md) for the current validation ladder, reproducible checks, and the claims that are deliberately out of scope. A passing test or public-data canary is not presented as customer adoption or universal production efficacy.
-
-
-## Recruiting evidence audit (2026-10-09)
-
-See [the bounded recruiting evidence audit](docs/RECRUITER_EVIDENCE_AUDIT_2026-10-09.md) for current dated verification, test-scope limitations and unsupported impact claims.
-
-### Maintained Python quality checks
-
-Use Ruff 0.8.4 to match the repository's CI tool version. Run `ruff check .`
-and `ruff format --check .` from the repository root. These checks include maintained
-source, tests, scripts, examples, benchmarks, validation helpers, and poster generators
-where present. Ruff's standard exclusions omit version-control metadata, virtual
-environments, and build/cache directories; generated poster HTML/PDF/PNG assets are
-not Python source. The poster generator keeps a narrowly documented E501 exception for
-long HTML/SVG template literals; its other lint rules and formatting still apply. Passing these static checks does not establish runtime behavior or product effectiveness.
-
+See [branch policy and restore procedure](docs/BRANCHES.md) and the generated [branch-cleanup evidence](https://github.com/poojakira/aws-agent-identity-guard/blob/a396433a4070a0ddc68aa83f9b1093e87fc3224f/release-evidence/manifest.json). Bots or collaborators may create later branches; the published report records the actual verification time rather than promising permanent branch counts.

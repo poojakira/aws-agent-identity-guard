@@ -1,3 +1,5 @@
+> **Historical/source-bounded record.** Statements below retain their cited source/date or author-recorded context. They do not attest to a later documentation head, deployment or field outcome. External historical assertions remain unverified in this pass. See [current evidence status](../EVIDENCE.md).
+
 # Resume Evidence
 
 This file anchors the quantitative claims used on Pooja Kiran's resume.
@@ -35,7 +37,7 @@ The workflow emits a machine-readable JUnit-derived summary and fails if the doc
 PYTEST_EVIDENCE tests=233 passed=230 skipped=3 failures=0 errors=0
 ```
 
-That run preserves the résumé/application snapshot. The repository has since grown; current main CI is tracked separately in `../../VERIFIED_METRICS.md` and must not be back-projected into older submitted material.
+That run preserves the résumé/application snapshot. The repository has since grown; later source-scoped CI is tracked separately in `../../VERIFIED_METRICS.md` and must not be back-projected into older submitted material.
 
 ### Performance gates
 

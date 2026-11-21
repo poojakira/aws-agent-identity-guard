@@ -1,0 +1,2 @@
+# Minimal requirements for this guided source-only demo, not the full product/test lock.
+# The static IAM engine requires only Python standard library.

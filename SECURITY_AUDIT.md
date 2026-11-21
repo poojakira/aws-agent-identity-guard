@@ -1,3 +1,5 @@
+> **Historical/source-bounded record.** Statements below retain their cited source/date or author-recorded context. They do not attest to a later documentation head, deployment or field outcome. External historical assertions remain unverified in this pass. See [current evidence status](docs/EVIDENCE.md).
+
 # Security Audit — aws-agent-identity-guard
 
 **Auditor:** agent/security-hardening-v1 (automated)

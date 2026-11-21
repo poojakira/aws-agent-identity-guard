@@ -1,3 +1,5 @@
+> **Historical research poster, October 14, 2026 UTC.** Its measurements apply to source `718582f5fd8419b0b8c2ca21361f7b0c715cb54b` and the [associated GitHub Actions run](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38497940763). See the [later candidate manifest](https://raw.githubusercontent.com/poojakira/aws-agent-identity-guard/a396433a4070a0ddc68aa83f9b1093e87fc3224f/release-evidence/manifest.json) for separately scoped local verification.
+
 # Research Brief - Poster 02
 
 > Evidence status: Refreshed against verified code snapshot `718582f5fd8419b0b8c2ca21361f7b0c715cb54b` and successful CI run `38497940763` on 2026-10-14.
@@ -16,7 +18,7 @@ Detecting Excessive Privilege and Identity-Pivot Risks Before Deployment
 
 ## One-Sentence Contribution
 
-A deterministic, non-executing IAM linter specialized for AI-agent roles with **25 rule IDs** spanning identity policies, trust policies, and permission-boundary risks, emitting text, JSON, and SARIF for pre-deployment review and CI gating.
+A deterministic, non-executing IAM linter specialized for AI-agent roles with **25 product rule IDs** (24 static plus one live-context boundary-presence rule) spanning identity/trust patterns and role context, emitting text, JSON, and SARIF for pre-deployment review and CI gating.
 
 ## Method
 
@@ -26,12 +28,12 @@ A deterministic, non-executing IAM linter specialized for AI-agent roles with **
 4. Emit findings with stable rule IDs and severity.
 5. Return CI-friendly exit codes and optional SARIF.
 
-## Current Verified Evidence
+## Verified Evidence at Poster Snapshot
 
-Current-main CI on Python 3.12 reports:
+The cited October 14 CI on Python 3.12 reports:
 
 - **247 collected: 244 passed, 3 skipped**, 0 failures/errors.
-- **25 deterministic rule IDs** remain implemented and test-covered.
+- **25 product rule IDs** comprise 24 static checks and one live-context boundary-presence check.
 - Separately anchored earlier synthetic performance gate over 500 policies (not a measured result in the current test count): **0.8397 ms p95** and **2,573 policies/sec**, both passing configured gates.
 - Ruff/format and security-audit jobs complete successfully.
 
@@ -40,7 +42,7 @@ Current-main CI on Python 3.12 reports:
 - Performance values are CI microbenchmarks on synthetic policies, not production SLOs.
 - The tool is a static analyzer, not a runtime authorization proxy.
 - It does not prove account-wide effective permissions or every cross-resource escalation path.
-- The 3 skipped tests require live AWS credentials; users must supply their own credentials through the standard AWS provider chain.
+- The 3 skipped tests are legacy rules-module API tests (`rules module not importable`), as recorded in the cited source; they are not live-AWS checks.
 
 ## Reproducibility
 

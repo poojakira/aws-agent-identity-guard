@@ -1,3 +1,31 @@
+# Documentation reconciliation — unreleased
+
+## 2026-11-18 — Architecture, selected branches and free notebook access
+
+- Added detailed component/trust-boundary and execution-sequence diagrams, verified against named source symbols and actual limits.
+- Added source-resolving, synthetic-only inline Colab notebooks that call the canonical engine, with local equivalent runners and explicit hosted-runtime limits.
+- Retired nonselected branches only after exact-tip recovery tags/private verified backups; retained main and the reviewed candidate without merging unreviewed work.
+- Updated README testing/evidence links and kept all production, independent-review, privacy and operational blockers explicit. No provider key or paid resource is used by this workflow.
+
+
+- Reconcile all README, API, threat, operations, security, testing, optional-integration and evidence guidance against actual interfaces.
+- Separate 24 static rules from the live-context twenty-fifth ID; correct legacy skip reasons, exit-status interpretation, live completeness and deterministic remediation output.
+- Correct OIDC versus account-AssumeRole/ExternalId documentation and mark the delegated example's mocked/client-side guard limitation; retain runtime code and tests unchanged.
+- Record completed implementation-source review/branch cleanup, preserve historical evidence, and require fresh proof for later documentation heads.
+- Refresh source-scoped poster labels/artifacts without claiming production, live-AWS or new-head results from old snapshots.
+
+# Local studio candidate — unreleased
+
+- Add actual browser policy upload/edit/review and before/after evidence around canonical static engines.
+- Add bounded structural input validation, exact source locations, supplied-only graph, canonical SARIF with schema verification, and text/evidence exports.
+- Distinguish 24 static rules from the additional live-context boundary-presence rule; retain effective-permission uncertainty.
+- Retire hardcoded dashboard results; add local threat/operations documentation and source-scoped evidence workflow.
+- Align existing declared Ruff 0.17.1 with CI and apply formatting without changing assertions or detection conditions.
+- Fix canonical capability descriptions for list-only permissions without changing rule IDs or severity.
+- Discard obsolete file reads and invalidate exports when delayed identity/trust uploads replace editor content.
+
+Historical entries below describe earlier snapshots and do not attest to this candidate. Their historical metrics and verification wording remain NOT VERIFIED unless linked to an accessible matching run.
+
 # Changelog
 
 ## [Unreleased]

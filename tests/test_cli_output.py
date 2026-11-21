@@ -18,7 +18,7 @@ from aws_agent_identity_guard.cli import main
 def test_duplicate_policy_key_is_rejected_before_analysis(tmp_path, capsys):
     policy = tmp_path / "ambiguous.json"
     policy.write_text(
-        '{"Statement":[{"Effect":"Allow","Action":"*",' '"Action":"s3:GetObject","Resource":"*"}]}',
+        '{"Statement":[{"Effect":"Allow","Action":"*","Action":"s3:GetObject","Resource":"*"}]}',
         encoding="utf-8",
     )
     with pytest.raises(SystemExit) as error:
@@ -111,9 +111,9 @@ def _assert_sarif_2_1_0_conformant(doc: dict) -> None:
     for run in runs:
         # run.tool.driver (§3.14.6, §3.18)
         driver = run["tool"]["driver"]
-        assert (
-            isinstance(driver.get("name"), str) and driver["name"]
-        ), "toolComponent.name is REQUIRED"
+        assert isinstance(driver.get("name"), str) and driver["name"], (
+            "toolComponent.name is REQUIRED"
+        )
         rules = driver.get("rules", [])
         assert isinstance(rules, list)
         rule_ids = [r["id"] for r in rules]
@@ -129,17 +129,17 @@ def _assert_sarif_2_1_0_conformant(doc: dict) -> None:
             # result.message.text is REQUIRED for our results (§3.27.11, §3.11)
             assert res["message"]["text"], "result.message.text REQUIRED"
             # result.level MUST be a valid enum value (§3.27.10)
-            assert (
-                res.get("level") in _SARIF_VALID_LEVELS
-            ), f"result.level {res.get('level')!r} not in SARIF enum"
+            assert res.get("level") in _SARIF_VALID_LEVELS, (
+                f"result.level {res.get('level')!r} not in SARIF enum"
+            )
             # ruleId / ruleIndex coherence (§3.27.5, §3.27.6)
             assert isinstance(res.get("ruleId"), str) and res["ruleId"]
             idx = res.get("ruleIndex")
             if idx is not None:
                 assert 0 <= idx < len(rules), "result.ruleIndex out of range"
-                assert (
-                    rules[idx]["id"] == res["ruleId"]
-                ), "result.ruleIndex MUST point to the rule with matching id"
+                assert rules[idx]["id"] == res["ruleId"], (
+                    "result.ruleIndex MUST point to the rule with matching id"
+                )
             # each result MUST reference a declared rule
             assert res["ruleId"] in rule_ids, "result.ruleId MUST be declared in driver.rules"
             # physicalLocation.artifactLocation.uri present (§3.28, §3.4)
@@ -173,7 +173,7 @@ def test_sarif_clean_policy_still_conformant(tmp_path):
                         "Effect": "Allow",
                         "Action": "bedrock:InvokeModel",
                         "Resource": (
-                            "arn:aws:bedrock:us-east-1::" "foundation-model/anthropic.claude-v2"
+                            "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-v2"
                         ),
                         "Condition": {"StringEquals": {"aws:RequestedRegion": "us-east-1"}},
                     }

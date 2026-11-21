@@ -1,0 +1,706 @@
+[
+  {
+    "path": ".dockerignore",
+    "size": 200,
+    "sha256": "6e7bf0e625e99992beb1d80d23ebc5f3543c47415eedd1994de3a6d7ddf6e181",
+    "type": "[none]",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": ".env.example",
+    "size": 423,
+    "sha256": "db8bac5fc6b1e4b56ae6693f6f57feade1e3b8f47e523fb79532382b56ad1130",
+    "type": ".example",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": ".github/CODEOWNERS",
+    "size": 13,
+    "sha256": "27d3ad00ee4a7804316eb48c1a30918124876bc87aa26a5ee84ef7c47eb0faef",
+    "type": "[none]",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": ".github/dependabot.yml",
+    "size": 581,
+    "sha256": "bf4813139146eb9fde7e0b79ab790af7e7e032d1b1747720fd59a688af8122e5",
+    "type": ".yml",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": ".github/workflows/aws-access-analyzer-pilot.yml",
+    "size": 1454,
+    "sha256": "fdaa06558ad44eaaa79a89add1fe901f498e5b3a1d8972e69aa8226edf6f07f9",
+    "type": ".yml",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": ".github/workflows/ci.yml",
+    "size": 5822,
+    "sha256": "825b6c0b0106b7c96040272e627716e7eacc5de46b27d035c00404f0711c02ef",
+    "type": ".yml",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": ".github/workflows/container.yml",
+    "size": 1640,
+    "sha256": "8d85b564e4fc481e0f11ec9cc0a114b3b337a3be4e0b632f30c90d222db97e43",
+    "type": ".yml",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": ".github/workflows/poster-artifact-parity.yml",
+    "size": 3039,
+    "sha256": "c106b8407cb8a07011d47337b1861e43522e1626073ed8fd07b970c9663af889",
+    "type": ".yml",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": ".github/workflows/production-gate.yml",
+    "size": 1020,
+    "sha256": "a28d6e2aca5a85e73978c64b6360115516b356ed7457a5a457a877f26514c0c9",
+    "type": ".yml",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": ".github/workflows/production-policy.yml",
+    "size": 1389,
+    "sha256": "7e4a5a26e3922beb6f9dc019172423b17ee15b8421b8dc88757580056d56ce6c",
+    "type": ".yml",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": ".github/workflows/release.yml",
+    "size": 5971,
+    "sha256": "e6714fc2226a18ddde9691d131061b4498da1429bfd8186a20a425246a1dbfd9",
+    "type": ".yml",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": ".github/workflows/security-hygiene.yml",
+    "size": 4400,
+    "sha256": "0b1e156188ff856db14fe6f5136f7a78c518e1aa771eae24547436bbd15db59e",
+    "type": ".yml",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": ".gitignore",
+    "size": 608,
+    "sha256": "6ffe0930bb9c96988df915e1a5a42850cb4c4e89fa5677ecb41513baab8e6695",
+    "type": "[none]",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": ".mailmap",
+    "size": 1882,
+    "sha256": "cfdefe094614d8558397b6efc0242a9a06251771937dbc05756fe29f06e6e681",
+    "type": "[none]",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "CHANGELOG.md",
+    "size": 3998,
+    "sha256": "75a36be6252aa1f549bd67365069d93c937904f1e92de9b76f51a63fe511afb4",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "CONTRIBUTING.md",
+    "size": 2112,
+    "sha256": "c91fcd6b2f32e89857aace9e49d1980c704f1410b95c493ffe5634a6adb0c51e",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "Dockerfile",
+    "size": 458,
+    "sha256": "dab31edc173fc73abe55fc0133631afb89da5cefe32cedea78961124699f334f",
+    "type": "[none]",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "INCIDENT_RUNBOOK.md",
+    "size": 11304,
+    "sha256": "abe301e239ad2da23669e0f2c33f3a1eee49eb01c19474568b1700ec7880585b",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "LICENSE",
+    "size": 3006,
+    "sha256": "136ae2854bcb9d6423a4293153ed5925cacdc30e537415cbd0a56dcf49983f49",
+    "type": "[none]",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "PRODUCTION.md",
+    "size": 2023,
+    "sha256": "0da5687226c26a6271158e2e5c6fb6e97f73890e78c9b59667f7e34c00a800a9",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "PRODUCT_VALIDATION.md",
+    "size": 1429,
+    "sha256": "d0cd59973a8c4d6dcc98dbf6dcb20b7d8685df55b65d185d48517b2c7b729f96",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "PROVENANCE.md",
+    "size": 6662,
+    "sha256": "b6f90289d84f11f78774525efc5bf1e22cd474ca4088ba461eb34ede621e6f54",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "README.md",
+    "size": 23680,
+    "sha256": "f656ffacefe765e5619ca3d5878948a0bc5f0e300a1bf2bf19e1deda6d13e699",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "RESUME_EVIDENCE.md",
+    "size": 224,
+    "sha256": "2d3825ddc8cdc90f85d06d09a3f1cbfd0c7d69e5b630ce0186951503e1536ff2",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "RUNBOOK.md",
+    "size": 18925,
+    "sha256": "fbb97f4ae945bff17769ca3e02a0bae9f6aabc76869a8e28ea09e84f0e96d7ed",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "SECURITY.md",
+    "size": 2719,
+    "sha256": "6c715ffdefa52854a954016e605715feb43cb80e5f67fc33bc5f97a9c5b19482",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "SECURITY_AUDIT.md",
+    "size": 5500,
+    "sha256": "694a0cfb7564f9a72fdbc695d5468379c707319138e2720578d14d022da364d7",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "SECURITY_AUDIT_2026-09-30.md",
+    "size": 2278,
+    "sha256": "adb8323e4c699b45b5d689e255536923c0f5af706fcbdb7177c11d2467b5168e",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "THREAT_MODEL.md",
+    "size": 5745,
+    "sha256": "cd1751e42bdb999b7dc098fb2a7336784cdf08bf944c5be128e4e750f5ad09fe",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "VERIFIED_METRICS.md",
+    "size": 2129,
+    "sha256": "eacf512c274190c42bbabf5e214f96fefe1acc23c4ea5faf4bad800b9bcf47bf",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "action.yml",
+    "size": 684,
+    "sha256": "0a88c2902a258a91d8cb8a8484da857418d9a3f7b4204c19b5926f4a1bab7df8",
+    "type": ".yml",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "benchmarks/perf_gate.py",
+    "size": 7148,
+    "sha256": "6a82e447c5fcecc03fc5e83a92798514520ed7438691756a673a2c40f91ad521",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "dashboard/index.html",
+    "size": 13441,
+    "sha256": "bb6c41c5d697491cf6cc4e4ddfda974543ddcbb421dcfa6053453c5d2bea3a0c",
+    "type": ".html",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "docs/OPERATIONAL_IAM_REMEDIATION_MEASUREMENT.md",
+    "size": 1819,
+    "sha256": "c8f4e799b757f5c2a53b1b0ce0f3a0e30d3b5b81bb44e413b32603bfb85f396a",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "docs/PERFORMANCE_BASELINE.md",
+    "size": 1955,
+    "sha256": "050e47491f21b348bcce25142c0d68d6a2f609b367b7d8aa2567f095cc9da2bd",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "docs/RECRUITER_EVIDENCE_AUDIT_2026-10-09.md",
+    "size": 2310,
+    "sha256": "086ee7f4643a65f68141344ce2779fd5bfc878832de7868582103a6cf7ff3fda",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "docs/aws-architecture.md",
+    "size": 7321,
+    "sha256": "6e5d7082a95531939b84e4c6c20fafa1e5045dc904b754d373ed321ab422885d",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "docs/aws-security-controls.md",
+    "size": 1834,
+    "sha256": "9b03046c6e2960b35965ed78211ae4393b4a691fb061a572b6d1eed294e5d941",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "docs/evidence/RESUME_EVIDENCE.md",
+    "size": 1894,
+    "sha256": "75f8a4acca50c34e9f64e8ce66d7f2a9f2040c42fd5d8d1f4b66b07c8b84f00e",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "docs/license-history/LICENSE-BEFORE-2026-10-13.txt",
+    "size": 1415,
+    "sha256": "073791bfb228c100614951cabf917d7f7423066e47be290f9317811497ea5972",
+    "type": ".txt",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "evidence_policy.json",
+    "size": 3023,
+    "sha256": "ef446adf9da78c518f0544233ec36e699f956d4e52dd93af6fdb547e4663e3ed",
+    "type": ".json",
+    "symlink": false,
+    "validation": "JSON parsed"
+  },
+  {
+    "path": "examples/agent_policy_wildcard.json",
+    "size": 182,
+    "sha256": "9d15c19572ceb1b17cde0d31d9d37fe83d9dc64b14dce52e7ca750b3aefa23e5",
+    "type": ".json",
+    "symlink": false,
+    "validation": "JSON parsed"
+  },
+  {
+    "path": "examples/delegated_credentials/README.md",
+    "size": 4822,
+    "sha256": "0b1bf4bae31fb4ba8b37b0b77578ddbe18350335ac30273b0d389b18d6114fb4",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "examples/delegated_credentials/delegated_credentials.py",
+    "size": 11587,
+    "sha256": "72bbd212ff940c7fc4b557e98de9b51085bb38436d40a9bad1609a6289b2c0bc",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "examples/delegated_credentials/test_delegated_credentials.py",
+    "size": 7935,
+    "sha256": "f14b32f8cc81030c6d8705cc3c0d3983db4a05cee7b2de61291d3fa265b0498b",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "examples/overprivileged_agent_bad.json",
+    "size": 505,
+    "sha256": "197eb6f7cb22ed35df20196c7667d4821e3a034f64c139e5e86d155d0a15c9bd",
+    "type": ".json",
+    "symlink": false,
+    "validation": "JSON parsed"
+  },
+  {
+    "path": "examples/real_world/aws_bedrock_agent_default.json",
+    "size": 2155,
+    "sha256": "5e955789dcc381a23394f546ca997063a2cb9a0ebfad9ce8c6d9c7dc1e5499e9",
+    "type": ".json",
+    "symlink": false,
+    "validation": "JSON parsed"
+  },
+  {
+    "path": "examples/real_world/aws_sagemaker_full_access.json",
+    "size": 3557,
+    "sha256": "a376c2231e44f0741de79d85c98bef62b579e2c36008d4ff0d8c76115a4dec6a",
+    "type": ".json",
+    "symlink": false,
+    "validation": "JSON parsed"
+  },
+  {
+    "path": "examples/real_world/lambda_over_permissive.json",
+    "size": 2618,
+    "sha256": "f24f678a616c23731168c440f581d98d95bb95aebac039f356ed732a4a7c2027",
+    "type": ".json",
+    "symlink": false,
+    "validation": "JSON parsed"
+  },
+  {
+    "path": "examples/well_scoped_bedrock_agent.json",
+    "size": 1716,
+    "sha256": "46cf5f0488587c6701da41f44d73dd3c0275b426abd38dc2ea03ffe091410d0f",
+    "type": ".json",
+    "symlink": false,
+    "validation": "JSON parsed"
+  },
+  {
+    "path": "infra/terraform/environments/dev/main.tf",
+    "size": 1133,
+    "sha256": "8e9187b4dcb6d48daa77b20af61cb09ac33694ef20a001f025fa8f529f3ffdb8",
+    "type": ".tf",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "infra/terraform/modules/scanner-iam/main.tf",
+    "size": 4860,
+    "sha256": "d44ef90c1ccde487bb05b845771aeab8da8ce6b18b58f8a9ec42db665835f94f",
+    "type": ".tf",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "integrations/N8N_WORKFLOW.md",
+    "size": 2651,
+    "sha256": "11ceba8b590278b00d8026fba808c0c7376145eb412b1d6ae230a990102427ad",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "integrations/n8n-iam-posture-scan.json",
+    "size": 8398,
+    "sha256": "29ee3b571b78127d7333f6be9adffc725cc6af26039b61f7d736add19be1fb93",
+    "type": ".json",
+    "symlink": false,
+    "validation": "JSON parsed"
+  },
+  {
+    "path": "poster/01_research_brief.md",
+    "size": 2345,
+    "sha256": "93b67c2ad9ccb36e4183747e790e5539983feeeaf4f33fad6c98a09d413f960e",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "poster/02_claim_ledger.md",
+    "size": 1128,
+    "sha256": "7b48e75c1c8486968dfcd125c08b9c3c0cfe9f2e7338dbb295254137e985e83f",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "poster/03_verified_metrics.md",
+    "size": 1072,
+    "sha256": "343df13fd17a13d0fe4730c155e7fd7eff311b8cb99adc0388c1c3de0686cb31",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "poster/13_reproducibility.md",
+    "size": 1092,
+    "sha256": "db551e08d931d3812a3907e338f5f3cf4acdcf602fb91a52ac91507528a10e94",
+    "type": ".md",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "poster/poster.png",
+    "size": 489142,
+    "sha256": "458923fe72cc1d444d9af769432762dc505a3b578f5a6c2adc0a3fa215cab03d",
+    "type": ".png",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "poster/poster_36x48.pdf",
+    "size": 754074,
+    "sha256": "ef6dcdaa15d06d6947265f1f57ae3899dc7e79a1bbb19d813996f79f56bd2946",
+    "type": ".pdf",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "poster/render_poster.py",
+    "size": 17704,
+    "sha256": "94c286a7947557cb7a5115158fc654663a2d6b70b050b079d8943b4227892ff6",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "pyproject.toml",
+    "size": 2352,
+    "sha256": "f6fcd88bef6267ad845a423e5589d75243edb39a598ea80b2704d80a63832d58",
+    "type": ".toml",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "scripts/measure_iam_role_remediation.py",
+    "size": 3621,
+    "sha256": "ebe94a4694979acc2bae439de96f4da92a17643f6996ac43634c194b571ccb92",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "scripts/security_scan.py",
+    "size": 5457,
+    "sha256": "b899be8aeb7ea4383dd14dadf5130e0f5a23feb172585de1f15649383b14359a",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "src/aws_agent_identity_guard/__init__.py",
+    "size": 209,
+    "sha256": "6a2a8564a979769074a5dfac74af850d9efdab100ef1d2a7328b5c0999a49a8c",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "src/aws_agent_identity_guard/access_analyzer_validation.py",
+    "size": 1950,
+    "sha256": "51714709dddd813721c73ac6ff50a98cdb94543f23f0042733202ad84e26ed99",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "src/aws_agent_identity_guard/cli.py",
+    "size": 12877,
+    "sha256": "4da8690017a9ffc087e203a70e1d5bda2e44e8dafb4fcfd7fd059362223b666c",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "src/aws_agent_identity_guard/live_scanner.py",
+    "size": 24693,
+    "sha256": "ebc5e219d0b598236c3dc8b406f7730c1bdb789584a45da077714e3d37e3918f",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "src/aws_agent_identity_guard/remediate.py",
+    "size": 17435,
+    "sha256": "b9116f295e81dd03169a7370dc0c186869e3b257280ab62b7b54d3d3cf09acf1",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "src/aws_agent_identity_guard/scanner.py",
+    "size": 51358,
+    "sha256": "9bfa9352a07afd4efef840b627abe5ec932266a3e1fb89dbd43e6cc5a340e420",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "tests/test_access_analyzer_contract.py",
+    "size": 2226,
+    "sha256": "56bec9bb43ac90576b426b85892de5f82d96dd85f5f4911261184b597e45a7a3",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "tests/test_access_analyzer_validation.py",
+    "size": 2630,
+    "sha256": "c3031c400d5d7c5721236c50b7b5cbbbe7de3e0645f6623b478c4dd8f33698b2",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "tests/test_cli_output.py",
+    "size": 7429,
+    "sha256": "12db48a434678df47fcfea61733a576aff6304c26b974e43e536017c94cc7c9b",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "tests/test_condition_structural.py",
+    "size": 15614,
+    "sha256": "fcc408de53959da7ed866e2d0a52f7062c93a269efbd14c0eae549ed7624fbfe",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "tests/test_coverage_boost.py",
+    "size": 27726,
+    "sha256": "39fa20515c62db3b8e1e44da6c2ffd076110f503e69edd3f07d51b3567a9a6a5",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "tests/test_enforce_mode.py",
+    "size": 7109,
+    "sha256": "0e17f7bb65621a53c11702f0fe2e87c1b620b5a791b40f5e5bf544d5558c7eda",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "tests/test_failure_modes.py",
+    "size": 13435,
+    "sha256": "63c5f31f2b42b2c71e63edde0328909913fd1eaaaa0ebc948ccd4d9fe80a31f2",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "tests/test_iam_parser_fuzz.py",
+    "size": 9675,
+    "sha256": "c54e74d049385f577991ee4613d98db31a91e7d0075feb38f69542686ea3d50b",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "tests/test_killchain.py",
+    "size": 5051,
+    "sha256": "a20fcb79f85001782f8682c8d63045567af93269d5e7032c8d69e2cf00b25c07",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "tests/test_live_scanner.py",
+    "size": 11777,
+    "sha256": "66f7a9b6d259bb010ffca80b4390061145842e6e578683cb6c26861be6f52bed",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "tests/test_measure_iam_remediation.py",
+    "size": 2561,
+    "sha256": "465090451cd94f79b615f861a4d3b54fb225cd7802f6c05006cef62b0b923bda",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "tests/test_real_world_policies.py",
+    "size": 41834,
+    "sha256": "ca0bc14229f96c5de27edc616d88ff745b5c180793191caed475a0686787791c",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "tests/test_scanner.py",
+    "size": 38150,
+    "sha256": "9f6d9bcaa685b38e0e434922e2799349d618aa24311c4f67f89308fa701dd541",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "uv.lock",
+    "size": 27159,
+    "sha256": "0a6c0eef8a980a60539178c3bf489ec4d8668a4a9790ee7eb6e45e11ea5f7546",
+    "type": ".lock",
+    "symlink": false,
+    "validation": "inventoried; content review pending"
+  },
+  {
+    "path": "validation/__init__.py",
+    "size": 74,
+    "sha256": "7fbeb17c14322f776345670e4a843c646921aa22473611878bc2b9e503798eb9",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "validation/aws_access_analyzer_pilot.py",
+    "size": 1529,
+    "sha256": "36fdb1dbe6184f1a5c0eb717d20f8e9fe3bf6930de371b106556c0fbb38c4e2a",
+    "type": ".py",
+    "symlink": false,
+    "validation": "AST syntax parsed"
+  },
+  {
+    "path": "validation/policies/agent-overprivileged.json",
+    "size": 267,
+    "sha256": "281c3fbde29f0f4d7e413b544bbc333616afb787dad34571609212d536ed4f3e",
+    "type": ".json",
+    "symlink": false,
+    "validation": "JSON parsed"
+  },
+  {
+    "path": "validation/policies/agent-scoped.json",
+    "size": 279,
+    "sha256": "a37d15d3d76055decce5b1ae782437b65443278f86d9df62ff40dc02c386e324",
+    "type": ".json",
+    "symlink": false,
+    "validation": "JSON parsed"
+  }
+]

@@ -129,9 +129,9 @@ class TestAIG001NotActionNotResource:
         iam_priv = [f for f in findings if f.rule_id == "AIG005" and "'iam:" in f.message]
         assert not iam_priv, f"iam:* is excluded, must not fire AIG005 on iam actions: {iam_priv}"
         # But non-excluded dangerous actions (e.g. cloudtrail:StopLogging) still fire.
-        assert any(
-            f.rule_id == "AIG011" for f in findings
-        ), "anti-forensics actions are NOT excluded by NotAction:iam:*, must still fire AIG011"
+        assert any(f.rule_id == "AIG011" for f in findings), (
+            "anti-forensics actions are NOT excluded by NotAction:iam:*, must still fire AIG011"
+        )
 
 
 class TestAIG002WildcardActions:

@@ -106,9 +106,9 @@ class TestAIG004PassRoleConditionParsing:
                 ]
             }
         )
-        assert any(
-            f.rule_id == "AIG004" for f in findings
-        ), "AIG004 must fire for PassRole with no condition"
+        assert any(f.rule_id == "AIG004" for f in findings), (
+            "AIG004 must fire for PassRole with no condition"
+        )
 
     def test_passrole_with_correct_condition_no_finding(self):
         """PassRole with proper PassedToService → no AIG004."""
@@ -126,9 +126,9 @@ class TestAIG004PassRoleConditionParsing:
                 ]
             }
         )
-        assert not any(
-            f.rule_id == "AIG004" for f in findings
-        ), "AIG004 must NOT fire when iam:PassedToService is present"
+        assert not any(f.rule_id == "AIG004" for f in findings), (
+            "AIG004 must NOT fire when iam:PassedToService is present"
+        )
 
     def test_passrole_with_lowercase_condition_key_no_finding(self):
         """
@@ -206,9 +206,9 @@ class TestAIG002PartialWildcards:
                 ]
             }
         )
-        assert any(
-            f.rule_id == "AIG002" for f in findings
-        ), "AIG002 must fire for 'iam:*Role*' — covers iam:PassRole (privilege escalation)"
+        assert any(f.rule_id == "AIG002" for f in findings), (
+            "AIG002 must fire for 'iam:*Role*' — covers iam:PassRole (privilege escalation)"
+        )
 
     def test_s3_get_star_fires(self):
         """'s3:Get*' expands to cover s3:GetObject (sensitive data)."""
@@ -223,9 +223,9 @@ class TestAIG002PartialWildcards:
                 ]
             }
         )
-        assert any(
-            f.rule_id == "AIG002" for f in findings
-        ), "AIG002 must fire for 's3:Get*' — covers s3:GetObject (sensitive data access)"
+        assert any(f.rule_id == "AIG002" for f in findings), (
+            "AIG002 must fire for 's3:Get*' — covers s3:GetObject (sensitive data access)"
+        )
 
     def test_bedrock_star_agent_star_fires(self):
         """'bedrock:*Agent*' expands to cover bedrock:CreateAgent, UpdateAgent."""
@@ -240,9 +240,9 @@ class TestAIG002PartialWildcards:
                 ]
             }
         )
-        assert any(
-            f.rule_id == "AIG002" for f in findings
-        ), "AIG002 must fire for 'bedrock:*Agent*' — covers agent control-plane actions"
+        assert any(f.rule_id == "AIG002" for f in findings), (
+            "AIG002 must fire for 'bedrock:*Agent*' — covers agent control-plane actions"
+        )
 
     def test_ec2_describe_star_does_not_fire(self):
         """'ec2:Describe*' is read-only and does not cover any dangerous action."""
@@ -259,9 +259,9 @@ class TestAIG002PartialWildcards:
         )
         # ec2:Describe* is read-only, should not trigger AIG002
         aig002 = [f for f in findings if f.rule_id == "AIG002"]
-        assert (
-            not aig002
-        ), f"AIG002 must NOT fire for 'ec2:Describe*' — read-only actions. Got: {aig002}"
+        assert not aig002, (
+            f"AIG002 must NOT fire for 'ec2:Describe*' — read-only actions. Got: {aig002}"
+        )
 
     def test_explicit_star_still_fires(self):
         """Existing behaviour: bare '*' still fires AIG002."""
@@ -345,6 +345,6 @@ class TestTrustPolicyConditionParsing:
                 {"ArnLike": {"aws:sourceArn": "arn:aws:lambda:us-east-1:999:function:myFn"}}
             )
         )
-        assert not any(
-            f.rule_id == "AIG-TP003" for f in findings
-        ), "TP003 must NOT fire — 'aws:sourceArn' equals 'aws:SourceArn' case-insensitively"
+        assert not any(f.rule_id == "AIG-TP003" for f in findings), (
+            "TP003 must NOT fire — 'aws:sourceArn' equals 'aws:SourceArn' case-insensitively"
+        )

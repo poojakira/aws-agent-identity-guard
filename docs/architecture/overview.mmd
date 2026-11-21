@@ -1,0 +1,12 @@
+flowchart TB
+    N0["1. Developer browser / policy input"]
+    N1["2. Loopback request boundary"]
+    N2["3. Strict parser + exact source locations"]
+    N3["4. Canonical identity / trust scanners"]
+    N4["5. Supplied-only graph + finding delta + SARIF"]
+    N5["6. Browser evidence + explicit export"]
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5

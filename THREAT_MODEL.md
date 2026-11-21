@@ -1,129 +1,42 @@
-# Threat Model — AWS Agent Identity Guard
+# Threat model
 
-**Version:** 0.1.0  
-**Method:** STRIDE  
-**Scope:** Static linter CLI + optional live Boto3 scanning mode  
-**Last updated:** 2026-08-06
+## Assets, actors and surfaces
 
----
+Assets include policy privacy, accurate source-linked findings, comparison/export integrity, operator host, optional AWS credentials and retained reports. The local operator/host are trusted; supplied JSON, file contents, browser-origin requests and optional AWS responses are not inherently trustworthy. Policy reports can contain sensitive organizational context.
 
-## 1. System Description
-
-`aws-agent-identity-guard` is a Python CLI tool that:
-
-1. **Static mode** — Reads local IAM policy JSON files and flags over-privileged patterns.
-2. **Live mode** — Enumerates IAM roles and users in a live AWS account via Boto3 and runs the same rules against each collected policy document.
-
-### Data Flow
-
-```
-[IAM policy JSON file]
-        │
-        ▼
-[CLI: argparse → json.loads]
-        │
-        ▼
-[scanner.py: scan_policy_document / scan_trust_policy]
-        │
-        ▼
-[Output: text / JSON / SARIF to stdout or file]
-
-[Live mode only]
-[AWS IAM APIs (read-only)] → [live_scanner.py: boto3] → same rule engine above
+```mermaid
+flowchart LR
+    Browser[Loopback editor and file input] --> HTTP[Host/Origin/framing/size boundary]
+    HTTP --> Parse[Bounded structural parsing and source spans]
+    Parse --> Engine[Canonical identity/trust patterns]
+    Engine --> Output[Findings, graph, comparison and exports]
+    File[CLI local JSON] --> CLI[Distinct CLI parser]
+    CLI --> Engine
+    AWS[Optional authorized IAM/STS reads] --> Live[Collection and completeness metadata]
+    Live --> Engine
 ```
 
-### Trust Boundaries
+The studio has no AWS client, database, external telemetry or multi-user authentication. The CLI reads the selected identity-policy file and can write requested reports. Optional live collection uses the operator's SDK credentials; it is not a continuously running account monitor. An integrating CI/operator decides what to do with findings.
 
-| Boundary | Description |
-|----------|-------------|
-| **File system** | Tool reads one JSON file from disk. No write access needed. |
-| **AWS IAM API** | Live mode reads IAM metadata. No write or mutate calls. |
-| **CI pipeline** | Tool is invoked as a build step; output (SARIF) is uploaded as an artifact. |
-| **Operator** | Person running the tool or configuring CI. |
+## Threat/control mapping
 
----
+| Threat | Implemented control and source/test relationship | Residual boundary |
+|---|---|---|
+| Malformed, duplicate or oversized studio input | `studio.analysis.Document` strict bounds/spans and HTTP framing in `studio.__main__`; `tests/test_studio.py` | Not a complete AWS language validator, general CPU sandbox or equivalent CLI size boundary |
+| Cross-site local request / DNS rebinding | Exact loopback peer/Host/Origin, fixed routes and CSP; studio boundary tests | Another local process/compromised OS can access loopback; no authenticated tenant boundary |
+| Untrusted HTML or stale evidence | Text rendering, revision/cancellation guards and exact source evidence; browser upload/edit/export regressions | Trusted browser/host required; explicit downloads persist |
+| Unsupported authorization inference | Effective permissions UNKNOWN, Deny/conditions shown, static versus live inventory separated | Pattern wording can be broad; complete intersections/applicability and exploitability are not solved |
+| Comparison misread as risk reduction | Stable finding fingerprints and Before/After source mapping | Position/message changes can create deltas without permission changes; no operational impact percentage |
+| Partial live scan appears clean | `live_scanner.py` errors/cap/completeness fields; CLI `--enforce`; live/error regression tests | Operator must use enforcement and inspect completeness; no complete inherited/group/resource-policy evaluation |
+| Excessive scanner authority | Collector invokes read-only IAM/STS APIs; approved credentials/configuration supplied externally | Least privilege and identity trust must be reviewed in the target account; code does not constrain stolen credentials independently |
+| Unsafe suggested fix | Rule-based templates are printed, not applied; generation timestamps can vary | Syntax/help wording is not a validated deployment; workload/resource/condition review remains external |
+| Artifact tampering or disclosure | Source/input/rule hashes and schema-valid exports; operator-controlled CI storage | Hashes are not signed, an attacker can rewrite reports, and policy/ARN data may be sensitive |
+| Dependency/workflow substitution | Audits, direct tool snapshot, pinned checked-in Actions and least-required workflow permissions | Audit databases/pins are partial controls, not cryptographic build or vulnerability-free guarantees |
 
-## 2. Assets
+## Separate trust examples
 
-| Asset | Sensitivity | Location |
-|-------|------------|----------|
-| IAM policy documents | Medium — may reveal resource ARN patterns | Input file / in-memory only |
-| AWS account ID | Low — exposed in role ARNs in live scan output | Scan report JSON |
-| IAM role and user names | Low | Scan report JSON |
-| AWS credentials (live mode) | Critical | Operator environment — **not stored by the tool** |
-| SARIF output file | Low | Written to disk only if `--output` flag used |
+The Terraform module implements **account-principal `sts:AssumeRole` plus ExternalId**, not a GitHub OIDC provider. OIDC federation requires its own approved provider/audience/subject trust and uses `AssumeRoleWithWebIdentity`, whose API has no ExternalId parameter. The delegated-credentials example is mocked and includes a client-side ExternalId comparison; its tests do not establish real STS condition enforcement. Do not deploy that teaching helper's generated trust policy unchanged. See [AWS architecture](docs/aws-architecture.md) and [the demo boundary](examples/delegated_credentials/README.md).
 
----
+## Required further evidence
 
-## 3. Threat Analysis (STRIDE)
-
-### S — Spoofing
-
-| Threat | Mitigated? | Notes |
-|--------|-----------|-------|
-| Attacker supplies a crafted policy JSON that causes the tool to misreport severity | Partially | JSON parsing uses stdlib `json.loads`; no eval or exec paths. Malformed JSON raises `json.JSONDecodeError` and the tool exits 2. |
-| Attacker replaces the policy file between tool invocation and read | Accepted risk | TOCTOU on file read. Operator must ensure the file is the one they intend to scan. |
-
-### T — Tampering
-
-| Threat | Mitigated? | Notes |
-|--------|-----------|-------|
-| Attacker modifies SARIF output after generation | Accepted risk | Output is written once; integrity is the responsibility of the CI pipeline (artifact checksums). |
-| Supply-chain compromise of GitHub Actions | Mitigated | All actions pinned to commit SHAs. |
-| Dependency substitution attack | Mitigated | `pip-audit` runs in CI. No runtime deps in static mode. |
-
-### R — Repudiation
-
-| Threat | Mitigated? | Notes |
-|--------|-----------|-------|
-| Operator denies that a policy was scanned | Accepted risk | Tool does not maintain its own audit log. CI artifacts serve as evidence. |
-
-### I — Information Disclosure
-
-| Threat | Mitigated? | Notes |
-|--------|-----------|-------|
-| Scan report leaks sensitive resource ARNs | Mitigated | ARNs from live mode are included in findings for remediation context, not exfiltrated. Operator controls where reports are stored. |
-| AWS credentials in tool output | Mitigated | Tool never logs or outputs credentials. Boto3 credential chain sources are not echoed. |
-
-### D — Denial of Service
-
-| Threat | Mitigated? | Notes |
-|--------|-----------|-------|
-| Very large policy document exhausts memory | Partially | No explicit file-size limit. AWS IAM documents are subject to service quotas, but those limits vary by policy type; local files should still be treated as untrusted input. |
-| Live scan enumerates excessive roles | Mitigated | `max_roles=500` safety cap in `LiveAccountScanner`. |
-| AWS API throttling during live scan | Handled | Retry behavior depends on the configured Botocore retry mode. `ClientError` exceptions are caught and logged; operators should configure retry policy and account for incomplete scans. |
-
-### E — Elevation of Privilege
-
-| Threat | Mitigated? | Notes |
-|--------|-----------|-------|
-| Live scanner mutates IAM resources | Mitigated | No write IAM APIs are called. Minimum required permissions are all read-only (`iam:List*`, `iam:Get*`, `sts:GetCallerIdentity`). |
-| Scanner identity used for privilege escalation | Mitigated | The recommended scanner IAM policy (in README) contains no privilege-escalation actions. |
-
----
-
-## 4. Security Assumptions
-
-1. The operator running the tool controls the input file path.
-2. In live mode, the operator has consciously configured AWS credentials with the read-only policy documented in the README.
-3. CI artifacts (SARIF output) are stored with appropriate access controls by the pipeline.
-4. The Python interpreter and OS running the tool are not compromised.
-
----
-
-## 5. Out-of-Scope Threats
-
-- Physical access to the machine running the tool
-- Compromise of the AWS account itself (that is what this tool helps detect, not prevent)
-- Side-channel attacks on the analysis algorithm
-- Bypass of IAM authorization for the scanner identity by a privileged attacker in the account
-
----
-
-## 6. Residual Risks
-
-| Risk | Likelihood | Impact | Accepted / Mitigate |
-|------|-----------|--------|-------------------|
-| False negatives (undetected over-privileged policies) | Medium | High | **Accepted** — tool is a best-effort linter, not a complete IAM semantics engine. Use IAM Access Analyzer for complete analysis. |
-| SARIF output not reviewed | Medium | Medium | **Accepted** — operator responsibility. |
-| Live scan credentials leaked through process listing | Low | High | **Accepted** — standard credential hygiene. |
+Full effective-IAM evaluation, representative accuracy studies, live account completeness, authenticated public hosting, external security/privacy/operational approval, complete supply-chain/build provenance and environment-specific recovery remain absent or unverified. No independent source-scoped test result is inherited by a later commit; use [EVIDENCE.md](docs/EVIDENCE.md). The trusted operator controls retention, permissions and dissemination of inputs/reports. This document assigns no universal likelihood score or accepted organizational risk on someone else's behalf.

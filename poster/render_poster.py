@@ -269,17 +269,17 @@ doc = (
     + css
     + '</style></head><body><div class="poster">'
 )
-doc += f'<section class="hero"><div><div class="kicker">Security Engineering Research Poster</div><h1 class="{title_class(title)}">{esc(title)}</h1><div class="subtitle">{esc(subtitle)}</div><div class="repo">{esc(repository)}</div></div><div class="hero-side"><div class="label">Evidence posture</div><div class="value">Verified, scoped, reproducible</div><div class="note">Claims are constrained to the repository evidence snapshot and stated limitations.</div></div></section>'
+doc += f'<section class="hero"><div><div class="kicker">Security Engineering Research Poster</div><h1 class="{title_class(title)}">{esc(title)}</h1><div class="subtitle">{esc(subtitle)}</div><div class="repo">{esc(repository)}</div></div><div class="hero-side"><div class="label">Evidence posture</div><div class="value">Historical source snapshot</div><div class="note">October 14, 2026 code/run only; later studio/documentation-head evidence is separate.</div></div></section>'
 doc += '<section class="metrics">' + metric_cards + "</section>"
 doc += (
-    '<section class="arch"><div class="section-kicker">System view</div><h2>Architecture and Threat-Control Flow</h2><div class="arch-grid"><div class="boundary"><div class="boundary-title">Trust Boundary</div><div class="boundary-lanes"><div class="lane"><strong>Input surface</strong><p>Data, models, requests, policies, or artifacts entering the tested path.</p></div><div class="lane"><strong>Control surface</strong><p>Repository-specific validation, analysis, and fail-closed checks.</p></div><div class="lane"><strong>Evidence surface</strong><p>Findings, metrics, tests, logs, or reproducible artifacts.</p></div></div><div class="boundary-note">This diagram describes the tested repository path, not a universal deployment guarantee.</div></div><div class="flow">'
+    '<section class="arch"><div class="section-kicker">System view</div><h2>Architecture and Threat-Control Flow</h2><div class="arch-grid"><div class="boundary"><div class="boundary-title">Trust Boundary</div><div class="boundary-lanes"><div class="lane"><strong>Input surface</strong><p>Supplied IAM identity/trust JSON or explicitly collected role/policy context.</p></div><div class="lane"><strong>Control surface</strong><p>Deterministic IAM patterns; collection errors/completeness remain explicit.</p></div><div class="lane"><strong>Evidence surface</strong><p>Source-scoped findings and reports; no effective-permission proof.</p></div></div><div class="boundary-note">This diagram describes the tested repository path, not a universal deployment guarantee.</div></div><div class="flow">'
     + flow_nodes
     + "</div></div></section>"
 )
 doc += (
     '<section class="middle"><div><div class="panel contrib"><h2>Research Contribution</h2><p>'
     + esc(contribution or "Repository contribution documented in the research brief.")
-    + '</p></div><div class="panel evidence-panel"><h2>Verified Evidence</h2><div class="evidence-grid">'
+    + '</p></div><div class="panel evidence-panel"><h2>Evidence for cited source</h2><div class="evidence-grid">'
     + evidence_chips
     + '</div></div></div><div class="panel method-panel"><h2>Method and Control Path</h2>'
     + method_rows
