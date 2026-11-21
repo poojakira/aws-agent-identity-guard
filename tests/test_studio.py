@@ -190,7 +190,8 @@ def test_sarif_export_matches_official_schema_and_statement_line_evidence():
     )
 
 
-def test_http_boundaries_actual_engine_error_recovery_and_rate(monkeypatch):
+@pytest.mark.parametrize("failure", [RuntimeError, ValueError, TypeError])
+def test_http_boundaries_actual_engine_error_recovery_and_rate(monkeypatch, failure):
     server = web.create_server(0)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -222,7 +223,7 @@ def test_http_boundaries_actual_engine_error_recovery_and_rate(monkeypatch):
         original = web.review_change
 
         def crash(_payload):
-            raise RuntimeError("synthetic sensitive exception text")
+            raise failure("synthetic sensitive exception text")
 
         monkeypatch.setattr(web, "review_change", crash)
         status, response = post()

@@ -105,7 +105,9 @@ class Document:
             value, end = self.parse(self.skip(0), (), 0)
             if self.skip(end) != len(raw):
                 raise InputError("Trailing content after policy JSON")
-        except (json.JSONDecodeError, RecursionError, OverflowError) as exc:
+        except InputError:
+            raise
+        except (ValueError, RecursionError, OverflowError) as exc:
             raise InputError("Malformed or excessively nested policy JSON") from exc
         if not isinstance(value, dict):
             raise InputError("Policy JSON must be an object")

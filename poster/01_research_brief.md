@@ -1,4 +1,4 @@
-> **Historical poster: October 14, 2026 source snapshot.** Values below attest only to their cited code/run, not to the later studio or documentation head. See [source-scoped evidence](../docs/EVIDENCE.md).
+> **Historical research poster, October 14, 2026 UTC.** Its measurements apply to source `718582f5fd8419b0b8c2ca21361f7b0c715cb54b` and the [associated GitHub Actions run](https://github.com/poojakira/aws-agent-identity-guard/actions/runs/38497940763). See the [later candidate manifest](https://raw.githubusercontent.com/poojakira/aws-agent-identity-guard/a396433a4070a0ddc68aa83f9b1093e87fc3224f/release-evidence/manifest.json) for separately scoped local verification.
 
 # Research Brief - Poster 02
 

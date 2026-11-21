@@ -122,12 +122,19 @@ class Handler(BaseHTTPRequestHandler):
             payload = json.loads(body, object_pairs_hook=unique_pairs)
             if not isinstance(payload, dict):
                 raise InputError("Request must be a JSON object")
-            report = review_change(payload)
         except InputError as exc:
             self.respond(400, {"error": str(exc)})
             return
-        except (ValueError, TypeError, RecursionError, UnicodeError):
+        except (ValueError, TypeError, RecursionError):
             self.respond(400, {"error": "Invalid request JSON or unsupported policy structure"})
+            return
+        except TimeoutError:
+            self.respond(408, {"error": "Request body timed out"})
+            return
+        try:
+            report = review_change(payload)
+        except InputError as exc:
+            self.respond(400, {"error": str(exc)})
             return
         except Exception:
             self.respond(500, {"error": "Static engine failed; no successful analysis established"})

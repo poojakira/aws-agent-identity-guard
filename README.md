@@ -54,11 +54,11 @@ Deny statements and conditions are visible context; the scanner does not evaluat
 
 Each studio document is limited to 32,768 UTF-8 bytes, depth 16 and 32 statements; action/resource/principal lists have at most 64 values. The backend retains no policy database. Inputs exist in browser/backend memory; explicit exports persist on the operator's disk. The trusted host/operator remain part of the boundary.
 
-## Current verification and source
+## Verification and release scope
 
-Read the [generated assessment and exact commands](https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/selected-branches-20261118/release-evidence/RELEASE_ASSESSMENT.md) and [source manifest](https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/selected-branches-20261118/release-evidence/manifest.json). The manifest records the checked-out SHA, clean state, actual regression/browser outcomes, skips, dependency scope and artifact hashes. Compare its `source_commit` with the checkout you are using. A passing earlier commit does not attest to a later commit.
+**LOCAL ONLY, historical snapshot.** The archived suite at `abe1c0a1e5953b18eae762a5c41f400ff677adb2` recorded 272 passed, 0 failed, 3 skipped, 77.15% statement coverage. The archive was generated on November 19, 2026 UTC and lists the exact commands, tooling, test window, skips and artifact hashes. Use its source SHA when citing the results. [Manifest](https://raw.githubusercontent.com/poojakira/aws-agent-identity-guard/a396433a4070a0ddc68aa83f9b1093e87fc3224f/release-evidence/manifest.json) · [Assessment](https://github.com/poojakira/aws-agent-identity-guard/blob/a396433a4070a0ddc68aa83f9b1093e87fc3224f/release-evidence/RELEASE_ASSESSMENT.md)
 
-The previous published documentation candidate was `4411c0792b0279c3bbd60e4af84210b3a551540a`; its [immutable evidence](https://github.com/poojakira/aws-agent-identity-guard/tree/evidence/docs-reconciliation-20261118/release-evidence) remains historical. The newer architecture/notebook changes require their own generated evidence. [PR #75](https://github.com/poojakira/aws-agent-identity-guard/pull/75) records the current source, publication and remaining blockers. **Release remains PARTIAL.**
+The studio evaluates supplied JSON and context offline. Complete AWS authorization depends on policy intersections and request context, including organization policies, session policies, resource policies and permission boundaries. [Draft review](https://github.com/poojakira/aws-agent-identity-guard/pull/75)
 
 ## Develop and verify
 
