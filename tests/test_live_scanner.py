@@ -319,3 +319,27 @@ def test_live_scan_marks_report_incomplete_on_aws_collection_error(monkeypatch):
     assert report.scan_complete is False
     assert report.errors
     assert "collection error" in (report.completeness_reason or "")
+
+
+@mock_aws
+def test_scan_role_by_name_rejects_incomplete_policy_collection(monkeypatch):
+    from botocore.exceptions import ClientError
+
+    session = _session()
+    session.client("iam").create_role(
+        RoleName="target", AssumeRolePolicyDocument=_trust({"Service": "lambda.amazonaws.com"})
+    )
+    scanner = LiveAccountScanner(session=session)
+    get_paginator = scanner._iam.get_paginator
+
+    def fail_once(name):
+        if name == "list_role_policies":
+            raise ClientError({"Error": {"Code": "AccessDenied", "Message": "denied"}}, name)
+        return get_paginator(name)
+
+    monkeypatch.setattr(scanner._iam, "get_paginator", fail_once)
+    with pytest.raises(RuntimeError, match="Role scan incomplete"):
+        scanner.scan_role_by_name("target")
+
+    monkeypatch.setattr(scanner._iam, "get_paginator", get_paginator)
+    assert {item["rule_id"] for item in scanner.scan_role_by_name("target")} == {"AIG-TP003"}

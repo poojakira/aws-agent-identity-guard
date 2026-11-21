@@ -560,7 +560,14 @@ class LiveAccountScanner:
         -------
         list[dict]
             Findings for this role only.
+
+        Raises
+        ------
+        RuntimeError
+            If AWS denied or failed to return any of the requested policies.
+            Successful collection still only supports static rule evaluation.
         """
+        self._collection_errors = []
         try:
             resp = self._iam.get_role(RoleName=role_name)
         except botocore.exceptions.ClientError as exc:
@@ -577,4 +584,9 @@ class LiveAccountScanner:
                 role_data.get("PermissionsBoundary", {}).get("PermissionsBoundaryArn")
             ),
         )
+        if self._collection_errors:
+            raise RuntimeError(
+                f"Role scan incomplete: {len(self._collection_errors)} AWS policy collection "
+                "error(s). Review IAM read access and retry."
+            )
         return self._scan_role(role)
